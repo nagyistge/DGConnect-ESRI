@@ -1,0 +1,51 @@
+﻿<ESRI.Configuration xmlns="http://schemas.esri.com/Desktop/AddIns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <Name>Dgx</Name>
+  <AddInID>{47f66660-0e07-4a42-9717-c3bc379a2776}</AddInID>
+  <Description>Information and GBDX Platform is a DigitalGlobe product enabling social media, text, vector and raster search and analytics capabilities.</Description>
+  <Version>1.2</Version>
+  <Image>Images\Atlas_Icon.ico</Image>
+  <Author>DigitalGlobe Inc.</Author>
+  <Company>DigitalGlobe Inc.</Company>
+  <Date>11/13/2015</Date>
+  <Targets>
+    <Target name="Desktop" version="10.2" />
+  </Targets>
+  <AddIn language="CLR" library="Dgx.dll" namespace="Dgx">
+    <ArcMap>
+      <Commands>
+        <Tool id="DigitalGlobe_Inc_sma_rssPolygon" class="RssPolygon" message="Identify region for search by drawing a rectangular area. Hold the shift key down for Circular area of interest" caption="Text Search" tip="Text Search" category="Add-In Controls" image="Images\rssPolygon.png" />
+        <Button id="DigitalGlobe_Inc_sma_smaConfig" class="SmaConfig" message="Various user settings and advanced configurations available for the platform" caption="Information and GBDX Platform Settings" tip="Information and GBDX Platform Settings" category="Add-In Controls" image="Images\smaConfig.png" />
+        <Tool id="DigitalGlobe_Inc_sma_VectorIndex" class="Dgx.Vector_Index.VectorIndex" message="On the dockable window enter search terms and select area" caption="Unified Commercial Vector Search" tip="Unified Commercial Vector Search" category="Add-In Controls" image="Images\VectorIndex.png" />
+        <Button id="DigitalGlobe_Inc_Dgx_DgxAboutButton" class="Dgx.DgxAboutButton" message="A DigitalGlobe Inc. platform providing social media, text, vector and raster search and analytics capabilities" caption="About Information and GBDX Platform" tip="About Information and GBDX Platform" category="Add-In Controls" image="Images\DgxAboutButton.png" />
+        <Button id="DigitalGlobe_Inc_Dgx_VectorIndexButton" class="Dgx.Vector_Index.ESRI_Tools.VectorIndexButton" message="On the dockable window enter search terms and select area" caption="Unified Commercial Vector Search" tip="Unified Commercial Vector Search" category="Vector Index" image="Images\VectorIndexButton.png" />
+        <Tool id="DigitalGlobe_Inc_Dgx_Selector" class="Dgx.Gbd.Selector" message="Searchs the selected area for images contained within GBD" caption="Select area for GBD Image Search" tip="Select area for GBD image search." category="Add-In Controls" image="Images\Selector.png" />
+        <Button id="DigitalGlobe_Inc_Dgx_GbdButton" class="Dgx.Gbd.GbdButton" message="Click to draw an AOI and see what GBD data is available." caption="Click to draw an AOI and see what GBD data is available." tip="GBD Data Viewer" category="Add-In Controls" image="Images\GbdButton.png" />
+        <Button id="DigitalGlobe_Inc_Dgx_AggregationButton" class="Dgx.Aggregations.AggregationButton" message="Tool used for doing aggregations on GBDX data." caption="Aggregation" tip="Aggregation" category="Add-In Controls" image="Images\AggregationButton.png" />
+        <Tool id="DigitalGlobe_Inc_Dgx_AggregationSelector" class="Dgx.Aggregations.AggregationSelector" message="When used will select the AOI that will be used by the Aggregation query service" caption="Select AOI for aggregation service" tip="Selects the AOI for the Aggregation service" category="Add-In Controls" image="Images\AggregationSelector.png" />
+      </Commands>
+      <Toolbars>
+        <Toolbar id="DigitalGlobe_Inc_sma_Social_Media_Analytics" caption="GBDX Toolbar" showInitially="true">
+          <Items>
+            <Tool refID="DigitalGlobe_Inc_sma_rssPolygon" />
+            <Button refID="DigitalGlobe_Inc_Dgx_VectorIndexButton" />
+            <Button refID="DigitalGlobe_Inc_Dgx_GbdButton" />
+            <Button refID="DigitalGlobe_Inc_Dgx_AggregationButton" />
+            <Button refID="DigitalGlobe_Inc_sma_smaConfig" separator="true" />
+            <Button refID="DigitalGlobe_Inc_Dgx_DgxAboutButton" />
+          </Items>
+        </Toolbar>
+      </Toolbars>
+      <DockableWindows>
+        <DockableWindow id="DigitalGlobe_Inc_Dgx_VectorIndexDockable" class="Dgx.Vector_Index.Forms.VectorIndexDockable+AddinImpl" caption="Unified Search" image="Images\VectorIndexDockable.png">
+          <InitialPlacement height="300" width="300" state="pinned" position="left" />
+        </DockableWindow>
+        <DockableWindow id="DigitalGlobe_Inc_Dgx_GbdDockableWindow" class="Dgx.Gbd.GbdDockableWindow+AddinImpl" caption="GBD Dockable Window" image="Images\GbdDockableWindow.png">
+          <InitialPlacement height="841" width="749" state="pinned" position="right" />
+        </DockableWindow>
+        <DockableWindow id="DigitalGlobe_Inc_Dgx_AggregationWindow" class="Dgx.Aggregations.AggregationWindow+AddinImpl" caption="Aggregations" image="Images\AggregationWindow.png">
+          <InitialPlacement height="264" width="267" state="unpinned" position="left" />
+        </DockableWindow>
+      </DockableWindows>
+    </ArcMap>
+  </AddIn>
+</ESRI.Configuration>

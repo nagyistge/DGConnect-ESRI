@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="Unit Test Projects\InsightCloud Unit Testing" Label="InsightCloud Unit Testing" Category="Project" />
+    <Node Id="RhinoMocks 3.6.1" Label="RhinoMocks 3.6.1" Category="Package" />
+    <Node Id="Unit Test Projects\STPTests" Label="STPTests" Category="Project" />
+    <Node Id="NUnit 2.6.4" Label="NUnit 2.6.4" Category="Package" />
+    <Node Id="SmartThreadPool" Label="SmartThreadPool" Category="Project" />
+    <Node Id="NUnit 2.6.4" Label="NUnit 2.6.4" Category="Package" />
+    <Node Id="Raster" Label="Raster" Category="Project" />
+    <Node Id="Newtonsoft.Json 6.0.8" Label="Newtonsoft.Json 6.0.8" Category="Package" />
+    <Node Id="InsightCloud" Label="InsightCloud" Category="Project" />
+    <Node Id="Newtonsoft.Json 6.0.8" Label="Newtonsoft.Json 6.0.8" Category="Package" />
+    <Node Id="RhinoMocks 3.6.1" Label="RhinoMocks 3.6.1" Category="Package" />
+    <Node Id="Encryption" Label="Encryption" Category="Project" />
+    <Node Id="Newtonsoft.Json 6.0.8" Label="Newtonsoft.Json 6.0.8" Category="Package" />
+    <Node Id="RhinoMocks 3.6.1" Label="RhinoMocks 3.6.1" Category="Package" />
+    <Node Id="NetworkConnections" Label="NetworkConnections" Category="Project" />
+    <Node Id="Newtonsoft.Json 6.0.8" Label="Newtonsoft.Json 6.0.8" Category="Package" />
+    <Node Id="RhinoMocks 3.6.1" Label="RhinoMocks 3.6.1" Category="Package" />
+  </Nodes>
+  <Links>
+    <Link Source="Unit Test Projects\InsightCloud Unit Testing" Target="RhinoMocks 3.6.1" Category="Installed Package" />
+    <Link Source="Unit Test Projects\STPTests" Target="NUnit 2.6.4" Category="Installed Package" />
+    <Link Source="SmartThreadPool" Target="NUnit 2.6.4" Category="Installed Package" />
+    <Link Source="Raster" Target="Newtonsoft.Json 6.0.8" Category="Installed Package" />
+    <Link Source="InsightCloud" Target="Newtonsoft.Json 6.0.8" Category="Installed Package" />
+    <Link Source="InsightCloud" Target="RhinoMocks 3.6.1" Category="Installed Package" />
+    <Link Source="Encryption" Target="Newtonsoft.Json 6.0.8" Category="Installed Package" />
+    <Link Source="Encryption" Target="RhinoMocks 3.6.1" Category="Installed Package" />
+    <Link Source="NetworkConnections" Target="Newtonsoft.Json 6.0.8" Category="Installed Package" />
+    <Link Source="NetworkConnections" Target="RhinoMocks 3.6.1" Category="Installed Package" />
+  </Links>
+  <Categories>
+    <Category Id="Project" />
+    <Category Id="Package" />
+  </Categories>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Project" ValueLabel="True">
+      <Condition Expression="HasCategory('Project')" />
+      <Setter Property="Background" Value="Blue" />
+    </Style>
+  </Styles>
+</DirectedGraph>
