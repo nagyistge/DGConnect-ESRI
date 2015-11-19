@@ -363,15 +363,16 @@ namespace Dgx.Gbd
             this.allResults.Clear();
             this.ClearPolygons();
 
+            // Check the domain to see which label should be on the export button
             if (
                 DGXSettings.Properties.Settings.Default.baseUrl.Equals(
                     DGXSettings.Properties.Settings.Default.DefaultBaseUrl))
             {
-                exportButton.Text = "Export";
+                this.exportButton.Text = "Export";
             }
             else
             {
-                exportButton.Text = "Order";
+                this.exportButton.Text = "Order";
             }
         }
 

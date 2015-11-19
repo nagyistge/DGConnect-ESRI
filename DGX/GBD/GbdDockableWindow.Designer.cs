@@ -52,11 +52,16 @@
             this.selectButton = new System.Windows.Forms.Button();
             this.selectedItemsLabel = new System.Windows.Forms.Label();
             this.totalItemsLabel = new System.Windows.Forms.Label();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.tabPage2 = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumbnailPictureBox)).BeginInit();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -107,7 +112,7 @@
             "1.1",
             "1.2",
             "1.3 (Lowest Resolution)"});
-            this.panResolutionComboBox.Location = new System.Drawing.Point(139, 192);
+            this.panResolutionComboBox.Location = new System.Drawing.Point(139, 193);
             this.panResolutionComboBox.Name = "panResolutionComboBox";
             this.panResolutionComboBox.Size = new System.Drawing.Size(129, 24);
             this.panResolutionComboBox.TabIndex = 10;
@@ -339,14 +344,14 @@
             this.tableLayoutPanel3.Controls.Add(this.selectButton, 0, 3);
             this.tableLayoutPanel3.Controls.Add(this.selectedItemsLabel, 0, 2);
             this.tableLayoutPanel3.Controls.Add(this.totalItemsLabel, 1, 2);
-            this.tableLayoutPanel3.Location = new System.Drawing.Point(3, 3);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(6, 6);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 4;
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 377F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 41F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(835, 809);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(591, 1586);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // dataGridView1
@@ -364,7 +369,7 @@
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.ShowEditingIcon = false;
-            this.dataGridView1.Size = new System.Drawing.Size(829, 349);
+            this.dataGridView1.Size = new System.Drawing.Size(622, 1126);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView1CellMouseEnter);
             // 
@@ -375,14 +380,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.thumbnailPictureBox.Location = new System.Drawing.Point(287, 3);
             this.thumbnailPictureBox.Name = "thumbnailPictureBox";
-            this.thumbnailPictureBox.Size = new System.Drawing.Size(545, 371);
+            this.thumbnailPictureBox.Size = new System.Drawing.Size(338, 371);
             this.thumbnailPictureBox.TabIndex = 2;
             this.thumbnailPictureBox.TabStop = false;
             // 
             // exportButton
             // 
             this.exportButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.exportButton.Location = new System.Drawing.Point(733, 776);
+            this.exportButton.Location = new System.Drawing.Point(526, 1553);
             this.exportButton.Name = "exportButton";
             this.exportButton.Size = new System.Drawing.Size(99, 25);
             this.exportButton.TabIndex = 3;
@@ -393,7 +398,7 @@
             // selectButton
             // 
             this.selectButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.selectButton.Location = new System.Drawing.Point(3, 776);
+            this.selectButton.Location = new System.Drawing.Point(3, 1553);
             this.selectButton.Name = "selectButton";
             this.selectButton.Size = new System.Drawing.Size(94, 24);
             this.selectButton.TabIndex = 4;
@@ -405,7 +410,7 @@
             // 
             this.selectedItemsLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.selectedItemsLabel.AutoSize = true;
-            this.selectedItemsLabel.Location = new System.Drawing.Point(3, 741);
+            this.selectedItemsLabel.Location = new System.Drawing.Point(3, 1518);
             this.selectedItemsLabel.Name = "selectedItemsLabel";
             this.selectedItemsLabel.Size = new System.Drawing.Size(108, 17);
             this.selectedItemsLabel.TabIndex = 5;
@@ -415,17 +420,51 @@
             // 
             this.totalItemsLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.totalItemsLabel.AutoSize = true;
-            this.totalItemsLabel.Location = new System.Drawing.Point(287, 741);
+            this.totalItemsLabel.Location = new System.Drawing.Point(287, 1518);
             this.totalItemsLabel.Name = "totalItemsLabel";
             this.totalItemsLabel.Size = new System.Drawing.Size(85, 17);
             this.totalItemsLabel.TabIndex = 6;
             this.totalItemsLabel.Text = "Total Items: ";
             // 
+            // tabControl1
+            // 
+            this.tabControl1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Location = new System.Drawing.Point(3, 3);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(585, 869);
+            this.tabControl1.TabIndex = 2;
+            // 
+            // tabPage1
+            // 
+            this.tabPage1.Controls.Add(this.tableLayoutPanel3);
+            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(577, 840);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Search/Order";
+            this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // tabPage2
+            // 
+            this.tabPage2.Location = new System.Drawing.Point(4, 25);
+            this.tabPage2.Name = "tabPage2";
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage2.Size = new System.Drawing.Size(571, 840);
+            this.tabPage2.TabIndex = 1;
+            this.tabPage2.Text = "Order Status";
+            this.tabPage2.UseVisualStyleBackColor = true;
+            // 
             // GbdDockableWindow
             // 
-            this.Controls.Add(this.tableLayoutPanel3);
+            this.Controls.Add(this.tabControl1);
             this.Name = "GbdDockableWindow";
-            this.Size = new System.Drawing.Size(841, 826);
+            this.Size = new System.Drawing.Size(591, 875);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -434,6 +473,8 @@
             this.tableLayoutPanel3.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumbnailPictureBox)).EndInit();
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -464,6 +505,9 @@
         private System.Windows.Forms.Button selectButton;
         private System.Windows.Forms.Label selectedItemsLabel;
         private System.Windows.Forms.Label totalItemsLabel;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage tabPage2;
 
     }
 }
