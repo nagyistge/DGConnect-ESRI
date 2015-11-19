@@ -239,6 +239,16 @@ namespace Dgx.Gbd
                 this.logWriter.Error(error);
             }
 
+            if (
+                DGXSettings.Properties.Settings.Default.baseUrl.Equals(
+                    DGXSettings.Properties.Settings.Default.DefaultBaseUrl))
+            {
+                exportButton.Text = "Export";
+            }
+            else
+            {
+                exportButton.Text = "Order";
+            }
 
             this.dataView.RowFilter = this.FilterSetup();
         }
@@ -352,6 +362,17 @@ namespace Dgx.Gbd
             this.localDatatable.Clear();
             this.allResults.Clear();
             this.ClearPolygons();
+
+            if (
+                DGXSettings.Properties.Settings.Default.baseUrl.Equals(
+                    DGXSettings.Properties.Settings.Default.DefaultBaseUrl))
+            {
+                exportButton.Text = "Export";
+            }
+            else
+            {
+                exportButton.Text = "Order";
+            }
         }
 
         #region Filtering
@@ -822,6 +843,111 @@ namespace Dgx.Gbd
         /// <param name="e">event arguments</param>
         private void ExportButtonClick(object sender, EventArgs e)
         {
+            if(DGXSettings.Properties.Settings.Default.baseUrl.Equals(DGXSettings.Properties.Settings.Default.DefaultBaseUrl))
+            {
+                this.ExportSelectionToFile();
+            }
+            else
+            {
+                this.OrderImagery();
+            }
+        }
+
+        /// <summary>
+        /// The create net object.
+        /// </summary>
+        /// <param name="success">
+        /// The success.
+        /// </param>
+        /// <returns>
+        /// The <see cref="NetObject"/>.
+        /// </returns>
+        private static NetObject CreateNetObject(ref bool success)
+        {
+            string decryptedPassword;
+            success = Aes.Instance.Decrypt128(
+                DGXSettings.Properties.Settings.Default.password,
+                out decryptedPassword);
+            if (!success)
+            {
+                return null;
+            }
+
+            // Creating network object.
+            NetObject netObj = new NetObject
+            {
+                AddressUrl =
+                    DGXSettings.Properties.Settings.Default.GbdSearchPath,
+                BaseUrl =
+                    DgxHelper.GetEndpointBase(
+                        DGXSettings.Properties.Settings.Default),
+                AuthEndpoint =
+                    DGXSettings.Properties.Settings.Default
+                    .authenticationServer,
+                User = DGXSettings.Properties.Settings.Default.username,
+                Password = decryptedPassword,
+            };
+
+            return netObj;
+        }
+
+        /// <summary>
+        /// Order the selected imagery.  
+        /// </summary>
+        private void OrderImagery()
+        {
+            try
+            {
+                var catIdList = new List<string>();
+                foreach (DataGridViewRow item in this.dataGridView1.Rows)
+                {
+                    var addRow = false;
+                    for (int i = 0; i <= item.Cells.Count - 1; i++)
+                    {
+                        // Don't record the value of if the polygon is being displayed or a null value.
+                        if (item.Cells[i].Value == null || item.Cells[i].OwningColumn.Name == "showPolygon")
+                        {
+                            continue;
+                        }
+
+                        if (addRow != true && item.Cells[i].OwningColumn.Name == "Selected")
+                        {
+                            addRow = (bool)item.Cells[i].Value;
+                            continue;
+                        }
+
+                        if (addRow && item.Cells[i].OwningColumn.Name == "Catalog ID")
+                        {
+                            catIdList.Add((string)item.Cells[i].Value);
+                        }
+                    }
+                }
+
+                var output = JsonConvert.SerializeObject(catIdList);
+
+                bool success = false;
+                var netObj = CreateNetObject(ref success);
+                netObj.AddressUrl = "/raster-catalog/api/gbd/orders/v1";
+                if (!success)
+                {
+                    MessageBox.Show(DgxResources.InvalidUserPass);
+                    return;
+                }
+
+                var result = this.comms.Post<GbdOrder>(netObj, output);
+
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
+        }
+
+        /// <summary>
+        /// The export selection to file for the user to order imagery.
+        /// </summary>
+        private void ExportSelectionToFile()
+        {
             try
             {
                 // Set up the save file dialog
@@ -878,7 +1004,7 @@ namespace Dgx.Gbd
                             writeRow = (bool)item.Cells[i].Value;
                             continue;
                         }
-                            
+
                         if (rowToBeWritten == string.Empty)
                         {
                             rowToBeWritten += item.Cells[i].Value.ToString();
@@ -890,7 +1016,7 @@ namespace Dgx.Gbd
                     }
 
                     // Write the comma delimited line to file
-                    if(writeRow)
+                    if (writeRow)
                     {
                         fileWriter.WriteLine(rowToBeWritten);
                     }
@@ -1306,7 +1432,7 @@ namespace Dgx.Gbd
         }
 
         #endregion
-
+        
         #region Drawing Methods
 
         /// <summary>

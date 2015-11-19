@@ -60,9 +60,12 @@
     <Compile Include="Gbd.Catalog.Response\Stats.cs" />
     <Compile Include="Gbd.Catalog.Response\TypeCounts.cs" />
     <Compile Include="GbdJarvis.cs" />
+    <Compile Include="GbdOrder.cs" />
     <Compile Include="GbdPoint.cs" />
     <Compile Include="GbdPolygon.cs" />
     <Compile Include="GbdSearchObject.cs" />
+    <Compile Include="Header.cs" />
+    <Compile Include="Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
