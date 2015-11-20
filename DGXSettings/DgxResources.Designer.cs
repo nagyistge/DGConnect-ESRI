@@ -300,6 +300,15 @@ namespace DGXSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to [{&quot;outEdges&quot;:{},&quot;inEdges&quot;:{},&quot;salesOrderNumber&quot;:&quot;054844819&quot;,&quot;lines&quot;:[{&quot;outEdges&quot;:{},&quot;inEdges&quot;:{},&quot;salesLineItemNumber&quot;:&quot;010&quot;,&quot;properties&quot;:{},&quot;identifier&quot;:null}],&quot;requestReferenceID&quot;:null,&quot;header&quot;:{&quot;serviceName&quot;:&quot;Ordering Service&quot;,&quot;messageID&quot;:&quot;1448049298666&quot;,&quot;serviceOperation&quot;:&quot;OrderCreate&quot;,&quot;serviceVersion&quot;:1,&quot;serviceProvider&quot;:&quot;DigitalGlobe&quot;,&quot;serviceConsumer&quot;:&quot;GBD&quot;,&quot;messageDateTimeStamp&quot;:1448049298666,&quot;sendRuntime&quot;:&quot;Test&quot;,&quot;classification&quot;:&quot;UNCLASSIFIED&quot;},&quot;properties&quot;:{},&quot;identifier&quot;:null}].
+        /// </summary>
+        public static string testString {
+            get {
+                return ResourceManager.GetString("testString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Total Items: .
         /// </summary>
         public static string totalItems {

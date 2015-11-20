@@ -935,7 +935,12 @@ namespace Dgx.Gbd
                     return;
                 }
 
+
                 var result = this.comms.Post<GbdOrder>(netObj, output);
+
+                var result = JsonConvert.DeserializeObject<GbdOrder[]>(DgxResources.testString);
+
+                Console.WriteLine("testing the data");
 
             }
             catch (Exception error)

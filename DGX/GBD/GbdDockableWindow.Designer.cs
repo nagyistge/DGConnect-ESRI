@@ -55,6 +55,9 @@
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
+            this.orderDataGridView = new System.Windows.Forms.DataGridView();
+            this.refreshButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
@@ -62,6 +65,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.thumbnailPictureBox)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
+            this.tabPage2.SuspendLayout();
+            this.tableLayoutPanel4.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.orderDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -351,7 +357,7 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 41F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(591, 1586);
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(728, 772);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // dataGridView1
@@ -369,7 +375,7 @@
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.ShowEditingIcon = false;
-            this.dataGridView1.Size = new System.Drawing.Size(622, 1126);
+            this.dataGridView1.Size = new System.Drawing.Size(722, 312);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView1CellMouseEnter);
             // 
@@ -380,14 +386,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.thumbnailPictureBox.Location = new System.Drawing.Point(287, 3);
             this.thumbnailPictureBox.Name = "thumbnailPictureBox";
-            this.thumbnailPictureBox.Size = new System.Drawing.Size(338, 371);
+            this.thumbnailPictureBox.Size = new System.Drawing.Size(438, 371);
             this.thumbnailPictureBox.TabIndex = 2;
             this.thumbnailPictureBox.TabStop = false;
             // 
             // exportButton
             // 
             this.exportButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.exportButton.Location = new System.Drawing.Point(526, 1553);
+            this.exportButton.Location = new System.Drawing.Point(626, 739);
             this.exportButton.Name = "exportButton";
             this.exportButton.Size = new System.Drawing.Size(99, 25);
             this.exportButton.TabIndex = 3;
@@ -398,7 +404,7 @@
             // selectButton
             // 
             this.selectButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.selectButton.Location = new System.Drawing.Point(3, 1553);
+            this.selectButton.Location = new System.Drawing.Point(3, 739);
             this.selectButton.Name = "selectButton";
             this.selectButton.Size = new System.Drawing.Size(94, 24);
             this.selectButton.TabIndex = 4;
@@ -410,7 +416,7 @@
             // 
             this.selectedItemsLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.selectedItemsLabel.AutoSize = true;
-            this.selectedItemsLabel.Location = new System.Drawing.Point(3, 1518);
+            this.selectedItemsLabel.Location = new System.Drawing.Point(3, 704);
             this.selectedItemsLabel.Name = "selectedItemsLabel";
             this.selectedItemsLabel.Size = new System.Drawing.Size(108, 17);
             this.selectedItemsLabel.TabIndex = 5;
@@ -420,7 +426,7 @@
             // 
             this.totalItemsLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.totalItemsLabel.AutoSize = true;
-            this.totalItemsLabel.Location = new System.Drawing.Point(287, 1518);
+            this.totalItemsLabel.Location = new System.Drawing.Point(287, 704);
             this.totalItemsLabel.Name = "totalItemsLabel";
             this.totalItemsLabel.Size = new System.Drawing.Size(85, 17);
             this.totalItemsLabel.TabIndex = 6;
@@ -436,7 +442,7 @@
             this.tabControl1.Location = new System.Drawing.Point(3, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(585, 869);
+            this.tabControl1.Size = new System.Drawing.Size(748, 813);
             this.tabControl1.TabIndex = 2;
             // 
             // tabPage1
@@ -445,26 +451,65 @@
             this.tabPage1.Location = new System.Drawing.Point(4, 25);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(577, 840);
+            this.tabPage1.Size = new System.Drawing.Size(740, 784);
             this.tabPage1.TabIndex = 0;
-            this.tabPage1.Text = "Search/Order";
+            this.tabPage1.Text = "Search";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.tableLayoutPanel4);
             this.tabPage2.Location = new System.Drawing.Point(4, 25);
             this.tabPage2.Name = "tabPage2";
             this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(571, 840);
+            this.tabPage2.Size = new System.Drawing.Size(740, 784);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "Order Status";
             this.tabPage2.UseVisualStyleBackColor = true;
+            // 
+            // tableLayoutPanel4
+            // 
+            this.tableLayoutPanel4.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel4.ColumnCount = 2;
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel4.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.tableLayoutPanel4.Controls.Add(this.orderDataGridView, 0, 0);
+            this.tableLayoutPanel4.Controls.Add(this.refreshButton, 1, 1);
+            this.tableLayoutPanel4.Location = new System.Drawing.Point(6, 6);
+            this.tableLayoutPanel4.Name = "tableLayoutPanel4";
+            this.tableLayoutPanel4.RowCount = 2;
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 95.16908F));
+            this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4.830918F));
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(728, 772);
+            this.tableLayoutPanel4.TabIndex = 0;
+            // 
+            // orderDataGridView
+            // 
+            this.orderDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.tableLayoutPanel4.SetColumnSpan(this.orderDataGridView, 2);
+            this.orderDataGridView.Location = new System.Drawing.Point(3, 3);
+            this.orderDataGridView.Name = "orderDataGridView";
+            this.orderDataGridView.RowTemplate.Height = 24;
+            this.orderDataGridView.Size = new System.Drawing.Size(559, 728);
+            this.orderDataGridView.TabIndex = 0;
+            // 
+            // refreshButton
+            // 
+            this.refreshButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.refreshButton.Location = new System.Drawing.Point(650, 741);
+            this.refreshButton.Name = "refreshButton";
+            this.refreshButton.Size = new System.Drawing.Size(75, 23);
+            this.refreshButton.TabIndex = 1;
+            this.refreshButton.Text = "Refresh";
+            this.refreshButton.UseVisualStyleBackColor = true;
             // 
             // GbdDockableWindow
             // 
             this.Controls.Add(this.tabControl1);
             this.Name = "GbdDockableWindow";
-            this.Size = new System.Drawing.Size(591, 875);
+            this.Size = new System.Drawing.Size(774, 819);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.tableLayoutPanel2.ResumeLayout(false);
@@ -475,6 +520,9 @@
             ((System.ComponentModel.ISupportInitialize)(this.thumbnailPictureBox)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
+            this.tabPage2.ResumeLayout(false);
+            this.tableLayoutPanel4.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.orderDataGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -508,6 +556,9 @@
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
+        private System.Windows.Forms.DataGridView orderDataGridView;
+        private System.Windows.Forms.Button refreshButton;
 
     }
 }

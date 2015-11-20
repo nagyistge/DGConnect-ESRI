@@ -203,4 +203,7 @@ Only letters and the '.' are allowed.</value>
   <data name="pleaseChooseDetailsGranularity" xml:space="preserve">
     <value>Please choose detail granularity</value>
   </data>
+  <data name="testString" xml:space="preserve">
+    <value>[{"outEdges":{},"inEdges":{},"salesOrderNumber":"054844819","lines":[{"outEdges":{},"inEdges":{},"salesLineItemNumber":"010","properties":{},"identifier":null}],"requestReferenceID":null,"header":{"serviceName":"Ordering Service","messageID":"1448049298666","serviceOperation":"OrderCreate","serviceVersion":1,"serviceProvider":"DigitalGlobe","serviceConsumer":"GBD","messageDateTimeStamp":1448049298666,"sendRuntime":"Test","classification":"UNCLASSIFIED"},"properties":{},"identifier":null}]</value>
+  </data>
 </root>
