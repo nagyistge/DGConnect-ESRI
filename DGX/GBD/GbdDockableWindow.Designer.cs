@@ -487,12 +487,15 @@
             // 
             // orderDataGridView
             // 
+            this.orderDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.orderDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.tableLayoutPanel4.SetColumnSpan(this.orderDataGridView, 2);
             this.orderDataGridView.Location = new System.Drawing.Point(3, 3);
             this.orderDataGridView.Name = "orderDataGridView";
             this.orderDataGridView.RowTemplate.Height = 24;
-            this.orderDataGridView.Size = new System.Drawing.Size(559, 728);
+            this.orderDataGridView.Size = new System.Drawing.Size(722, 728);
             this.orderDataGridView.TabIndex = 0;
             // 
             // refreshButton
