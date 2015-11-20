@@ -169,6 +169,8 @@ namespace Dgx.Gbd
 
         private Logger logWriter;
 
+        private DataTable orderTable;
+
         #endregion
 
         /// <summary>
@@ -213,7 +215,7 @@ namespace Dgx.Gbd
 
             this.thumbnailPictureBox.LoadCompleted += this.ThumbnailPictureBoxLoadCompleted;
             this.cachedImages = new Dictionary<string, Image>();
-            this.thumbnailPictureBox.InitialImage = new Bitmap(DGXSettings.DgxResources.PleaseStandBy, new Size(309, 376));
+            this.thumbnailPictureBox.InitialImage = new Bitmap(DgxResources.PleaseStandBy, new Size(309, 376));
 
             this.displayAllPolgons = false;
 
@@ -243,14 +245,22 @@ namespace Dgx.Gbd
                 DGXSettings.Properties.Settings.Default.baseUrl.Equals(
                     DGXSettings.Properties.Settings.Default.DefaultBaseUrl))
             {
-                exportButton.Text = "Export";
+                this.exportButton.Text = "Export";
             }
             else
             {
-                exportButton.Text = "Order";
+                this.exportButton.Text = "Order";
             }
 
             this.dataView.RowFilter = this.FilterSetup();
+            this.SetupOrderStatusTable();
+        }
+
+        private void SetupOrderStatusTable()
+        {
+            this.orderTable = this.CreateOrderTable();
+            this.orderDataGridView.DataSource = this.orderTable;
+
         }
 
         void GbdDockableWindow_VisibleChanged(object sender, EventArgs e)
@@ -292,6 +302,22 @@ namespace Dgx.Gbd
             var primary = new DataColumn[1];
             primary[0] = dt.Columns["Catalog ID"];
             dt.PrimaryKey = primary;
+            return dt;
+        }
+
+        /// <summary>
+        /// Create Order Data Table
+        /// </summary>
+        /// <returns>
+        /// The <see cref="DataTable"/>.
+        /// </returns>
+        private DataTable CreateOrderTable()
+        {
+            var dt = new DataTable();
+
+            dt.Columns.Add(new DataColumn("Order ID", typeof(string)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("Order Date", typeof(string)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("Service Provider", typeof(string)) { ReadOnly = true });
             return dt;
         }
 
