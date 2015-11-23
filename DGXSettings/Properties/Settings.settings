@@ -53,5 +53,8 @@
     <Setting Name="GbdSearchPath" Type="System.String" Scope="Application">
       <Value Profile="(Default)">/raster-catalog/api/gbd/catalog/v1/search</Value>
     </Setting>
+    <Setting Name="GbdOrders" Type="System.String" Scope="User">
+      <Value Profile="(Default)">gbdOrders</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -271,6 +271,19 @@ namespace NetworkConnections
         }
 
         /// <summary>
+        /// Not Implemented.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        /// <exception cref="NotImplementedException">
+        /// </exception>
+        public string GetAccessToken()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Will authenticate the NetObject's cookie container.  
         /// This is a useful way to pre-authenticate prior to sending a request.  
         /// Note this is required before a delete request can be sent. 

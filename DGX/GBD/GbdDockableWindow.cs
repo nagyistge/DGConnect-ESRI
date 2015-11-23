@@ -171,6 +171,7 @@ namespace Dgx.Gbd
 
         private DataTable orderTable;
 
+        private List<GbdOrder> gbdOrderList;
         #endregion
 
         /// <summary>
@@ -318,6 +319,10 @@ namespace Dgx.Gbd
             dt.Columns.Add(new DataColumn("Order ID", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Order Date", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Service Provider", typeof(string)) { ReadOnly = true });
+
+            var primary = new DataColumn[1];
+            primary[0] = dt.Columns["Order Id"];
+            dt.PrimaryKey = primary;
             return dt;
         }
 
@@ -881,101 +886,6 @@ namespace Dgx.Gbd
         }
 
         /// <summary>
-        /// The create net object.
-        /// </summary>
-        /// <param name="success">
-        /// The success.
-        /// </param>
-        /// <returns>
-        /// The <see cref="NetObject"/>.
-        /// </returns>
-        private static NetObject CreateNetObject(ref bool success)
-        {
-            string decryptedPassword;
-            success = Aes.Instance.Decrypt128(
-                DGXSettings.Properties.Settings.Default.password,
-                out decryptedPassword);
-            if (!success)
-            {
-                return null;
-            }
-
-            // Creating network object.
-            NetObject netObj = new NetObject
-            {
-                AddressUrl =
-                    DGXSettings.Properties.Settings.Default.GbdSearchPath,
-                BaseUrl =
-                    DgxHelper.GetEndpointBase(
-                        DGXSettings.Properties.Settings.Default),
-                AuthEndpoint =
-                    DGXSettings.Properties.Settings.Default
-                    .authenticationServer,
-                User = DGXSettings.Properties.Settings.Default.username,
-                Password = decryptedPassword,
-            };
-
-            return netObj;
-        }
-
-        /// <summary>
-        /// Order the selected imagery.  
-        /// </summary>
-        private void OrderImagery()
-        {
-            try
-            {
-                var catIdList = new List<string>();
-                foreach (DataGridViewRow item in this.dataGridView1.Rows)
-                {
-                    var addRow = false;
-                    for (int i = 0; i <= item.Cells.Count - 1; i++)
-                    {
-                        // Don't record the value of if the polygon is being displayed or a null value.
-                        if (item.Cells[i].Value == null || item.Cells[i].OwningColumn.Name == "showPolygon")
-                        {
-                            continue;
-                        }
-
-                        if (addRow != true && item.Cells[i].OwningColumn.Name == "Selected")
-                        {
-                            addRow = (bool)item.Cells[i].Value;
-                            continue;
-                        }
-
-                        if (addRow && item.Cells[i].OwningColumn.Name == "Catalog ID")
-                        {
-                            catIdList.Add((string)item.Cells[i].Value);
-                        }
-                    }
-                }
-
-                var output = JsonConvert.SerializeObject(catIdList);
-
-                bool success = false;
-                var netObj = CreateNetObject(ref success);
-                netObj.AddressUrl = "/raster-catalog/api/gbd/orders/v1";
-                if (!success)
-                {
-                    MessageBox.Show(DgxResources.InvalidUserPass);
-                    return;
-                }
-
-
-                var result = this.comms.Post<GbdOrder>(netObj, output);
-
-                var result = JsonConvert.DeserializeObject<GbdOrder[]>(DgxResources.testString);
-
-                Console.WriteLine("testing the data");
-
-            }
-            catch (Exception error)
-            {
-                this.logWriter.Error(error);
-            }
-        }
-
-        /// <summary>
         /// The export selection to file for the user to order imagery.
         /// </summary>
         private void ExportSelectionToFile()
@@ -1465,6 +1375,106 @@ namespace Dgx.Gbd
 
         #endregion
         
+        #region Imagery Ordering
+        /// <summary>
+        /// Update the order table with imagery that was ordered in the payload
+        /// </summary>
+        /// <param name="payload">
+        /// the GBD orders for the imagery
+        /// </param>
+        /// <param name="orderTable">
+        /// The order data table.
+        /// </param>
+        private static void UpdateOrderTable(IEnumerable<GbdOrder> payload, ref DataTable orderTable)
+        {
+            foreach (GbdOrder item in payload)
+            {
+                var row = orderTable.NewRow();
+                row["Order ID"] = item.salesOrderNumber;
+                row["Order Date"] = item.header.messageDateTimeStamp;
+                row["Service Provider"] = item.header.serviceProvider;
+                orderTable.Rows.Add(row);
+            }
+        }
+
+        /// <summary>
+        /// Get the user selected imagery cat ids for ordering
+        /// </summary>
+        /// <param name="grid">
+        /// The data grid that contains the imagery information.
+        /// </param>
+        /// <returns>
+        /// The <see cref="List"/>.
+        /// </returns>
+        private static List<string> GetImageryToBeOrdered(DataGridView grid)
+        {
+            var catIdList = new List<string>();
+            foreach (DataGridViewRow item in grid.Rows)
+            {
+                var addRow = false;
+                for (int i = 0; i <= item.Cells.Count - 1; i++)
+                {
+                    // Don't record the value of if the polygon is being displayed or a null value.
+                    if (item.Cells[i].Value == null || item.Cells[i].OwningColumn.Name == "showPolygon")
+                    {
+                        continue;
+                    }
+
+                    if (addRow != true && item.Cells[i].OwningColumn.Name == "Selected")
+                    {
+                        addRow = (bool)item.Cells[i].Value;
+                        continue;
+                    }
+
+                    if (addRow && item.Cells[i].OwningColumn.Name == "Catalog ID")
+                    {
+                        catIdList.Add((string)item.Cells[i].Value);
+                    }
+                }
+            }
+
+            return catIdList;
+        }
+
+        /// <summary>
+        /// Write the GBD orders to file from the GBD Order's Table.
+        /// </summary>
+        private void WriteGbdOrdersToFile()
+        {
+            // To Be Implemented...
+        }
+
+        /// <summary>
+        /// Order the selected imagery.  
+        /// </summary>
+        private void OrderImagery()
+        {
+            try
+            {
+                var catIdList = GetImageryToBeOrdered(this.dataGridView1);
+
+                var output = JsonConvert.SerializeObject(catIdList);
+
+                // setup the request for the orders
+                var request = new RestRequest("/raster-catalog/api/gbd/orders/v1", Method.POST);
+                request.AddHeader("Authorization", "Bearer " + this.comms.GetAccessToken());
+                request.AddParameter("application/json", output, ParameterType.RequestBody);
+
+                // send the order in.
+                var result = this.client.Execute<List<GbdOrder>>(request);
+
+                UpdateOrderTable(result.Data, ref this.orderTable);
+
+                this.WriteGbdOrdersToFile();
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
+        }
+
+        #endregion
+
         #region Drawing Methods
 
         /// <summary>

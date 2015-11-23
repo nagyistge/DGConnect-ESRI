@@ -298,6 +298,17 @@ namespace NetworkConnections
         }
 
         /// <summary>
+        /// Returns the GBD access token.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        public string GetAccessToken()
+        {
+            return this.AccessToken;
+        }
+
+        /// <summary>
         /// Handle the delete request of a stored query workspace.
         /// </summary>
         /// <param name="netObject">

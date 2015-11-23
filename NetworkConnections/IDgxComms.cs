@@ -104,5 +104,13 @@ namespace NetworkConnections
         /// The <see cref="T"/>.
         /// </returns>
         T Post<T>(NetObject netObject, string jsonDataPayLoad);
+
+        /// <summary>
+        /// Get the GBD access token.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        string GetAccessToken();
     }
 }

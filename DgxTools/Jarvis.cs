@@ -25,6 +25,12 @@
                                                  + DGXSettings.Properties.Settings.Default.logfile;
 
         /// <summary>
+        /// The file that contains the GBD order information.  i.e. order numbers etc.
+        /// </summary>
+        public static readonly string GbdOrderFile = Environment.GetFolderPath(
+            Environment.SpecialFolder.ApplicationData) + DGXSettings.Properties.Settings.Default.GbdOrders;
+
+        /// <summary>
         /// The base 32 codes.
         /// </summary>
         private const string Base32Codes = "0123456789bcdefghjkmnpqrstuvwxyz";
