@@ -112,6 +112,11 @@ namespace Dgx.Gbd
         private Thread worker4Thread;
 
         /// <summary>
+        /// Thread that will do status update checks.
+        /// </summary>
+        private Thread statusUpdateThread;
+
+        /// <summary>
         /// Thread control variable.  When set to false the threads will exit gracefully otherwise they will run until the work queue has been depleted.
         /// </summary>
         private volatile bool okToWork = true;
@@ -279,6 +284,14 @@ namespace Dgx.Gbd
         private delegate void DataTableDone(DataTable dt, Dictionary<string, Properties> responses);
 
         /// <summary>
+        /// Callback to update the order status.  Will be fired from a background thread
+        /// </summary>
+        /// <param name="updateStatus">
+        /// The update status.
+        /// </param>
+        private delegate void UpdateStatusCallback(GbdOrder updateStatus);
+
+        /// <summary>
         /// Gets or sets the hook object of the dockable window
         /// </summary>
         private object Hook { get; set; }
@@ -321,7 +334,7 @@ namespace Dgx.Gbd
             dt.Columns.Add(new DataColumn("Order ID", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Order Date", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Service Provider", typeof(string)) { ReadOnly = true });
-            dt.Columns.Add(new DataColumn("Order Status", typeof (string)) {ReadOnly = true});
+            dt.Columns.Add(new DataColumn("Order Status", typeof (string)) {ReadOnly = false});
             var primary = new DataColumn[1];
             primary[0] = dt.Columns["Order ID"];
             dt.PrimaryKey = primary;
@@ -391,6 +404,7 @@ namespace Dgx.Gbd
             this.ThreadLifeCheck(this.worker2Thread);
             this.ThreadLifeCheck(this.worker3Thread);
             this.ThreadLifeCheck(this.worker4Thread);
+            this.ThreadLifeCheck(this.statusUpdateThread);
 
             this.localDatatable.Clear();
             this.allResults.Clear();
@@ -1461,21 +1475,95 @@ namespace Dgx.Gbd
                 var request = new RestRequest("/raster-catalog/api/gbd/orders/v1", Method.POST);
                 request.AddHeader("Authorization", "Bearer " + this.comms.GetAccessToken());
                 request.AddParameter("application/json", output, ParameterType.RequestBody);
-
-                //// send the order in.
-                //var result = this.client.Execute<List<GbdOrder>>(request);
-
-                //UpdateOrderTable(result.Data, ref this.orderTable);
-
                 
                 var deserial = new JsonDeserializer();
                 var result = deserial.Deserialize<List<GbdOrder>>(new RestResponse<List<GbdOrder>>
                 {
                     Content = DgxResources.multipleGbdOrders
                 });
+                
                 UpdateOrderTable(result,ref this.orderTable);
 
                 this.WriteGbdOrdersToFile();
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
+        }
+
+        #endregion
+
+        #region Status Refresh
+
+        private void RefreshButtonClick(object sender, EventArgs e)
+        {
+            var ids = this.GetOrderIdsForRefresh();
+
+            this.ThreadLifeCheck(this.statusUpdateThread);
+            this.statusUpdateThread =
+                new Thread(
+                    () => this.CheckOrderStatus(ids, new RestClient("iipdev.digitalglobe.com"), this.comms.GetAccessToken()));
+             this.statusUpdateThread.Start();
+        }
+
+        private List<string> GetOrderIdsForRefresh()
+        {
+            
+            List<string> list = new List<string>();
+            try
+            {
+                foreach (DataGridViewRow row in this.orderDataGridView.Rows)
+                {
+                    var item = row.Cells["Order ID"].Value.ToString();
+                    if (!string.IsNullOrEmpty(item))
+                    {
+                        list.Add(item);
+                    }
+                    //list.Add(row.Cells["Order ID"].Value.ToString());
+                }
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
+            return list;
+        }
+
+        private void CheckOrderStatus(List<string> orderList, IRestClient client, string token)
+        {
+            foreach (var id in orderList)
+            {
+                if (this.okToWork)
+                {
+                    var request = new RestRequest("/raster-catalog/api/gbd/orders/v1/status/" + id, Method.GET);
+                    request.AddHeader("Authorization", "Bearer " + token);
+                    var result = this.client.Execute<GbdOrder>(request);
+
+                    // Callback to the main UI thread to update the data table
+                    this.Invoke(new UpdateStatusCallback(this.UpdateRecordStatus), result.Data);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Update record status
+        /// </summary>
+        /// <param name="orderStatusUpdate">
+        /// The order status update.
+        /// </param>
+        private void UpdateRecordStatus(GbdOrder orderStatusUpdate)
+        {
+            try
+            {
+                foreach (DataRow row in this.orderTable.Rows)
+                {
+                    string orderId = row["Order ID"].ToString();
+                    if (orderId == orderStatusUpdate.salesOrderNumber)
+                    {
+                        row["Order Status"] = orderStatusUpdate.lines[0].lineItemStatus;
+                    }
+                }
             }
             catch (Exception error)
             {
@@ -1661,44 +1749,6 @@ namespace Dgx.Gbd
 
                 base.Dispose(disposing);
             }
-        }
-
-        #endregion
-
-        #region Status Refresh
-        private void refreshButton_Click(object sender, EventArgs e)
-        {
-            var request = new RestRequest("/raster-catalog/api/gbd/orders/v1/status/", Method.GET);
-            
-            // Added order id as a parameter
-            //request.AddParameter()
-
-            this.GetOrderIdsForRefresh();
-
-            this.CheckOrderStatus();
-
-            this.UpdateRecordStatus();
-        }
-
-        private List<string> GetOrderIdsForRefresh()
-        {
-            '';
-            p;
-            '';
-            ;
-            ;
-            ;
-            lkzcfg/ >;,. return (from DataGridViewRow row in this.orderDataGridView.Rows select row.Cells["Order ID"].Value.ToString()).ToList();
-        }
-
-        private void CheckOrderStatus(List<string> orderList)
-        {
-            // to be implemented
-        }
-
-        private void UpdateRecordStatus()
-        {
-            // to be implemented
         }
 
         #endregion
