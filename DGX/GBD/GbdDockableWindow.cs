@@ -21,6 +21,8 @@
 
 using DgxTools;
 using Logging;
+using Microsoft.Windows.Controls;
+using RestSharp.Deserializers;
 
 namespace Dgx.Gbd
 {
@@ -319,9 +321,9 @@ namespace Dgx.Gbd
             dt.Columns.Add(new DataColumn("Order ID", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Order Date", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Service Provider", typeof(string)) { ReadOnly = true });
-
+            dt.Columns.Add(new DataColumn("Order Status", typeof (string)) {ReadOnly = true});
             var primary = new DataColumn[1];
-            primary[0] = dt.Columns["Order Id"];
+            primary[0] = dt.Columns["Order ID"];
             dt.PrimaryKey = primary;
             return dt;
         }
@@ -1460,10 +1462,18 @@ namespace Dgx.Gbd
                 request.AddHeader("Authorization", "Bearer " + this.comms.GetAccessToken());
                 request.AddParameter("application/json", output, ParameterType.RequestBody);
 
-                // send the order in.
-                var result = this.client.Execute<List<GbdOrder>>(request);
+                //// send the order in.
+                //var result = this.client.Execute<List<GbdOrder>>(request);
 
-                UpdateOrderTable(result.Data, ref this.orderTable);
+                //UpdateOrderTable(result.Data, ref this.orderTable);
+
+                
+                var deserial = new JsonDeserializer();
+                var result = deserial.Deserialize<List<GbdOrder>>(new RestResponse<List<GbdOrder>>
+                {
+                    Content = DgxResources.multipleGbdOrders
+                });
+                UpdateOrderTable(result,ref this.orderTable);
 
                 this.WriteGbdOrdersToFile();
             }
@@ -1651,6 +1661,44 @@ namespace Dgx.Gbd
 
                 base.Dispose(disposing);
             }
+        }
+
+        #endregion
+
+        #region Status Refresh
+        private void refreshButton_Click(object sender, EventArgs e)
+        {
+            var request = new RestRequest("/raster-catalog/api/gbd/orders/v1/status/", Method.GET);
+            
+            // Added order id as a parameter
+            //request.AddParameter()
+
+            this.GetOrderIdsForRefresh();
+
+            this.CheckOrderStatus();
+
+            this.UpdateRecordStatus();
+        }
+
+        private List<string> GetOrderIdsForRefresh()
+        {
+            '';
+            p;
+            '';
+            ;
+            ;
+            ;
+            lkzcfg/ >;,. return (from DataGridViewRow row in this.orderDataGridView.Rows select row.Cells["Order ID"].Value.ToString()).ToList();
+        }
+
+        private void CheckOrderStatus(List<string> orderList)
+        {
+            // to be implemented
+        }
+
+        private void UpdateRecordStatus()
+        {
+            // to be implemented
         }
 
         #endregion
