@@ -1405,9 +1405,13 @@ namespace Dgx.Gbd
         {
             foreach (GbdOrder item in payload)
             {
+                // Convert the timestamp received in the gbd order to something more useful.
+                var epochTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                epochTime = epochTime.AddMilliseconds(item.header.messageDateTimeStamp);
+
                 var row = orderTable.NewRow();
                 row["Order ID"] = item.salesOrderNumber;
-                row["Order Date"] = item.header.messageDateTimeStamp;
+                row["Order Date"] = epochTime.ToString("g");
                 row["Service Provider"] = item.header.serviceProvider;
                 orderTable.Rows.Add(row);
             }
@@ -1503,7 +1507,6 @@ namespace Dgx.Gbd
                 var ids = this.GetOrderIdsForRefresh();
 
                 this.ThreadLifeCheck(this.statusUpdateThread);
-                //this.CheckOrderStatus(ids, new RestClient("https://iipdev.digitalglobe.com"), this.comms.GetAccessToken());
                 this.statusUpdateThread =
                     new Thread(
                         () =>
@@ -1565,7 +1568,6 @@ namespace Dgx.Gbd
                             keepRunning = false;
                         }
                     }
-
 
                     // Callback to the main UI thread to update the data table
                     this.Invoke(new UpdateStatusCallback(this.UpdateRecordStatus), result.Data);
