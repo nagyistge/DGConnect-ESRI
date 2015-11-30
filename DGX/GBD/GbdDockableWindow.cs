@@ -202,7 +202,7 @@ namespace Dgx.Gbd
             this.logWriter = new Logger(Jarvis.LogFile,false);
 
             this.InitializeComponent();
-            this.VisibleChanged += this.GbdDockableWindow_VisibleChanged;
+            this.VisibleChanged += this.GbdDockableWindowVisibleChanged;
             this.Hook = hook;
             GbdRelay.Instance.AoiHasBeenDrawn += this.InstanceAoiHasBeenDrawn;
 
@@ -264,6 +264,9 @@ namespace Dgx.Gbd
             this.SetupOrderStatusTable();
         }
 
+        /// <summary>
+        /// Setup up the order status data table.
+        /// </summary>
         private void SetupOrderStatusTable()
         {
             this.orderTable = this.CreateOrderTable();
@@ -271,7 +274,16 @@ namespace Dgx.Gbd
 
         }
 
-        void GbdDockableWindow_VisibleChanged(object sender, EventArgs e)
+        /// <summary>
+        /// The GBD dockable window visible changed event handler
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void GbdDockableWindowVisibleChanged(object sender, EventArgs e)
         {
             this.ResetGbd();
         }
@@ -393,6 +405,9 @@ namespace Dgx.Gbd
             this.UpdateSelectedAndTotalLabels();
         }
 
+        /// <summary>
+        /// Reset GBD window
+        /// </summary>
         private void ResetGbd()
         {
             this.okToWork = false;
@@ -1461,7 +1476,7 @@ namespace Dgx.Gbd
         /// </summary>
         private void WriteGbdOrdersToFile()
         {
-            // To Be Implemented...
+            // #ToBeImplemented
         }
 
         /// <summary>
@@ -1506,7 +1521,10 @@ namespace Dgx.Gbd
             {
                 var ids = this.GetOrderIdsForRefresh();
 
+                // make sure the thread isn't running.  if it is gracefully kill it ...
                 this.ThreadLifeCheck(this.statusUpdateThread);
+
+                // set up new thread
                 this.statusUpdateThread =
                     new Thread(
                         () =>
@@ -1514,6 +1532,8 @@ namespace Dgx.Gbd
                             ids,
                             new RestClient("https://iipdev.digitalglobe.com"),
                             this.comms.GetAccessToken()));
+
+                // execute the job
                 this.statusUpdateThread.Start();
             }
             catch (Exception error)
