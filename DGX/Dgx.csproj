@@ -172,6 +172,10 @@
     <Compile Include="Aggregations\AggregationWindow.xaml.cs">
       <DependentUpon>AggregationWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Aggregations\PivotTable.cs" />
+    <Compile Include="Aggregations\PivotTableAnalysisResult.cs" />
+    <Compile Include="Aggregations\PivotTableAnalyzer.cs" />
+    <Compile Include="Aggregations\PivotTableEntry.cs" />
     <Compile Include="Config.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Config.esriaddinx</DependentUpon>
