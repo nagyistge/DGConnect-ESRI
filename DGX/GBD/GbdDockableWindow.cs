@@ -1498,13 +1498,25 @@ namespace Dgx.Gbd
 
         private void RefreshButtonClick(object sender, EventArgs e)
         {
-            var ids = this.GetOrderIdsForRefresh();
+            try
+            {
+                var ids = this.GetOrderIdsForRefresh();
 
-            this.ThreadLifeCheck(this.statusUpdateThread);
-            this.statusUpdateThread =
-                new Thread(
-                    () => this.CheckOrderStatus(ids, new RestClient("iipdev.digitalglobe.com"), this.comms.GetAccessToken()));
-             this.statusUpdateThread.Start();
+                this.ThreadLifeCheck(this.statusUpdateThread);
+                //this.CheckOrderStatus(ids, new RestClient("https://iipdev.digitalglobe.com"), this.comms.GetAccessToken());
+                this.statusUpdateThread =
+                    new Thread(
+                        () =>
+                        this.CheckOrderStatus(
+                            ids,
+                            new RestClient("https://iipdev.digitalglobe.com"),
+                            this.comms.GetAccessToken()));
+                this.statusUpdateThread.Start();
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
         }
 
         private List<string> GetOrderIdsForRefresh()
@@ -1520,7 +1532,6 @@ namespace Dgx.Gbd
                     {
                         list.Add(item);
                     }
-                    //list.Add(row.Cells["Order ID"].Value.ToString());
                 }
             }
             catch (Exception error)
@@ -1530,7 +1541,7 @@ namespace Dgx.Gbd
             return list;
         }
 
-        private void CheckOrderStatus(List<string> orderList, IRestClient client, string token)
+        private void CheckOrderStatus(List<string> orderList, IRestClient webClient, string token)
         {
             foreach (var id in orderList)
             {
@@ -1538,13 +1549,30 @@ namespace Dgx.Gbd
                 {
                     var request = new RestRequest("/raster-catalog/api/gbd/orders/v1/status/" + id, Method.GET);
                     request.AddHeader("Authorization", "Bearer " + token);
-                    var result = this.client.Execute<GbdOrder>(request);
+
+                    var result = webClient.Execute<GbdOrder>(request);
+                    var keepRunning = true;
+                    var numTries = 0;
+                    while (keepRunning)
+                    {
+                        if (result.Data.salesOrderNumber == null && numTries <=5)
+                        {
+                            numTries++;
+                            result = webClient.Execute<GbdOrder>(request);
+                        }
+                        else
+                        {
+                            keepRunning = false;
+                        }
+                    }
+
 
                     // Callback to the main UI thread to update the data table
                     this.Invoke(new UpdateStatusCallback(this.UpdateRecordStatus), result.Data);
                 }
             }
         }
+
 
         /// <summary>
         /// Update record status
@@ -1556,12 +1584,16 @@ namespace Dgx.Gbd
         {
             try
             {
-                foreach (DataRow row in this.orderTable.Rows)
+                // Don't bother if the GBD Order is null
+                if (orderStatusUpdate.salesOrderNumber != null)
                 {
-                    string orderId = row["Order ID"].ToString();
-                    if (orderId == orderStatusUpdate.salesOrderNumber)
+                    foreach (DataRow row in this.orderTable.Rows)
                     {
-                        row["Order Status"] = orderStatusUpdate.lines[0].lineItemStatus;
+                        string orderId = row["Order ID"].ToString();
+                        if (orderId == orderStatusUpdate.salesOrderNumber)
+                        {
+                            row["Order Status"] = orderStatusUpdate.lines[0].lineItemStatus;
+                        }
                     }
                 }
             }
