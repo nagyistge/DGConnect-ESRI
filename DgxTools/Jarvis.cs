@@ -10,7 +10,7 @@
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Geodatabase;
     using ESRI.ArcGIS.Geometry;
-
+  
     using Logging;
 
     using Newtonsoft.Json;
@@ -111,15 +111,21 @@
 
             // The enumFieldError enumerator can be inspected at this point to determine 
             // which fields were modified during validation.
-            IFeatureClass featureClass = featureWorkspace.CreateFeatureClass(
-                featureClassName,
-                validatedFields,
-                ocDesc.InstanceCLSID,
-                ocDesc.ClassExtensionCLSID,
-                esriFeatureType.esriFTSimple,
-                "SHAPE",
-                string.Empty);
-            return featureClass;
+            try {
+              IFeatureClass featureClass = featureWorkspace.CreateFeatureClass(
+                  featureClassName,
+                  validatedFields,
+                  ocDesc.InstanceCLSID,
+                  ocDesc.ClassExtensionCLSID,
+                  esriFeatureType.esriFTSimple,
+                  "SHAPE",
+                  string.Empty);
+              return featureClass;
+            }
+            catch (Exception ex) {
+              throw new Exception("Jarvis hates you..." + ex.Message);                
+            }
+          
         }
 
         /// <summary>
@@ -266,5 +272,14 @@
 
             return workspace;
         }
+        public static List<String> GetFieldList(IFeatureClass fc) {
+          List<String> outlist = new List<String>();
+          for (int i = 0; i < fc.Fields.FieldCount;i++ ) {
+            outlist.Add(fc.Fields.get_Field(i).Name);
+          }
+          return outlist;
+        }
+    
+
     }
 }

@@ -54,14 +54,14 @@ namespace Dgx.Aggregations
     using UserControl = System.Windows.Controls.UserControl;
 
   public delegate void SendAnInt(int val);
-  public delegate void UpdateAggWindowPbar(int min, int max, int val);
+  public delegate void UpdateAggWindowPbar(int max, int min, int val);
 
     /// <summary>
     /// Designer class of the dockable window add-in. It contains WPF user interfaces that
     /// make up the dockable window.
     /// </summary>
   public partial class AggregationWindow : UserControl {
- 
+  
     /// <summary>
     /// used for writing to the log files.
     /// </summary>
@@ -419,8 +419,14 @@ namespace Dgx.Aggregations
       // get the polygon of the geohash
       //uniqueFieldNames.Add("cos_sim", "cos_sim");
      IFeatureCursor insertCur= featureClass.Insert(true);
+     this.pbarChangeDet.Maximum = ptable.Count;
+     this.pbarChangeDet.Minimum = 0;
+     this.pbarChangeDet.Value = 0;
+     int i = 0;
       foreach (PivotTableEntry entry in ptable) {
-
+        i++;
+        this.UpdatePBar(i);
+      
         var poly = this.GetGeoHashPoly(entry.RowKey);
         var buffer = featureClass.CreateFeatureBuffer();
 
@@ -702,6 +708,11 @@ namespace Dgx.Aggregations
         columnsToIgnore.Add("OBJECTID");
       }
       PivotTable pt = new PivotTable();
+      if (PivotTableCache.Cache.ContainsKey(layer.Name)) {
+        pt = PivotTableCache.Cache[layer.Name];
+        return pt;
+      }
+     
       IFeatureCursor featureCursor = layer.FeatureClass.Search(null, false);
       IFeature feature = featureCursor.NextFeature();
       // loop through the returned features and get the value for the field
@@ -743,6 +754,69 @@ namespace Dgx.Aggregations
         }
         pt.Add(entry);
         feature = featureCursor.NextFeature();
+      }
+
+      sai.Invoke(Convert.ToInt32(pbarChangeDet.Maximum));
+      //add to the cache
+      if (!PivotTableCache.Cache.ContainsKey(layer.Name)) {
+        PivotTableCache.Cache.Add(layer.Name, pt);
+      }
+      return pt;
+
+    }
+
+    public PivotTable FeaturesToPivotTable(List<IFeature> layers, String rowKeyColName, List<String> columnsToIgnore) {
+      SendAnInt sai = new SendAnInt(this.UpdatePBar);
+      this.pbarChangeDet.Minimum = 0;
+      this.pbarChangeDet.Maximum = layers.Count;
+      this.pbarChangeDet.Value = 0;
+
+      if (columnsToIgnore == null) {
+        columnsToIgnore = new List<String>();
+      }
+      if (!columnsToIgnore.Contains("OBJECTID")) {
+        columnsToIgnore.Add("OBJECTID");
+      }
+      PivotTable pt = new PivotTable();
+    
+     // IFeature feature = featureCursor.NextFeature();
+      // loop through the returned features and get the value for the field
+      int x = 0;
+      foreach (IFeature feature in layers) {
+        PivotTableEntry entry = new PivotTableEntry();
+        //do something with each feature(ie update geometry or attribute)
+        //  Console.WriteLine("The {0} field contains a value of {1}", nameOfField, feature.get_Value(fieldIndexValue));
+        pbarChangeDet.Value++;
+        sai.Invoke(x);
+        x++;
+        for (int i = 0; i < feature.Fields.FieldCount; i++) {
+          if (pbarChangeDet.Value == pbarChangeDet.Maximum) {
+            pbarChangeDet.Maximum = pbarChangeDet.Maximum + 10;
+          }
+          
+          string fname = feature.Fields.get_Field(i).Name;
+          string val = feature.get_Value(i).ToString();
+
+          if (columnsToIgnore.Contains(fname)) {
+            continue;
+          }
+
+          if (fname.Equals(rowKeyColName)) {
+            entry.RowKey = Convert.ToString(val);
+            continue;
+          }
+          else {
+            try {
+              entry.Data.Add(fname, int.Parse(val));
+            }
+            catch (Exception e) {
+              continue;
+            }
+          }
+
+        }
+        pt.Add(entry);
+      
       }
       sai.Invoke(Convert.ToInt32(pbarChangeDet.Maximum));
       return pt;
@@ -807,6 +881,8 @@ namespace Dgx.Aggregations
 
       return outlist;
     }
+
+
     public ESRI.ArcGIS.Carto.IFeatureLayer getLayerByName(List<ESRI.ArcGIS.Carto.IFeatureLayer> layers, String name) {
       foreach (IFeatureLayer layer in layers) {
         if (layer.Name.Equals(name)) {
@@ -815,21 +891,152 @@ namespace Dgx.Aggregations
       }
       return null;
     }
+    public List<IFeature> getSelectedFeatureFromLayerByName(List<ESRI.ArcGIS.Carto.IFeatureLayer> layers, String nameOfLayer) {
+      IFeatureLayer l = null;
+      foreach (IFeatureLayer layer in layers) {
+        if (layer.Name.Equals(nameOfLayer)) {
+          l = layer;
+          break;
+        }
+      }
+      return GetSelectedFeatures(l);
+
+    }
+
+    public List<IFeature> GetSelectedFeatures(IFeatureLayer featureLayer) {
+      IFeatureSelection featureSelection = (IFeatureSelection)featureLayer;
+      var selectionSet = featureSelection.SelectionSet;
+      IFeatureClass featureClass = featureLayer.FeatureClass;
+      string shapeField = featureClass.ShapeFieldName;
+  
+    
+
+      ICursor cursor;
+      selectionSet.Search( new QueryFilterClass(), false, out cursor);
+      var featureCursor = cursor as IFeatureCursor;
+      var features = new List<IFeature>();
+
+      IFeature feature;
+      while ((feature = featureCursor.NextFeature()) != null)
+        features.Add((feature));
+
+      return features;
+    }
+
+
+    private void butRunSignature_Click(object sender, RoutedEventArgs e) {
+      try {
+        if (cbFocusLayer.Text == null || cbFocusLayer.Text == "") {
+          MessageBox.Show("You must select a layer");
+          return;
+        }
+        List<IFeatureLayer> layers = GetFeatureLayersFromToc(GetActiveViewFromArcMap(ArcMap.Application));
+        IFeatureLayer layerWithSelection = getLayerByName(layers, cbFocusLayer.Text);
+        if (layerWithSelection == null) {
+          MessageBox.Show("Layer does not exist");
+          return;
+        }
+        this.pbarChangeDet.Minimum = 0;
+        this.pbarChangeDet.Maximum = layerWithSelection.FeatureClass.FeatureCount(null);
+        this.pbarChangeDet.Value = 0;
+        System.Windows.Forms.Application.DoEvents();
+
+        List<IFeature> outPut = getSelectedFeatureFromLayerByName(layers, cbFocusLayer.Text);
+        List<String> cols = new List<string>();
+        Dictionary<string, string> outputCols = new Dictionary<string, string>();
+        if (outPut.Count == 0) {
+          MessageBox.Show("No features in focus layer are selected. Make a selection");
+          return;
+        }
+
+        PivotTable signature = this.FeaturesToPivotTable(outPut, "Name", null);
+        List<String> ignoreCols = new List<String>() { "OBJECTID", "SHAPE" };
+
+
+        PivotTableAnalyzer analyzer = new PivotTableAnalyzer(new SendAnInt(this.UpdatePBar), new UpdateAggWindowPbar(this.SetPBarProperties));
+        this.UpdateStatusLabel("Preparing and caching AOI layer");
+        System.Windows.Forms.Application.DoEvents();
+
+        PivotTable aoiPivotTable = this.FeatureLayerToPivotTable(layerWithSelection, "Name", null);
+
+        this.UpdateStatusLabel("Processing Signature");
+
+        System.Windows.Forms.Application.DoEvents();
+
+        if (signature.Count > 1) {
+          DialogResult res = MessageBox.Show("You have multiple cells selected. Would you like to use an average of the selected features as the signature? If NO is selected, a new layer will be generated for every selected cell. If YES is selected an average will be generated as the signature, one layer will be generated, and typically the resulting similarity distribution may be narrower. Also, diff columns are based on the averages.", "Multiple Selected Cells", MessageBoxButtons.YesNo);
+          if (res == DialogResult.Yes) {
+            Dictionary<string, Dictionary<String, double>> Graph = analyzer.GetSimilarityGraph(signature);
+
+            foreach (String key in Graph.Keys) {
+              String formattedGraph = "Graph for rowkey: " + key + "\n";
+              foreach (String innerKey in Graph[key].Keys) {
+                double sim = Graph[key][innerKey];
+                formattedGraph += "\t" + innerKey + " :: " + sim + "\n";
+              }
+              MessageBox.Show(formattedGraph);
+            }
+            DialogResult resGraph = MessageBox.Show("Continue?", "Graph", MessageBoxButtons.YesNoCancel);
+            if (resGraph == DialogResult.No || resGraph == DialogResult.Cancel) {
+              UpdatePBar(0);
+              UpdateStatusLabel("Status");
+              return;
+            }
+            signature = analyzer.GenerateAverageVector(signature);
+          }
+        }
+
+        foreach (PivotTableEntry entry in signature) {
+          PivotTable res = analyzer.GetSparseSimilarites(entry, aoiPivotTable, true, false);
+          foreach (String colName in res[0].Data.Keys) {
+            if (!outputCols.ContainsKey(colName)) {
+              if (!ignoreCols.Contains(colName)) {
+                outputCols.Add(colName, colName);
+              }
+            }
+          }
+          IWorkspace ws = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+
+          String fcName = "mlt_" + entry.RowKey + "_" + System.DateTime.Now.Millisecond;
+          var featureClass = Jarvis.CreateStandaloneFeatureClass(
+                            ws,
+                            fcName,
+                            outputCols,
+                            false,
+                            0);
+          IFeatureCursor insertCur = featureClass.Insert(true);
+          this.UpdateStatusLabel("Loading Feature Class");
+          System.Windows.Forms.Application.DoEvents();
+
+          InsertPivoTableRowsToFeatureClass(featureClass, res, outputCols);
+          this.AddLayerToArcMap(fcName);
+
+          lblPbarStatus.Content = "Done";
+          this.pbarChangeDet.Value = 0;
+          System.Windows.Forms.Application.DoEvents();
+        }
+      }
+      catch (Exception ex) {
+        MessageBox.Show("An unhandled exception occured");
+      }
+    }
 
     private void buttAnalyzeDiff_Click(object sender, RoutedEventArgs e) {
-      try {
+      try {  
         String layerA = (String)this.cbAggLayerA.SelectedValue;
         String layerB = this.cbAggLayerB.Text;
         if(layerA==null || layerB == null){
           MessageBox.Show("no layers available");
         }
         List<IFeatureLayer> layers = GetFeatureLayersFromToc(GetActiveViewFromArcMap(ArcMap.Application));
+      //  getSelectedFeatureFromLayerByName(layers, "somename");
         IFeatureLayer flayerA = getLayerByName(layers, layerA);
         IFeatureLayer flayerB = getLayerByName(layers, layerB);
-        this.UpdateStatusLabel("formatting Layer A");
+        this.pbarChangeDet.Value = 0;
+        this.UpdateStatusLabel("formatting and Caching Layer A");
         System.Windows.Forms.Application.DoEvents();
         PivotTable ptA = FeatureLayerToPivotTable(flayerA, "Name", null);
-        this.UpdateStatusLabel("formatting Layer B");
+        this.UpdateStatusLabel("formatting and Caching Layer B");
         System.Windows.Forms.Application.DoEvents();
         PivotTable ptB = FeatureLayerToPivotTable(flayerB, "Name", null);
         this.UpdateStatusLabel("Generating Change Detection layer");
@@ -860,8 +1067,10 @@ namespace Dgx.Aggregations
 
         InsertPivoTableRowsToFeatureClass(featureClass, res, uniqueFieldNames);
         this.AddLayerToArcMap(fcName);
+        this.pbarChangeDet.Value = 0;
       
         lblPbarStatus.Content = "Done";
+
         System.Windows.Forms.Application.DoEvents();
         ///now I need to create a feature class and feature layer from this object
         ///
@@ -877,6 +1086,43 @@ namespace Dgx.Aggregations
 
 
     }
+
+    private void butPopFocLyrCb_Click(object sender, RoutedEventArgs e) {
+
+      ESRI.ArcGIS.ArcMapUI.IContentsView cView = GetContentsViewFromArcMap(ArcMap.Application, 0);
+      ESRI.ArcGIS.Carto.IActiveView aView = GetActiveViewFromArcMap(ArcMap.Application);
+      List<ESRI.ArcGIS.Carto.IFeatureLayer> layers = GetFeatureLayersFromToc(aView);
+
+      if (!cbFocusLayer.Items.IsEmpty) {
+        cbFocusLayer.Items.Clear();
+   
+      }
+
+      if (!cbFocusLayer.Items.IsEmpty) {
+        for (int i = 0; i < cbAggLayerA.Items.Count; i++) {
+          cbFocusLayer.Items.RemoveAt(i);
+        }
+      }     
+
+
+      foreach (IFeatureLayer layer in layers) {
+        // MessageBox.Show(layer.Name + " -- " + layer.DataSourceType);
+        if (layer.Name.ToLower().Contains("aggregation")) {
+
+          cbFocusLayer.Items.Add(layer.Name);
+        }
+      }
+
+      if (cbFocusLayer.Items.Count < 1) {
+        MessageBox.Show("No aggregation layers available");
+      }
+    }
+
+    private void Button_Click_1(object sender, RoutedEventArgs e) {
+      MessageBox.Show("MLTC stands for \"More Like This[ese] Cell[s].\"\nThis tool shows a similarity heatmap based on a selection. Similar in nature to a \" More Like This \" function. If many cells are selected then there will either be an output layer for each selected cell, or the average will be calculated.\n"+
+      "If an average is selected, then a graph of similarities between each feature will br printed out.\nMake a selection\nchoose the layer with the selection\nclick generate button", "About");
+    }
+
 
 
   }
