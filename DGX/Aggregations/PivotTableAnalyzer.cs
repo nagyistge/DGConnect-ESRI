@@ -117,17 +117,64 @@ namespace Dgx.Aggregations {
       return idprob;
     }
 
+    public PivotTable GenerateAverageVector(PivotTable tableWithMoreThanOneRow) {
+      if (tableWithMoreThanOneRow.Count < 2) {
+        throw new Exception("Must Have more than one row");
+      }
+      
+      Dictionary<String, List<Double>> data = new Dictionary<String, List<Double>>();
+      //consolidate all the values for each column of each entry in the pivot table
+      foreach (PivotTableEntry entry in tableWithMoreThanOneRow) {
+        foreach (String key in entry.Data.Keys) {
+          if (data.ContainsKey(key)) {
+            data[key].Add(entry.Data[key]);
+          }
+          else {
+            List<Double> newList = new List<Double>();
+            newList.Add(entry.Data[key]);
+            data.Add(key,newList);
+          }
+        }
+      }
+      //now average each and produce a new data dictionary
+      Dictionary<String, Double> averages = new Dictionary<String, Double>();
+      foreach (String key in data.Keys) {
+        double avg = 0d;
+        foreach (Double val in data[key]) {
+          avg += val;
+        }
+        avg = avg / data[key].Count;
+        averages.Add(key, avg);
+      }
+      PivotTableEntry newEntry = new PivotTableEntry() {
+        Data = averages, 
+        Context = tableWithMoreThanOneRow[0].Context, 
+        RowKey = tableWithMoreThanOneRow[0].RowKey 
+      };
+
+      PivotTable pt = new PivotTable();
+      pt.Add(newEntry);
+      return pt;
+    }
+
 
     public PivotTable GetSparseSimilarites(PivotTableEntry baseVector, PivotTable vectors, bool logarithm, bool onlyBase) {
+     
+      this.pbarUpdate(vectors.Count, 0, 0);
+      
       PivotTable outMap = new PivotTable();
       int i = 0;
       foreach (PivotTableEntry b in vectors) {
         PivotTableAnalysisResult similarity = GetSparseSimilarity(baseVector, b, logarithm, onlyBase);
-        if (similarity.RowKey != "null") {
-          Console.WriteLine(similarity.prob);
+        similarity.Data.Add("cos_sim", similarity.prob);
+        Dictionary<String, double> diffData = CalculateDiffs(baseVector, b);
+        foreach (String key in diffData.Keys) {
+          if (!similarity.Data.ContainsKey(key)) {
+            similarity.Data.Add(key, diffData[key]);
+          }
         }
         outMap.Add(similarity);
-        
+        this.pbarValueUpdate(i);
         i++;
       }
       return outMap;
@@ -158,8 +205,8 @@ namespace Dgx.Aggregations {
         b.Add(av.RowKey, av);
         hashset.Add(av.RowKey);
       }
-     
-      this.pbarUpdate.Invoke(0, hashset.Count, 0);
+
+      this.pbarUpdate.Invoke(hashset.Count, 0, 0);
       //now hashset variable is a unique list of strings
       Dictionary<string,double> empty = new Dictionary<string, double>();
       foreach(String s in hashset){
@@ -186,6 +233,33 @@ namespace Dgx.Aggregations {
       }
       return outList;
     }
+
+    public Dictionary<String, Dictionary<String, Double>> GetSimilarityGraph(PivotTable signature) {
+   
+      Dictionary<String, Dictionary<String, Double>> outputGraph = new Dictionary<string, Dictionary<string, double>>();
+      if (signature.Count < 2) { return outputGraph; }
+
+      for (int i = 0; i < signature.Count; i++) {
+        ///tricky... creates an acyclic undirected, non repeating graph
+        for (int x = i +1; x < signature.Count; x++) {
+          PivotTableEntry a = signature[i];
+          PivotTableEntry b = signature[x];
+          double sim = GetSparseSimilarity(a, b, true, false).prob;
+          if (outputGraph.ContainsKey(a.RowKey)) {
+            outputGraph[a.RowKey].Add(b.RowKey, sim);
+          }
+          else {
+            Dictionary<String, double> newInnerMap = new Dictionary<string, double>();
+            newInnerMap.Add(b.RowKey, sim);
+            outputGraph.Add(a.RowKey, newInnerMap);
+          }
+        }
+      }
+
+
+      return outputGraph;
+    }
+
 
    /// <summary>
    /// Converts a csv file to a pivot table.

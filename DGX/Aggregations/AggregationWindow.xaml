@@ -14,7 +14,7 @@
             <ColumnDefinition Width="28*"/>
             <ColumnDefinition Width="221*"/>
         </Grid.ColumnDefinitions>
-        <Grid Margin="11.92,-5,-48.749,-41.097" Grid.ColumnSpan="2" Grid.RowSpan="3" Grid.Column="1">
+        <Grid Margin="10,19.8,-33.235,-65.897" Grid.ColumnSpan="3" Grid.RowSpan="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="291*"/>
                 <RowDefinition Height="201*"/>
@@ -69,24 +69,45 @@
             <Button Name="selectAreaButton" Content="Select Area" HorizontalAlignment="Left" Margin="9.886,313.875,0,0" VerticalAlignment="Top" Width="75" Height="21.6" Click="SelectAreaButtonClick"/>
             <TextBox Name="tbFilter" HorizontalAlignment="Left" Height="55.935" Margin="9.886,252.94,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="226.286" AcceptsReturn="True" 
 VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;value&gt; AND|OR ..."/>
-            <Label Content="Add a Query Filter" HorizontalAlignment="Left" Margin="10,228.187,0,0" VerticalAlignment="Top" Height="25.96" Width="106.123"/>
-            <TabControl Name="tabAggAnalytics" HorizontalAlignment="Left" Height="215.983" Margin="-2.035,10,0,0" VerticalAlignment="Top" Width="238.207" Grid.Row="1">
+
+            <ProgressBar x:Name="pbarChangeDet" HorizontalAlignment="Left" Height="17.938" Margin="10,167.743,0,0" VerticalAlignment="Top" Width="238.207" Grid.Row="1"/>
+
+            <TabControl x:Name="tabAggAnalytics" HorizontalAlignment="Left" Height="187.54" Margin="10,382.805,0,0" VerticalAlignment="Top" Width="238.207" Grid.RowSpan="2">
+           
                 <TabItem Header="Change Detection">
-                    <Grid Background="#FFE5E5E5" Margin="0,0,1.2,6">
-                        <Button x:Name="buttAnalyzeAgg" Content="Refresh drop down lists" HorizontalAlignment="Left" Margin="10,12.805,0,0" VerticalAlignment="Top" Width="131.972" Click="buttAnalyzeAgg_Click"/>
-                        <ComboBox x:Name="cbAggLayerA" HorizontalAlignment="Left" Margin="10,39.765,0,0" VerticalAlignment="Top" Width="206.972" SelectedIndex="0"/>
-                        <ComboBox x:Name="cbAggLayerB" HorizontalAlignment="Left" Margin="10,66.725,0,0" VerticalAlignment="Top" Width="206.972" SelectedIndex="0"/>
-                        <Button x:Name="buttAnalyzeDiff" Content="Get Diff" HorizontalAlignment="Left" Margin="143.207,93.685,0,0" VerticalAlignment="Top" Width="75" Click="buttAnalyzeDiff_Click"/>
-                        <ProgressBar Name="pbarChangeDet" HorizontalAlignment="Left" Height="17.938" Margin="10,150.085,0,0" VerticalAlignment="Top" Width="208.207"/>
-                        <Label Name="lblPbarStatus" Content="Status:" HorizontalAlignment="Left" Margin="11.2,119.125,0,0" VerticalAlignment="Top" RenderTransformOrigin="0.063,-0.092" Width="207.007"/>
-                        <Button Name="butChangeInfo" Content="i" HorizontalAlignment="Left" Margin="196.372,5.5,0,0" VerticalAlignment="Top" Width="20.6" RenderTransformOrigin="0.604,-0.039" Click="butChangeInfo_Click"/>
+                    <Grid Background="#FFE5E5E5" Margin="0,0,1.2,7.6">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="15*"/>
+                            <ColumnDefinition Width="104*"/>
+                            <ColumnDefinition Width="108.003"/>
+                        </Grid.ColumnDefinitions>
+                        <Button x:Name="buttAnalyzeAgg" Content="Refresh drop down lists" HorizontalAlignment="Left" Margin="10,12.805,0,0" VerticalAlignment="Top" Width="131.972" Click="buttAnalyzeAgg_Click" Grid.ColumnSpan="3"/>
+                        <ComboBox x:Name="cbAggLayerA" HorizontalAlignment="Left" Margin="10,39.765,0,0" VerticalAlignment="Top" Width="206.972" SelectedIndex="0" Grid.ColumnSpan="3"/>
+                        <ComboBox x:Name="cbAggLayerB" HorizontalAlignment="Left" Margin="10,66.725,0,0" VerticalAlignment="Top" Width="206.972" SelectedIndex="0" Grid.ColumnSpan="3"/>
+                        <Button x:Name="buttAnalyzeDiff" Content="Generate" HorizontalAlignment="Left" Margin="24.386,93.685,0,0" VerticalAlignment="Top" Width="75" Click="buttAnalyzeDiff_Click" Grid.Column="2"/>
+                        <Button x:Name="butChangeInfo" Content="i" HorizontalAlignment="Left" Margin="77.551,5.5,0,0" VerticalAlignment="Top" Width="20.6" RenderTransformOrigin="0.604,-0.039" Click="butChangeInfo_Click" Grid.Column="2"/>
                     </Grid>
                 </TabItem>
-                <TabItem Header="...">
-                    <Grid Background="#FFE5E5E5"/>
+                <TabItem Header="MLTC" Margin="-8,0,4,-3">
+                    <Grid Background="#FFE5E5E5" Margin="0,0,0,2.8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="11*"/>
+                            <ColumnDefinition Width="25*"/>
+                            <ColumnDefinition Width="18*"/>
+                            <ColumnDefinition Width="17*"/>
+                            <ColumnDefinition Width="45*"/>
+                            <ColumnDefinition Width="112*"/>
+                        </Grid.ColumnDefinitions>
+                        <ComboBox x:Name="cbFocusLayer" HorizontalAlignment="Left" Margin="10,45.137,0,0" VerticalAlignment="Top" Width="208.207" Grid.ColumnSpan="6"/>
+                        <Button x:Name="butPopFocLyrCb" Content="Refresh drop down lists" HorizontalAlignment="Left" Margin="10,18.177,0,0" VerticalAlignment="Top" Width="143.4" RenderTransformOrigin="0.272,-0.055" Click="butPopFocLyrCb_Click" Grid.ColumnSpan="6"/>
+                        <Button x:Name="butRunSignature" Content="Generate" Grid.Column="5" HorizontalAlignment="Left" Margin="26.807,85.937,0,0" VerticalAlignment="Top" Width="75" Click="butRunSignature_Click"/>
+                        <Button Content="i" Grid.Column="5" HorizontalAlignment="Left" Margin="71.6,10,0,0" VerticalAlignment="Top" Width="19.807" Height="16.36" Click="Button_Click_1"/>
+                    </Grid>
                 </TabItem>
             </TabControl>
-            <Label Content="Aggregation result analyses" HorizontalAlignment="Left" Margin="-2.035,385.599,0,0" VerticalAlignment="Top" Height="27.003" Grid.RowSpan="2"/>
+            <Label Content="Add a Query Filter" HorizontalAlignment="Left" Margin="10,228.187,0,0" VerticalAlignment="Top" Height="25.96" Width="106.123"/>
+            <Label Content="Aggregation result analyses" HorizontalAlignment="Left" Margin="19.022,350.802,0,0" VerticalAlignment="Top" Height="27.003"/>
+            <Label Name="lblPbarStatus" Content="Status" HorizontalAlignment="Left" Margin="10,190.681,0,0" Grid.Row="1" VerticalAlignment="Top" Width="238.093"/>
         </Grid>
         <Grid HorizontalAlignment="Left" Height="0" Margin="119.8,61.2,0,-57.349" VerticalAlignment="Top" Width="3.2" Grid.Column="2" Grid.Row="2"/>
     </Grid>
