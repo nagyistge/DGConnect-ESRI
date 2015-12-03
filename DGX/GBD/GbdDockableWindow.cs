@@ -38,6 +38,8 @@ namespace Dgx.Gbd
     using System.Threading;
     using System.Windows.Forms;
     using DGXSettings;
+    using DGXSettings.Properties;
+
     using Encryption;
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.esriSystem;
@@ -65,6 +67,8 @@ namespace Dgx.Gbd
         /// Regular expression for getting the catalog id out of a url address.-
         /// </summary>
         private readonly Regex catalogIdRegEx = new Regex("catalogId=(?<catId>.*?)&");
+
+        private readonly string filePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Settings.Default.GbdOrders;
         
         /// <summary>
         /// GBD Comms that will talk with the GBD services.
@@ -262,6 +266,16 @@ namespace Dgx.Gbd
 
             this.dataView.RowFilter = this.FilterSetup();
             this.SetupOrderStatusTable();
+
+            // Allocate the memory for the object even if we don't have orders yet
+            this.gbdOrderList = new List<GbdOrder>();
+
+            // If we have orders saved then lets load them up
+            if (File.Exists(this.filePath))
+            {
+                this.gbdOrderList = this.LoadGbdOrdersFromFile(this.filePath);
+                UpdateOrderTable(this.gbdOrderList, ref this.orderTable);
+            }
         }
 
         /// <summary>
@@ -1474,9 +1488,23 @@ namespace Dgx.Gbd
         /// <summary>
         /// Write the GBD orders to file from the GBD Order's Table.
         /// </summary>
-        private void WriteGbdOrdersToFile()
+        private void WriteGbdOrdersToFile(List <GbdOrder> orders)
         {
-            // #ToBeImplemented
+            var serializedOutput = JsonConvert.SerializeObject(orders);
+            File.WriteAllText(this.filePath, serializedOutput);
+        }
+
+        /// <summary>
+        /// Load the GBD orders from given file path.
+        /// </summary>
+        /// <param name="filepath"></param>
+        private List<GbdOrder> LoadGbdOrdersFromFile(string filepath)
+        {
+            var serializedOutput = File.ReadAllText(this.filePath);
+
+            var list = JsonConvert.DeserializeObject<List<GbdOrder>>(serializedOutput);
+
+            return list;
         }
 
         /// <summary>
@@ -1484,6 +1512,7 @@ namespace Dgx.Gbd
         /// </summary>
         private void OrderImagery()
         {
+            // #ToBeImplemented
             try
             {
                 var catIdList = GetImageryToBeOrdered(this.dataGridView1);
@@ -1503,7 +1532,9 @@ namespace Dgx.Gbd
                 
                 UpdateOrderTable(result,ref this.orderTable);
 
-                this.WriteGbdOrdersToFile();
+                this.gbdOrderList.AddRange(result);
+
+                this.WriteGbdOrdersToFile(this.gbdOrderList);
             }
             catch (Exception error)
             {

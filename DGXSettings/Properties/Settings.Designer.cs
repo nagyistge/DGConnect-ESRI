@@ -200,7 +200,7 @@ namespace DGXSettings.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("gbdOrders")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\DGX\\gbdOrders")]
         public string GbdOrders {
             get {
                 return ((string)(this["GbdOrders"]));
