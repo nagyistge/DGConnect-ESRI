@@ -203,4 +203,7 @@ Only letters and the '.' are allowed.</value>
   <data name="pleaseChooseDetailsGranularity" xml:space="preserve">
     <value>Please choose detail granularity</value>
   </data>
+  <data name="upgradeRequired" xml:space="preserve">
+    <value>In order to access this functionality, upgrade your account.</value>
+  </data>
 </root>
