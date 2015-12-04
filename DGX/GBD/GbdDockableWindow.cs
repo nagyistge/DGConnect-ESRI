@@ -1566,7 +1566,6 @@ namespace Dgx.Gbd
         /// </summary>
         private void OrderImagery()
         {
-            // #ToBeImplemented
             try
             {
                 // get the ID's of the images to be ordered
