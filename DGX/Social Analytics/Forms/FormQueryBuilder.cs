@@ -31,6 +31,8 @@ namespace Dgx
     using Dgx.Properties;
     using Dgx.Social_Analytics.Forms;
 
+    using DGXSettings;
+
     using Encryption;
 
     using ESRI.ArcGIS.Geometry;
@@ -124,8 +126,17 @@ namespace Dgx
 
             if (!authentic)
             {
-                MessageBox.Show(DGXSettings.DgxResources.InvalidUserPass);
                 this.ValidAuthentication = false;
+
+                if (nobject.ResponseStatusCode == HttpStatusCode.Forbidden)
+                {
+                    MessageBox.Show(DgxResources.upgradeRequired);
+                }
+                else
+                {
+                    MessageBox.Show(DgxResources.InvalidUserPass);
+                }
+                
                 return;
             }
 

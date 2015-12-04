@@ -309,6 +309,15 @@ namespace DGXSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to In order to access this functionality, upgrade your account..
+        /// </summary>
+        public static string upgradeRequired {
+            get {
+                return ResourceManager.GetString("upgradeRequired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No data found..
         /// </summary>
         public static string VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_ {

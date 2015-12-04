@@ -93,24 +93,6 @@ namespace Dgx.Forms
             this.isUnitTest = isUnitTest;
         }
 
-        #region Public Methods
-
-        /// <summary>
-        /// Validate username
-        /// </summary>
-        /// <param name="username">
-        /// The username to be validated
-        /// </param>
-        /// <returns>
-        /// true if the username is valid
-        /// </returns>
-        public static bool ValidUsername(string username)
-        {
-            return Regex.IsMatch(username, @"^[a-zA-Z.]+$");
-        }
-
-        #endregion
-
         #region Private Methods
 
         /// <summary>
@@ -193,16 +175,10 @@ namespace Dgx.Forms
         /// </param>
         private void ButtonOkClick(object sender, EventArgs e)
         {
-            // Enforce username requirements
-            if (!ValidUsername(this.UserNameTextBox.Text))
-            {
-                MessageBox.Show(DGXSettings.DgxResources.InvalidUsername);
-                return;
-            }
-
             DGXSettings.Properties.Settings.Default["username"] = this.UserNameTextBox.Text;
             DGXSettings.Properties.Settings.Default.geoDatabase = this.fileGdbDirectoryTextBox.Text;
             DGXSettings.Properties.Settings.Default.baseUrl = this.urlTextBox.Text;
+            
             string temp;
             if (Aes.Instance.Encrypt128(this.PasswordTextBox.Text, out temp))
             {
@@ -229,13 +205,6 @@ namespace Dgx.Forms
         /// </param>
         private void ButtonTestClick(object sender, EventArgs e)
         {
-            // Enforce username requirements
-            if (!ValidUsername(this.UserNameTextBox.Text))
-            {
-                MessageBox.Show(DGXSettings.DgxResources.InvalidUsername);
-                return;
-            }
-
             var netObj = new NetObject
                              {
                                  AuthEndpoint = DGXSettings.Properties.Settings.Default.authenticationServer,
