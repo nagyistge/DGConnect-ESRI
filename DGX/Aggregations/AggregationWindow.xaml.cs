@@ -950,7 +950,7 @@ namespace Dgx.Aggregations
         }
 
         PivotTable signature = this.FeaturesToPivotTable(outPut, "Name", null);
-        List<String> ignoreCols = new List<String>() { "OBJECTID", "SHAPE" };
+        List<String> ignoreCols = new List<String>() { "OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area" };
 
 
         PivotTableAnalyzer analyzer = new PivotTableAnalyzer(new SendAnInt(this.UpdatePBar), new UpdateAggWindowPbar(this.SetPBarProperties));
@@ -1017,7 +1017,7 @@ namespace Dgx.Aggregations
         }
       }
       catch (Exception ex) {
-        MessageBox.Show("An unhandled exception occured");
+        MessageBox.Show("An unhandled exception occurred");
       }
     }
 
@@ -1033,12 +1033,14 @@ namespace Dgx.Aggregations
         IFeatureLayer flayerA = getLayerByName(layers, layerA);
         IFeatureLayer flayerB = getLayerByName(layers, layerB);
         this.pbarChangeDet.Value = 0;
+
         this.UpdateStatusLabel("formatting and Caching Layer A");
         System.Windows.Forms.Application.DoEvents();
-        PivotTable ptA = FeatureLayerToPivotTable(flayerA, "Name", null);
+        List<String> ignoreCols = new List<String>() { "OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area" };
+        PivotTable ptA = FeatureLayerToPivotTable(flayerA, "Name", ignoreCols);
         this.UpdateStatusLabel("formatting and Caching Layer B");
         System.Windows.Forms.Application.DoEvents();
-        PivotTable ptB = FeatureLayerToPivotTable(flayerB, "Name", null);
+        PivotTable ptB = FeatureLayerToPivotTable(flayerB, "Name", ignoreCols);
         this.UpdateStatusLabel("Generating Change Detection layer");
         System.Windows.Forms.Application.DoEvents();
         Dictionary<String, String> uniqueFieldNames = new Dictionary<String, String>();
