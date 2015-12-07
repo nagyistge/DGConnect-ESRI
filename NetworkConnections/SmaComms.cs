@@ -318,8 +318,11 @@ namespace NetworkConnections
             {
                 nobj.CookieJar = DgAuth.Instance.AuthenticateService(st, nobj.AuthEndpoint);
             }
-            catch
+            catch(WebException error)
             {
+                nobj.ErrorOccurred = true;
+                nobj.Error = error;
+                nobj.ResponseStatusCode = ((HttpWebResponse)error.Response).StatusCode;
                 return false;
             }
 
