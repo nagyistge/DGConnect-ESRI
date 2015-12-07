@@ -336,6 +336,18 @@ namespace Dgx.Gbd
         private delegate void DataTableDone(DataTable dt, Dictionary<string, Properties> responses);
 
         /// <summary>
+        /// Callback to update the gbd list of orders
+        /// </summary>
+        /// <param name="orderId">order id of the status to be updated.</param>
+        /// <param name="status">status of the order</param>
+        private delegate void UpdateListCallback(string orderId, string status);
+
+        /// <summary>
+        /// Callback to signal that the gbd orders need to be re-written to file.
+        /// </summary>
+        private delegate void WriteUpdatesToFile();
+
+        /// <summary>
         /// Callback to update the order status.  Will be fired from a background thread
         /// </summary>
         /// <param name="updateStatus">
@@ -1489,6 +1501,16 @@ namespace Dgx.Gbd
                 row["Order ID"] = item.salesOrderNumber;
                 row["Order Date"] = epochTime.ToString("g");
                 row["Service Provider"] = item.header.serviceProvider;
+
+                if (item.lines.Count > 0)
+                {
+                    var status = item.lines[0].lineItemStatus;
+
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        row["Order Status"] = item.lines[0].lineItemStatus;
+                    }
+                }
                 orderTable.Rows.Add(row);
             }
         }
@@ -1727,9 +1749,13 @@ namespace Dgx.Gbd
                 foreach (DataGridViewRow row in this.orderDataGridView.Rows)
                 {
                     var item = row.Cells["Order ID"].Value.ToString();
+                    var currentStatus = row.Cells["Order Status"].Value.ToString();
                     if (!string.IsNullOrEmpty(item))
                     {
-                        list.Add(item);
+                        if (!string.Equals(currentStatus, "DELIVERED"))
+                        {
+                            list.Add(item);
+                        }
                     }
                 }
             }
@@ -1800,17 +1826,43 @@ namespace Dgx.Gbd
                 {
                     foreach (DataRow row in this.orderTable.Rows)
                     {
-                        string orderId = row["Order ID"].ToString();
-                        if (orderId == orderStatusUpdate.salesOrderNumber)
+                        var orderId = row["Order ID"].ToString();
+                        if (orderId != orderStatusUpdate.salesOrderNumber)
                         {
-                            row["Order Status"] = orderStatusUpdate.lines[0].lineItemStatus;
+                            continue;
                         }
+
+                        row["Order Status"] = orderStatusUpdate.lines[0].lineItemStatus;
+                        this.UpdateOrderListStatus(orderId, orderStatusUpdate.lines[0].lineItemStatus);
+                        this.WriteGbdOrdersToFile(this.gbdOrderList);
+
+                        // Since there should only be one order that has the specfied order id lets stop searching
+                        break;
                     }
                 }
             }
             catch (Exception error)
             {
                 this.logWriter.Error(error);
+                this.logWriter.Error(error);
+            }
+        }
+
+        private void UpdateOrderListStatus(string orderId, string status)
+        {
+            // should only be one item with that order id.
+            foreach (GbdOrder item in this.gbdOrderList.Where(item => item.salesOrderNumber == orderId))
+            {
+                if (item.lines.Count <= 0)
+                {
+                    continue;
+                }
+
+                var line = item.lines[0];
+                if (line != null)
+                {
+                    line.lineItemStatus = status;
+                }
             }
         }
 
