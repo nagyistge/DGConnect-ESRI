@@ -270,6 +270,11 @@ namespace NetworkConnections
             throw new NotImplementedException();
         }
 
+        public IRestClient GetClient()
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Not Implemented.
         /// </summary>

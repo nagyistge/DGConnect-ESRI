@@ -23,6 +23,8 @@ namespace NetworkConnections
 {
     using System.Collections.Specialized;
 
+    using RestSharp;
+
     /// <summary>
     /// The DgxComms interface.
     /// </summary>
@@ -104,6 +106,8 @@ namespace NetworkConnections
         /// The <see cref="T"/>.
         /// </returns>
         T Post<T>(NetObject netObject, string jsonDataPayLoad);
+
+        IRestClient GetClient();
 
         /// <summary>
         /// Get the GBD access token.

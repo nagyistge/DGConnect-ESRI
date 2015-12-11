@@ -298,6 +298,17 @@ namespace NetworkConnections
         }
 
         /// <summary>
+        /// Get the RestSharp client used in the wrapper interface.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IRestClient"/>.
+        /// </returns>
+        public IRestClient GetClient()
+        {
+            return this.client;
+        }
+
+        /// <summary>
         /// Returns the GBD access token.
         /// </summary>
         /// <returns>

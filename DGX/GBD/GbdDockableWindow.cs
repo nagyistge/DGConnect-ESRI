@@ -1,15 +1,15 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GbdDockableWindow.cs" company="DigitalGlobe">
 //   Copyright 2015 DigitalGlobe
-//   //      Licensed under the Apache License, Version 2.0 (the "License");
-//   //      you may not use this file except in compliance with the License.
-//   //      You may obtain a copy of the License at
-//   //          http://www.apache.org/licenses/LICENSE-2.0
-//   //      Unless required by applicable law or agreed to in writing, software
-//   //      distributed under the License is distributed on an "AS IS" BASIS,
-//   //      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//   //      See the License for the specific language governing permissions and
-//   //      limitations under the License.
+//   //   //      Licensed under the Apache License, Version 2.0 (the "License");
+//   //   //      you may not use this file except in compliance with the License.
+//   //   //      You may obtain a copy of the License at
+//   //   //          http://www.apache.org/licenses/LICENSE-2.0
+//   //   //      Unless required by applicable law or agreed to in writing, software
+//   //   //      distributed under the License is distributed on an "AS IS" BASIS,
+//   //   //      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   //   //      See the License for the specific language governing permissions and
+//   //   //      limitations under the License.
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -335,17 +335,7 @@ namespace Dgx.Gbd
         /// <param name="responses">dictionary of the newly complete responses.</param>
         private delegate void DataTableDone(DataTable dt, Dictionary<string, Properties> responses);
 
-        /// <summary>
-        /// Callback to update the gbd list of orders
-        /// </summary>
-        /// <param name="orderId">order id of the status to be updated.</param>
-        /// <param name="status">status of the order</param>
-        private delegate void UpdateListCallback(string orderId, string status);
-
-        /// <summary>
-        /// Callback to signal that the gbd orders need to be re-written to file.
-        /// </summary>
-        private delegate void WriteUpdatesToFile();
+        private delegate void ExecuteAfterResponse(List<GbdOrder> orders);
 
         /// <summary>
         /// Callback to update the order status.  Will be fired from a background thread
@@ -1511,6 +1501,7 @@ namespace Dgx.Gbd
                         row["Order Status"] = item.lines[0].lineItemStatus;
                     }
                 }
+
                 orderTable.Rows.Add(row);
             }
         }
@@ -1599,27 +1590,17 @@ namespace Dgx.Gbd
                 var request = new RestRequest("/raster-catalog/api/gbd/orders/v1", Method.POST);
                 request.AddHeader("Authorization", "Bearer " + this.comms.GetAccessToken());
                 request.AddParameter("application/json", output, ParameterType.RequestBody);
-                
-                bool success = false;
 
-                var netObj = CreateNetObject(ref success);
+                var commsClient = this.comms.GetClient();
 
-                netObj.AddressUrl = "/raster-catalog/api/gbd/orders/v1";
-
-                if (!success)
+                if (commsClient == null)
                 {
-                    MessageBox.Show(DgxResources.InvalidUserPass);
-                    return;
+                    commsClient = new RestClient(DgxHelper.GetEndpointBase(Settings.Default));
                 }
 
-                // send the order to GBD
-                var result = this.comms.Post<List<GbdOrder>>(netObj, output);
-                
-                UpdateOrderTable(result,ref this.orderTable);
-
-                this.gbdOrderList.AddRange(result);
-
-                this.WriteGbdOrdersToFile(this.gbdOrderList);
+                commsClient.ExecuteAsync<List<GbdOrder>>(
+                    request,
+                    resp => this.Invoke(new ExecuteAfterResponse(this.HandleOrderResponse), resp.Data));
             }
             catch (Exception error)
             {
@@ -1627,6 +1608,25 @@ namespace Dgx.Gbd
             }
         }
 
+        /// <summary>
+        /// The handle order response.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        private void HandleOrderResponse(List<GbdOrder> data)
+        {
+            try
+            {
+                UpdateOrderTable(data, ref this.orderTable);
+                this.gbdOrderList.AddRange(data);
+                this.WriteGbdOrdersToFile(this.gbdOrderList);
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
+        }
         /// <summary>
         /// The create net object.
         /// </summary>
@@ -1640,7 +1640,7 @@ namespace Dgx.Gbd
         {
             string decryptedPassword;
             success = Aes.Instance.Decrypt128(
-                DGXSettings.Properties.Settings.Default.password,
+                Settings.Default.password,
                 out decryptedPassword);
             if (!success)
             {
@@ -1651,14 +1651,14 @@ namespace Dgx.Gbd
             NetObject netObj = new NetObject
             {
                 AddressUrl =
-                    DGXSettings.Properties.Settings.Default.GbdSearchPath,
+                    Settings.Default.GbdSearchPath,
                 BaseUrl =
                     DgxHelper.GetEndpointBase(
-                        DGXSettings.Properties.Settings.Default),
+                        Settings.Default),
                 AuthEndpoint =
-                    DGXSettings.Properties.Settings.Default
+                    Settings.Default
                     .authenticationServer,
-                User = DGXSettings.Properties.Settings.Default.username,
+                User = Settings.Default.username,
                 Password = decryptedPassword,
             };
 
@@ -1848,6 +1848,15 @@ namespace Dgx.Gbd
             }
         }
 
+        /// <summary>
+        /// The update order list status.
+        /// </summary>
+        /// <param name="orderId">
+        /// The order id.
+        /// </param>
+        /// <param name="status">
+        /// The status.
+        /// </param>
         private void UpdateOrderListStatus(string orderId, string status)
         {
             // should only be one item with that order id.
