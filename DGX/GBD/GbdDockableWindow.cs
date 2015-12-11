@@ -1621,13 +1621,15 @@ namespace Dgx.Gbd
                 UpdateOrderTable(data, ref this.orderTable);
                 this.gbdOrderList.AddRange(data);
                 this.WriteGbdOrdersToFile(this.gbdOrderList);
-                
+                this.UpdateStatus();
+                this.tabControl1.SelectTab(this.statusPage);
             }
             catch (Exception error)
             {
                 this.logWriter.Error(error);
             }
         }
+
         /// <summary>
         /// The create net object.
         /// </summary>

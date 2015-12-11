@@ -54,7 +54,7 @@
             this.totalItemsLabel = new System.Windows.Forms.Label();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
-            this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.statusPage = new System.Windows.Forms.TabPage();
             this.tableLayoutPanel4 = new System.Windows.Forms.TableLayoutPanel();
             this.orderDataGridView = new System.Windows.Forms.DataGridView();
             this.refreshButton = new System.Windows.Forms.Button();
@@ -65,7 +65,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.thumbnailPictureBox)).BeginInit();
             this.tabControl1.SuspendLayout();
             this.tabPage1.SuspendLayout();
-            this.tabPage2.SuspendLayout();
+            this.statusPage.SuspendLayout();
             this.tableLayoutPanel4.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.orderDataGridView)).BeginInit();
             this.SuspendLayout();
@@ -118,7 +118,7 @@
             "1.1",
             "1.2",
             "1.3 (Lowest Resolution)"});
-            this.panResolutionComboBox.Location = new System.Drawing.Point(139, 192);
+            this.panResolutionComboBox.Location = new System.Drawing.Point(139, 193);
             this.panResolutionComboBox.Name = "panResolutionComboBox";
             this.panResolutionComboBox.Size = new System.Drawing.Size(129, 24);
             this.panResolutionComboBox.TabIndex = 10;
@@ -438,7 +438,7 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tabControl1.Controls.Add(this.tabPage1);
-            this.tabControl1.Controls.Add(this.tabPage2);
+            this.tabControl1.Controls.Add(this.statusPage);
             this.tabControl1.Location = new System.Drawing.Point(3, 3);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
@@ -456,16 +456,16 @@
             this.tabPage1.Text = "Search";
             this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // tabPage2
+            // statusPage
             // 
-            this.tabPage2.Controls.Add(this.tableLayoutPanel4);
-            this.tabPage2.Location = new System.Drawing.Point(4, 25);
-            this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage2.Size = new System.Drawing.Size(583, 796);
-            this.tabPage2.TabIndex = 1;
-            this.tabPage2.Text = "Order Status";
-            this.tabPage2.UseVisualStyleBackColor = true;
+            this.statusPage.Controls.Add(this.tableLayoutPanel4);
+            this.statusPage.Location = new System.Drawing.Point(4, 25);
+            this.statusPage.Name = "statusPage";
+            this.statusPage.Padding = new System.Windows.Forms.Padding(3);
+            this.statusPage.Size = new System.Drawing.Size(583, 796);
+            this.statusPage.TabIndex = 1;
+            this.statusPage.Text = "Order Status";
+            this.statusPage.UseVisualStyleBackColor = true;
             // 
             // tableLayoutPanel4
             // 
@@ -528,7 +528,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.thumbnailPictureBox)).EndInit();
             this.tabControl1.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
-            this.tabPage2.ResumeLayout(false);
+            this.statusPage.ResumeLayout(false);
             this.tableLayoutPanel4.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.orderDataGridView)).EndInit();
             this.ResumeLayout(false);
@@ -563,7 +563,7 @@
         private System.Windows.Forms.Label totalItemsLabel;
         private System.Windows.Forms.TabControl tabControl1;
         private System.Windows.Forms.TabPage tabPage1;
-        private System.Windows.Forms.TabPage tabPage2;
+        private System.Windows.Forms.TabPage statusPage;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.DataGridView orderDataGridView;
         private System.Windows.Forms.Button refreshButton;
