@@ -1621,6 +1621,7 @@ namespace Dgx.Gbd
                 UpdateOrderTable(data, ref this.orderTable);
                 this.gbdOrderList.AddRange(data);
                 this.WriteGbdOrdersToFile(this.gbdOrderList);
+                
             }
             catch (Exception error)
             {
@@ -1683,55 +1684,63 @@ namespace Dgx.Gbd
         {
             try
             {
-                var ids = this.GetOrderIdsForRefresh();
-
-                // make sure the thread isn't running.  if it is gracefully kill it ...
-                this.ThreadLifeCheck(this.statusUpdateThread);
-
-                if (this.comms.GetAccessToken() == null)
-                {
-                    string decryptedPassword;
-                    var success = Aes.Instance.Decrypt128(
-                        Settings.Default.password,
-                        out decryptedPassword);
-                    if (!success)
-                    {
-                        return;
-                    }
-
-                    var netObj = new NetObject
-                    {
-                        AddressUrl =
-                            Settings.Default.GbdSearchPath,
-                        BaseUrl =
-                            DgxHelper.GetEndpointBase(
-                                Settings.Default),
-                        AuthEndpoint =
-                            Settings.Default
-                            .authenticationServer,
-                        User = Settings.Default.username,
-                        Password = decryptedPassword,
-                    };
-
-                    this.comms.AuthenticateNetworkObject(ref netObj);
-                }
-
-                // set up new thread
-                this.statusUpdateThread =
-                    new Thread(
-                        () =>
-                        this.CheckOrderStatus(
-                            ids,
-                            new RestClient(DgxHelper.GetEndpointBase(Settings.Default)),
-                            this.comms.GetAccessToken()));
-
-                // execute the job
-                this.statusUpdateThread.Start();
+                this.UpdateStatus();
             }
             catch (Exception error)
             {
                 this.logWriter.Error(error);
             }
+        }
+
+        private void CheckAccessToken()
+        {
+            if (this.comms.GetAccessToken() == null)
+            {
+                string decryptedPassword;
+                var success = Aes.Instance.Decrypt128(
+                    Settings.Default.password,
+                    out decryptedPassword);
+                if (!success)
+                {
+                    return;
+                }
+
+                var netObj = new NetObject
+                {
+                    AddressUrl =
+                        Settings.Default.GbdSearchPath,
+                    BaseUrl =
+                        DgxHelper.GetEndpointBase(
+                            Settings.Default),
+                    AuthEndpoint =
+                        Settings.Default
+                        .authenticationServer,
+                    User = Settings.Default.username,
+                    Password = decryptedPassword,
+                };
+
+                this.comms.AuthenticateNetworkObject(ref netObj);
+            }
+        }
+
+        private void UpdateStatus()
+        {
+            this.CheckAccessToken();
+
+            // make sure the thread isn't running.  if it is gracefully kill it ...
+            this.ThreadLifeCheck(this.statusUpdateThread);
+
+            // set up new thread
+            this.statusUpdateThread =
+                new Thread(
+                    () =>
+                    this.CheckOrderStatus(
+                        this.GetOrderIdsForRefresh(),
+                        new RestClient(DgxHelper.GetEndpointBase(Settings.Default)),
+                        this.comms.GetAccessToken()));
+
+            // execute the job
+            this.statusUpdateThread.Start();
         }
 
         /// <summary>
