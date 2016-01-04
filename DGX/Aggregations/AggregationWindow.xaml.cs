@@ -80,12 +80,12 @@ namespace Gbdx.Aggregations
       this.startDatePicker.DisplayDateEnd = this.endDatePicker.SelectedDate.Value;
       this.endDatePicker.DisplayDateStart = this.startDatePicker.SelectedDate;
 
-      this.Client = new RestClient(DgxHelper.GetEndpointBase(Settings.Default));
+      this.Client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
       string unencryptedPassword;
       var result = Aes.Instance.Decrypt128(Settings.Default.password, out unencryptedPassword);
 
       if (result) {
-        this.Authenticate(Settings.Default.username, unencryptedPassword, this.Client, DgxHelper.GetAuthenticationEndpoint(Settings.Default), true);
+        this.Authenticate(Settings.Default.username, unencryptedPassword, this.Client, GbdxHelper.GetAuthenticationEndpoint(Settings.Default), true);
       }
 
       AggregationRelay.Instance.AoiHasBeenDrawn += this.InstanceAoiHasBeenDrawn;
@@ -157,7 +157,7 @@ namespace Gbdx.Aggregations
                 this.Authorization = resp.Data;
               }
               else {
-                MessageBox.Show(DgxResources.InvalidUserPass);
+                MessageBox.Show(GbdxResources.InvalidUserPass);
               }
             });
       }
@@ -167,7 +167,7 @@ namespace Gbdx.Aggregations
           this.Authorization = response.Data;
         }
         else {
-          MessageBox.Show(DgxResources.InvalidUserPass);
+          MessageBox.Show(GbdxResources.InvalidUserPass);
         }
       }
     }
@@ -221,17 +221,17 @@ namespace Gbdx.Aggregations
     /// </param>
     private void GoButtonClick(object sender, RoutedEventArgs e) {
       if (this.AoiPolygon == null) {
-        MessageBox.Show(DgxResources.invalidBoundingBox);
+        MessageBox.Show(GbdxResources.invalidBoundingBox);
         return;
       }
 
       if (this.QuerySelectionComboBox.SelectedIndex == -1) {
-        MessageBox.Show(DgxResources.noAggregationSelected);
+        MessageBox.Show(GbdxResources.noAggregationSelected);
         return;
       }
 
       if (this.detailGranularityComboBox.SelectedIndex == -1) {
-        MessageBox.Show(DgxResources.pleaseChooseDetailsGranularity);
+        MessageBox.Show(GbdxResources.pleaseChooseDetailsGranularity);
         return;
       }
 
@@ -247,16 +247,16 @@ namespace Gbdx.Aggregations
               Settings.Default.username,
               unencryptedPassword,
               this.Client,
-              DgxHelper.GetAuthenticationEndpoint(Settings.Default),
+              GbdxHelper.GetAuthenticationEndpoint(Settings.Default),
               false);
         }
         else {
-          MessageBox.Show(DgxResources.problemDecryptingPassword);
+          MessageBox.Show(GbdxResources.problemDecryptingPassword);
           return;
         }
 
         if (this.Authorization == null) {
-          MessageBox.Show(DgxResources.InvalidUserPass);
+          MessageBox.Show(GbdxResources.InvalidUserPass);
           return;
         }
       }
@@ -321,7 +321,7 @@ namespace Gbdx.Aggregations
                   DispatcherPriority.Normal,
                   (MethodInvoker)delegate { this.goButton.IsEnabled = true; });
 
-              MessageBox.Show(DgxResources.Source_ErrorMessage);
+              MessageBox.Show(GbdxResources.Source_ErrorMessage);
             }
           });
     }

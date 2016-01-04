@@ -606,7 +606,7 @@ namespace Gbdx
                 }
                 else
                 {
-                    MessageBox.Show(DgxResources.Source_ErrorMessage);
+                    MessageBox.Show(GbdxResources.Source_ErrorMessage);
                 }
 
                 // clear out the query 
@@ -617,7 +617,7 @@ namespace Gbdx
 
             if (this.noResultsFound)
             {
-                MessageBox.Show(GbdxSettings.DgxResources.VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_);
+                MessageBox.Show(GbdxSettings.GbdxResources.VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_);
                 return;
             }
 

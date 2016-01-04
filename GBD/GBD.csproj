@@ -69,9 +69,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DGXSettings\DGXSettings.csproj">
+    <ProjectReference Include="..\DGXSettings\GBDXSettings.csproj">
       <Project>{f96e1da5-a0cd-4569-8727-8fb3c2935731}</Project>
-      <Name>DGXSettings</Name>
+      <Name>GBDXSettings</Name>
     </ProjectReference>
     <ProjectReference Include="..\DgxTools\GbdxTools.csproj">
       <Project>{95b5413e-160a-4afb-8b0a-b0df1b1c093b}</Project>

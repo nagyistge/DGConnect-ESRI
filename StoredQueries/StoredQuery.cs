@@ -30,22 +30,22 @@ namespace StoredQueries
     using Newtonsoft.Json;
 
     /// <summary>
-    /// Implements the IDgx interface.
+    /// Implements the IStoredQuery interface.
     /// </summary>
     public class StoredQuery:IStoredQuery
     {
         /// <summary>
-        /// Class implementing the IDgxComms interface to be used for 
+        /// Class implementing the IGbdxComms interface to be used for 
         /// </summary>
-        private IDgxComms cloudComms;
+        private IGbdxComms cloudComms;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StoredQuery"/> class.
         /// </summary>
         /// <param name="comms">
-        /// Interface that defines how to talk with DGX Cloud services. <see cref="IDgxComms"/> 
+        /// Interface that defines how to talk with GBDX Cloud services. <see cref="IGbdxComms"/> 
         /// </param>
-        public StoredQuery (IDgxComms comms)
+        public StoredQuery (IGbdxComms comms)
         {
             this.cloudComms = comms;
         }
@@ -55,8 +55,7 @@ namespace StoredQueries
         /// </summary>
         public StoredQuery()
         {
-            // No object implementing IDgxComms was passed in.  
-            this.cloudComms = new DgxComms();
+            this.cloudComms = new GbdxComms();
         }
 
         #region IStoryQuery Implementation
@@ -65,7 +64,7 @@ namespace StoredQueries
         /// Get the queries stored in the stored query service.
         /// </summary>
         /// <param name="comms">
-        /// <see cref="IDgxComms"/> used for communicating with the stored query service.
+        /// <see cref="IGbdxComms"/> used for communicating with the stored query service.
         /// </param>
         /// <param name="netObject">
         /// the network object to be used in communicating with stored query service
@@ -73,7 +72,7 @@ namespace StoredQueries
         /// <returns>
         /// List of queries stored in the service.
         /// </returns>
-        public List<SavedQuery> GetQueries(IDgxComms comms, NetObject netObject)
+        public List<SavedQuery> GetQueries(IGbdxComms comms, NetObject netObject)
         {
             var output = comms.Request(netObject);
 
@@ -106,7 +105,7 @@ namespace StoredQueries
         /// Add/Update a query with the stored query service.
         /// </summary>
         /// <param name="comms">
-        /// <see cref="IDgxComms"/> used for communicating with the stored query service.
+        /// <see cref="IGbdxComms"/> used for communicating with the stored query service.
         /// </param>
         /// <param name="netObject">
         /// the network object to be used in communicating with stored query service
@@ -117,7 +116,7 @@ namespace StoredQueries
         /// <returns>
         /// True if the update/add was successful.
         /// </returns>
-        public bool UpdateQuery(IDgxComms comms, NetObject netObject, SavedQuery itemToAddUpdate)
+        public bool UpdateQuery(IGbdxComms comms, NetObject netObject, SavedQuery itemToAddUpdate)
         {
             try
             {
@@ -163,7 +162,7 @@ namespace StoredQueries
         /// Delete a query from the stored service.
         /// </summary>
         /// <param name="comms">
-        /// <see cref="IDgxComms"/> used for communicating with the stored query service.
+        /// <see cref="IGbdxComms"/> used for communicating with the stored query service.
         /// </param>
         /// <param name="netObject">
         /// the network object to be used in communicating with stored query service
@@ -171,7 +170,7 @@ namespace StoredQueries
         /// <returns>
         /// True if the delete query method is successful.
         /// </returns>
-        public bool DeleteQuery(IDgxComms comms, NetObject netObject)
+        public bool DeleteQuery(IGbdxComms comms, NetObject netObject)
         {
             try
             {

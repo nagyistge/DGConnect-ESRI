@@ -28,7 +28,7 @@ namespace NetworkConnections.Tests
 
 
     [TestClass()]
-    public class DgxCommsTests
+    public class GbdxCommsTests
     {
         private JsonDeserializer deserial = new JsonDeserializer();
 
@@ -70,7 +70,7 @@ namespace NetworkConnections.Tests
                 .Return(temp);
 
             // Remove the mockRepo from constructor to hit actual endpoint.
-            var testClass = new DgxComms(mockRepo);
+            var testClass = new GbdxComms(mockRepo);
             var result = testClass.AuthenticateNetworkObject(ref netObj);
 
 
@@ -103,7 +103,7 @@ namespace NetworkConnections.Tests
                 .Return(temp);
 
             // Remove the mockRepo from constructor to hit actual endpoint.
-            var testClass = new DgxComms(mockRepo);
+            var testClass = new GbdxComms(mockRepo);
             var result = testClass.AuthenticateNetworkObject(ref netObj);
 
 
@@ -151,7 +151,7 @@ namespace NetworkConnections.Tests
                 .Return(sourceData);
 
             // Remove the mockRepo from constructor to hit actual endpoint.
-            var testClass = new DgxComms(mockRepo);
+            var testClass = new GbdxComms(mockRepo);
 
             var result = testClass.Request(netObj);
             Assert.IsTrue(result.Result == Resource1.GetRequestNormalResponse);
@@ -170,7 +170,7 @@ namespace NetworkConnections.Tests
                     "/insight-vector/api/esri/OSM/Polygon/Building/paging?left=36.2845510828066&upper=35.6019997390785&right=37.529485081057&lower=34.6768653000117&ttl=1m&count=100"
             };
 
-            var testClass = new DgxComms();
+            var testClass = new GbdxComms();
 
             var result = testClass.Request(netObj);
 

@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDgxComms.cs" company="DigitalGlobe">
+// <copyright file="IGbdxComms.cs" company="DigitalGlobe">
 //   Copyright 2015 DigitalGlobe
 //   
 //      Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
 //      limitations under the License.
 // </copyright>
 // <summary>
-//   The DgxComms interface.
+//   The GbdxComms interface.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -26,9 +26,9 @@ namespace NetworkConnections
     using RestSharp;
 
     /// <summary>
-    /// The DgxComms interface.
+    /// The IGbdxComms interface.
     /// </summary>
-    public interface IDgxComms
+    public interface IGbdxComms
     {
         /// <summary>
         /// The request.

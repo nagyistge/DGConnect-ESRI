@@ -77,7 +77,7 @@ namespace Gbdx.Gbd
         /// <summary>
         /// GBD Comms that will talk with the GBD services.
         /// </summary>
-        private readonly IDgxComms comms;
+        private readonly IGbdxComms comms;
 
         /// <summary>
         /// The polygon of the drawn AOI.
@@ -222,12 +222,12 @@ namespace Gbdx.Gbd
             // Check to make sure there are credentials for GBD account.
             if (string.IsNullOrEmpty(Settings.Default.username) || string.IsNullOrEmpty(Settings.Default.password))
             {
-                MessageBox.Show(DgxResources.InvalidUserPass);
+                MessageBox.Show(GbdxResources.InvalidUserPass);
                 return;
             }
 
             // Initialize GBD Communications and authorize with GBD authentication.
-            this.comms = new DgxComms(Jarvis.LogFile, false);
+            this.comms = new GbdxComms(Jarvis.LogFile, false);
 
             this.logWriter = new Logger(Jarvis.LogFile,false);
 
@@ -253,7 +253,7 @@ namespace Gbdx.Gbd
 
             this.thumbnailPictureBox.LoadCompleted += this.ThumbnailPictureBoxLoadCompleted;
             this.cachedImages = new Dictionary<string, Image>();
-            this.thumbnailPictureBox.InitialImage = new Bitmap(DgxResources.PleaseStandBy, new Size(309, 376));
+            this.thumbnailPictureBox.InitialImage = new Bitmap(GbdxResources.PleaseStandBy, new Size(309, 376));
 
             this.displayAllPolgons = false;
 
@@ -837,7 +837,7 @@ namespace Gbdx.Gbd
                                                AddressUrl =
                                                    Settings.Default.GbdSearchPath,
                                                BaseUrl =
-                                                   DgxHelper.GetEndpointBase(
+                                                   GbdxHelper.GetEndpointBase(
                                                        Settings.Default),
                                                AuthEndpoint =
                                                    Settings.Default
@@ -1217,8 +1217,8 @@ namespace Gbdx.Gbd
                 }
             }
 
-            this.selectedItemsLabel.Text = DgxResources.selectedItems + selectedRowCount;
-            this.totalItemsLabel.Text = DgxResources.totalItems + this.dataGridView1.RowCount;
+            this.selectedItemsLabel.Text = GbdxResources.selectedItems + selectedRowCount;
+            this.totalItemsLabel.Text = GbdxResources.totalItems + this.dataGridView1.RowCount;
         }
 
         /// <summary>
@@ -1350,7 +1350,7 @@ namespace Gbdx.Gbd
                 }
 
                 // Throw up the please wait image
-                this.thumbnailPictureBox.Image = new Bitmap(DgxResources.PleaseStandBy, this.thumbnailPictureBox.Size);
+                this.thumbnailPictureBox.Image = new Bitmap(GbdxResources.PleaseStandBy, this.thumbnailPictureBox.Size);
                 
                 // get the image asynchronsly 
                 this.asyncHandle = this.client.ExecuteAsync(
@@ -1595,7 +1595,7 @@ namespace Gbdx.Gbd
 
                 if (commsClient == null)
                 {
-                    commsClient = new RestClient(DgxHelper.GetEndpointBase(Settings.Default));
+                    commsClient = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
                 }
 
                 commsClient.ExecuteAsync<List<GbdOrder>>(
@@ -1656,7 +1656,7 @@ namespace Gbdx.Gbd
                 AddressUrl =
                     Settings.Default.GbdSearchPath,
                 BaseUrl =
-                    DgxHelper.GetEndpointBase(
+                    GbdxHelper.GetEndpointBase(
                         Settings.Default),
                 AuthEndpoint =
                     Settings.Default
@@ -1712,7 +1712,7 @@ namespace Gbdx.Gbd
                     AddressUrl =
                         Settings.Default.GbdSearchPath,
                     BaseUrl =
-                        DgxHelper.GetEndpointBase(
+                        GbdxHelper.GetEndpointBase(
                             Settings.Default),
                     AuthEndpoint =
                         Settings.Default
@@ -1738,7 +1738,7 @@ namespace Gbdx.Gbd
                     () =>
                     this.CheckOrderStatus(
                         this.GetOrderIdsForRefresh(),
-                        new RestClient(DgxHelper.GetEndpointBase(Settings.Default)),
+                        new RestClient(GbdxHelper.GetEndpointBase(Settings.Default)),
                         this.comms.GetAccessToken()));
 
             // execute the job

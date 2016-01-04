@@ -62,7 +62,7 @@ namespace Gbdx
         private readonly RbList timeLimit;
 
         /// <summary>
-        /// Class implementing IDgxComms interface.
+        /// Class implementing IGbdxComms interface.
         /// </summary>
         private readonly SmaComms cloudComms;
 
@@ -113,7 +113,7 @@ namespace Gbdx
 
             if (string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.username) || string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.password))
             {
-                MessageBox.Show(GbdxSettings.DgxResources.InvalidUserPass);
+                MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
                 this.ValidAuthentication = false;
                 return;
             }
@@ -131,11 +131,11 @@ namespace Gbdx
 
                 if (nobject.ResponseStatusCode == HttpStatusCode.Forbidden)
                 {
-                    MessageBox.Show(DgxResources.upgradeRequired);
+                    MessageBox.Show(GbdxResources.upgradeRequired);
                 }
                 else
                 {
-                    MessageBox.Show(DgxResources.InvalidUserPass);
+                    MessageBox.Show(GbdxResources.InvalidUserPass);
                 }
                 
                 return;
@@ -353,10 +353,10 @@ namespace Gbdx
                 CookieJar = new CookieContainer(),
                 TimeoutSetting = 8000,
                 User = GbdxSettings.Properties.Settings.Default.username,
-                BaseUrl = DgxHelper.GetCasBaseEndpoint(GbdxSettings.Properties.Settings.Default)
+                BaseUrl = GbdxHelper.GetCasBaseEndpoint(GbdxSettings.Properties.Settings.Default)
             };
-            netobj.AuthEndpoint = DgxHelper.GetCasAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
-            netobj.TicketEndpoint = DgxHelper.GetCasTicketEndpoint(GbdxSettings.Properties.Settings.Default);
+            netobj.AuthEndpoint = GbdxHelper.GetCasAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
+            netobj.TicketEndpoint = GbdxHelper.GetCasTicketEndpoint(GbdxSettings.Properties.Settings.Default);
 
             // Decrypt the password.  If an error occurs inform the user and return an unusable object.
             string pass;
@@ -367,7 +367,7 @@ namespace Gbdx
             }
             else
             {
-                MessageBox.Show(GbdxSettings.DgxResources.PasswordProblemCheckSettings);
+                MessageBox.Show(GbdxSettings.GbdxResources.PasswordProblemCheckSettings);
                 return null;
             }
 
@@ -386,7 +386,7 @@ namespace Gbdx
         private void PictureBoxFavoriteClick(object sender, EventArgs e)
         {
             this.filledHeartImageShown = !this.filledHeartImageShown;
-            this.button1.Image = this.filledHeartImageShown ? GbdxSettings.DgxResources.filledStar : GbdxSettings.DgxResources.emptyStar;
+            this.button1.Image = this.filledHeartImageShown ? GbdxSettings.GbdxResources.filledStar : GbdxSettings.GbdxResources.emptyStar;
 
             // If True then lets save the query.
             if (this.filledHeartImageShown)
@@ -488,7 +488,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.GbdxResources.invalidDateTime);
             }
         }
 
@@ -518,7 +518,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.GbdxResources.invalidDateTime);
             }
         }
 
@@ -548,7 +548,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.GbdxResources.invalidDateTime);
             }
         }
 
@@ -578,7 +578,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.GbdxResources.invalidDateTime);
             }
         }
 
@@ -608,7 +608,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.GbdxResources.invalidDateTime);
             }
         }
 
@@ -638,7 +638,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.GbdxResources.invalidDateTime);
             }
         }
 
@@ -668,7 +668,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.GbdxResources.invalidDateTime);
             }
         }
 
@@ -710,7 +710,7 @@ namespace Gbdx
             if (this.advancedOptionsShown)
             {
                 this.Size = new Size(412, 585);
-                this.advancedOptionsLinkLabel.Text = GbdxSettings.DgxResources.Hide_Advanced_Options;
+                this.advancedOptionsLinkLabel.Text = GbdxSettings.GbdxResources.Hide_Advanced_Options;
                 this.tableLayoutPanel1.SetRow(this.buttonCancel, 5);
                 this.tableLayoutPanel1.SetRow(this.groupBox1, 2);
                 this.tableLayoutPanel1.SetRow(this.buttonRun, 5);
@@ -718,7 +718,7 @@ namespace Gbdx
             else
             {
                 this.Size = new Size(412, 220);
-                this.advancedOptionsLinkLabel.Text = GbdxSettings.DgxResources.Show_Advanced_Options;
+                this.advancedOptionsLinkLabel.Text = GbdxSettings.GbdxResources.Show_Advanced_Options;
                 this.tableLayoutPanel1.SetRow(this.buttonCancel, 2);
                 this.tableLayoutPanel1.SetRow(this.buttonRun, 2);
                 this.tableLayoutPanel1.SetRow(this.groupBox1, 5);
@@ -1051,7 +1051,7 @@ namespace Gbdx
             this.queryLimit.RestoreSelection(queryMenuitem.SourceSavedQuery.properties.EsriAddin.QueryLimit);
 
             this.filledHeartImageShown = !this.filledHeartImageShown;
-            this.button1.Image = GbdxSettings.DgxResources.filledStar;
+            this.button1.Image = GbdxSettings.GbdxResources.filledStar;
         }
 
         /// <summary>
@@ -1097,7 +1097,7 @@ namespace Gbdx
         private void KeywordsTextChanged(object sender, EventArgs e)
         {
             this.filledHeartImageShown = !this.filledHeartImageShown;
-            this.button1.Image = GbdxSettings.DgxResources.emptyStar;
+            this.button1.Image = GbdxSettings.GbdxResources.emptyStar;
         }
     }
 }

@@ -45,9 +45,9 @@ namespace Gbdx
         private bool isUnitTest = false;
 
         /// <summary>
-        /// Class that implements the IDgxComms interface.
+        /// Class that implements the IGbdxComms interface.
         /// </summary>
-        private IDgxComms comms;
+        private IGbdxComms comms;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FormConfiguration"/> class.
@@ -79,7 +79,7 @@ namespace Gbdx
             // Set the base url text box.
             this.urlTextBox.Text = string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.baseUrl) ? GbdxSettings.Properties.Settings.Default.DefaultBaseUrl : GbdxSettings.Properties.Settings.Default.baseUrl;
 
-            this.comms = new DgxComms();
+            this.comms = new GbdxComms();
         }
 
         /// <summary>
@@ -186,7 +186,7 @@ namespace Gbdx
             }
             else
             {
-                MessageBox.Show(GbdxSettings.DgxResources.ErrorSavingPassword);
+                MessageBox.Show(GbdxSettings.GbdxResources.ErrorSavingPassword);
                 return;
             }
 
@@ -221,19 +221,19 @@ namespace Gbdx
                 this.PasswordTextBox.BackColor = Color.GreenYellow;
                 this.UserNameTextBox.BackColor = Color.GreenYellow;
                 this.urlTextBox.BackColor = Color.GreenYellow;
-                MessageBox.Show(GbdxSettings.DgxResources.SuccessfulConnection);
+                MessageBox.Show(GbdxSettings.GbdxResources.SuccessfulConnection);
                 return;
             }
 
             if (netObj.ResponseStatusCode == HttpStatusCode.Unauthorized)
             {
-                MessageBox.Show(GbdxSettings.DgxResources.InvalidUserPass);
+                MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
                 this.PasswordTextBox.BackColor = Color.Tomato;
                 this.UserNameTextBox.BackColor = Color.Tomato;
                 return;
             }
 
-            MessageBox.Show(GbdxSettings.DgxResources.InvalidUrl);
+            MessageBox.Show(GbdxSettings.GbdxResources.InvalidUrl);
             this.urlTextBox.BackColor = Color.Tomato;
             this.PasswordTextBox.BackColor = Color.White;
             this.UserNameTextBox.BackColor = Color.White;

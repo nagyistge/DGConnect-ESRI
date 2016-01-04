@@ -196,8 +196,8 @@
     <Compile Include="Vector Index\AboutBox.Designer.cs">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </Compile>
-    <Compile Include="DgxAboutButton.cs" />
-    <Compile Include="DgxHelper.cs" />
+    <Compile Include="GbdxAboutButton.cs" />
+    <Compile Include="GbdxHelper.cs" />
     <Compile Include="RBList.cs" />
     <Compile Include="Social Analytics\Forms\CustomMenuItem.cs">
       <SubType>Component</SubType>
@@ -338,9 +338,9 @@
       <Project>{f6bd5faf-14c8-4aa6-b90c-03043b0e54fe}</Project>
       <Name>Aggregations</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DGXSettings\DGXSettings.csproj">
+    <ProjectReference Include="..\DGXSettings\GBDXSettings.csproj">
       <Project>{f96e1da5-a0cd-4569-8727-8fb3c2935731}</Project>
-      <Name>DGXSettings</Name>
+      <Name>GBDXSettings</Name>
     </ProjectReference>
     <ProjectReference Include="..\DgxTools\GbdxTools.csproj">
       <Project>{95b5413e-160a-4afb-8b0a-b0df1b1c093b}</Project>

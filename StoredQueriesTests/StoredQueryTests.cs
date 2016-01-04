@@ -31,7 +31,7 @@ namespace StoredQueries.Tests
         [TestMethod()]
         public void TestGetQueries_NoneAvailable()
         {
-            var mockRepo = MockRepository.GenerateStub<IDgxComms>();
+            var mockRepo = MockRepository.GenerateStub<IGbdxComms>();
             mockRepo.Stub(comms => comms.Request(Arg<NetObject>.Is.Anything))
                 .Return(new NetObject {ResponseStatusCode = HttpStatusCode.NoContent});
 
@@ -45,7 +45,7 @@ namespace StoredQueries.Tests
         [TestMethod()]
         public void TestGetQueries_TwoItemsReturned()
         {
-            var mockRepo = MockRepository.GenerateStub<IDgxComms>();
+            var mockRepo = MockRepository.GenerateStub<IGbdxComms>();
             mockRepo.Stub(comms =>
                 comms.Request(Arg<NetObject>.Is.Anything))
                 .Return(new NetObject
@@ -81,7 +81,7 @@ namespace StoredQueries.Tests
                     }
                 }
             };
-            var mockRepo = MockRepository.GenerateStub<IDgxComms>();
+            var mockRepo = MockRepository.GenerateStub<IGbdxComms>();
 
             mockRepo.Stub(comms => comms.PushRequest(Arg<NetObject>.Is.Anything, Arg<string>.Is.Anything))
                 .Return(
@@ -119,7 +119,7 @@ namespace StoredQueries.Tests
                     }
                 }
             };
-            var mockRepo = MockRepository.GenerateStub<IDgxComms>();
+            var mockRepo = MockRepository.GenerateStub<IGbdxComms>();
 
             mockRepo.Stub(comms => comms.PushRequest(Arg<NetObject>.Is.Anything, Arg<string>.Is.Anything))
                 .Return(
@@ -138,7 +138,7 @@ namespace StoredQueries.Tests
         [TestMethod()]
         public void TestDeleteQuery_DeleteItem()
         {
-            var mockRepo = MockRepository.GenerateStub<IDgxComms>();
+            var mockRepo = MockRepository.GenerateStub<IGbdxComms>();
 
             mockRepo.Stub(comms => comms.DeleteRequest(Arg<NetObject>.Is.Anything))
                 .Return(
@@ -159,7 +159,7 @@ namespace StoredQueries.Tests
         [TestMethod()]
         public void TestDeleteQuery_400DeleteItem()
         {
-            var mockRepo = MockRepository.GenerateStub<IDgxComms>();
+            var mockRepo = MockRepository.GenerateStub<IGbdxComms>();
 
             mockRepo.Stub(comms => comms.DeleteRequest(Arg<NetObject>.Is.Anything))
                 .Return(
@@ -179,7 +179,7 @@ namespace StoredQueries.Tests
         [TestMethod()]
         public void TestDeleteQuery_204DeleteItem()
         {
-            var mockRepo = MockRepository.GenerateStub<IDgxComms>();
+            var mockRepo = MockRepository.GenerateStub<IGbdxComms>();
 
             mockRepo.Stub(comms => comms.DeleteRequest(Arg<NetObject>.Is.Anything))
                 .Return(

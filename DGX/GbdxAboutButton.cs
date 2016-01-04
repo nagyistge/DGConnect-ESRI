@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DgxAboutButton.cs" company="DigitalGlobe">
+// <copyright file="GbdxAboutButton.cs" company="DigitalGlobe">
 //   Copyright 2015 DigitalGlobe
 //   
 //      Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
 //      limitations under the License.
 // </copyright>
 // <summary>
-//   The DGX cloud about button.
+//   The GBDX cloud about button.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -24,14 +24,14 @@ namespace Gbdx
     using ESRI.ArcGIS.Desktop.AddIns;
 
     /// <summary>
-    /// The dgx cloud about button.
+    /// The Gbdx cloud about button.
     /// </summary>
-    public class DgxAboutButton : Button
+    public class GbdxAboutButton : Button
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="DgxAboutButton"/> class.
+        /// Initializes a new instance of the <see cref="GbdxAboutButton"/> class.
         /// </summary>
-        public DgxAboutButton()
+        public GbdxAboutButton()
         {
         }
 

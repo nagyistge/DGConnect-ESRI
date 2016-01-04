@@ -30,7 +30,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("DigitalGlobe")]
-[assembly: AssemblyProduct("DGX")]
+[assembly: AssemblyProduct("GBDX")]
 [assembly: AssemblyCopyright("Copyright © DigitalGlobe 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

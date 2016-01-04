@@ -22,14 +22,14 @@ namespace GbdxSettings {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class DgxResources {
+    public class GbdxResources {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal DgxResources() {
+        internal GbdxResources() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace GbdxSettings {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GbdxSettings.DgxResources", typeof(DgxResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("GbdxSettings.GbdxResources", typeof(GbdxResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -66,16 +66,6 @@ namespace GbdxSettings {
         public static string Delete {
             get {
                 return ResourceManager.GetString("Delete", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to DGX Layer already exists.  If you want to re-add the layer to ArcMap please remove the layer and click this button again..
-        /// </summary>
-        public static string DgxRaster_DoesWmsLayerExist_Dgx_Layer_already_exists___If_you_want_to_re_add_the_layer_to_ArcMap_please_remove_the_layer_and_click_this_button_again_ {
-            get {
-                return ResourceManager.GetString("DgxRaster_DoesWmsLayerExist_Dgx_Layer_already_exists___If_you_want_to_re_add_the_" +
-                        "layer_to_ArcMap_please_remove_the_layer_and_click_this_button_again_", resourceCulture);
             }
         }
         
@@ -251,6 +241,16 @@ namespace GbdxSettings {
         public static string Queued {
             get {
                 return ResourceManager.GetString("Queued", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GBDX Layer already exists.  If you want to re-add the layer to ArcMap please remove the layer and click this button again..
+        /// </summary>
+        public static string Raster_DoesWmsLayerExist_Layer_already_exists___If_you_want_to_re_add_the_layer_to_ArcMap_please_remove_the_layer_and_click_this_button_again_ {
+            get {
+                return ResourceManager.GetString("Raster_DoesWmsLayerExist_Layer_already_exists___If_you_want_to_re_add_the_layer_t" +
+                        "o_ArcMap_please_remove_the_layer_and_click_this_button_again_", resourceCulture);
             }
         }
         

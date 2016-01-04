@@ -120,8 +120,8 @@
   <data name="Delete" xml:space="preserve">
     <value>Delete</value>
   </data>
-  <data name="DgxRaster_DoesWmsLayerExist_Dgx_Layer_already_exists___If_you_want_to_re_add_the_layer_to_ArcMap_please_remove_the_layer_and_click_this_button_again_" xml:space="preserve">
-    <value>DGX Layer already exists.  If you want to re-add the layer to ArcMap please remove the layer and click this button again.</value>
+  <data name="Raster_DoesWmsLayerExist_Layer_already_exists___If_you_want_to_re_add_the_layer_to_ArcMap_please_remove_the_layer_and_click_this_button_again_" xml:space="preserve">
+    <value>GBDX Layer already exists.  If you want to re-add the layer to ArcMap please remove the layer and click this button again.</value>
   </data>
   <data name="Download_all_Below_100000" xml:space="preserve">
     <value>Download All Below 100,000</value>

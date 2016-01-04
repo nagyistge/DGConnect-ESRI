@@ -59,8 +59,8 @@
     <Compile Include="CasAuthenticator.cs" />
     <Compile Include="DgAuth.cs" />
     <Compile Include="ICas.cs" />
-    <Compile Include="IDgxComms.cs" />
-    <Compile Include="DgxComms.cs" />
+    <Compile Include="IGbdxComms.cs" />
+    <Compile Include="GbdxComms.cs" />
     <Compile Include="NetObject.cs" />
     <Compile Include="NetworkResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

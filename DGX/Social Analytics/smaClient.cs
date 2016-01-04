@@ -192,9 +192,9 @@ namespace Gbdx
         private NetObject RunOrbit()
         {
             var responseFromServer = new NetObject();
-            responseFromServer.BaseUrl = DgxHelper.GetCasBaseEndpoint(GbdxSettings.Properties.Settings.Default);
-            responseFromServer.AuthEndpoint = DgxHelper.GetCasAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
-            responseFromServer.TicketEndpoint = DgxHelper.GetCasTicketEndpoint(GbdxSettings.Properties.Settings.Default);
+            responseFromServer.BaseUrl = GbdxHelper.GetCasBaseEndpoint(GbdxSettings.Properties.Settings.Default);
+            responseFromServer.AuthEndpoint = GbdxHelper.GetCasAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
+            responseFromServer.TicketEndpoint = GbdxHelper.GetCasTicketEndpoint(GbdxSettings.Properties.Settings.Default);
             responseFromServer.User = GbdxSettings.Properties.Settings.Default.username;
 
             var unEncryptedPassword = string.Empty;

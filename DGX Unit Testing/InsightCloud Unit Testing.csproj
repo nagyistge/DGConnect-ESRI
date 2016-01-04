@@ -106,8 +106,8 @@
     <Compile Include="DgAuthTest.cs" />
     <Compile Include="FormConfigurationTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="DgxClientTest.cs" />
-    <Compile Include="DgxCommunicationsTest.cs" />
+    <Compile Include="GbdxClientTest.cs" />
+    <Compile Include="GbdxCommunicationsTest.cs" />
     <Compile Include="Vector Index\VectorIndexHelperTests.cs">
       <ExcludeFromStyleCop>True</ExcludeFromStyleCop>
     </Compile>

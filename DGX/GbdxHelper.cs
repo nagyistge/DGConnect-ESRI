@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DgxHelper.cs" company="DigitalGlobe">
+// <copyright file="GbdxHelper.cs" company="DigitalGlobe">
 //   Copyright 2015 DigitalGlobe
 //   
 //      Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,7 +15,7 @@
 //      limitations under the License.
 // </copyright>
 // <summary>
-//   Defines the DgxCloudHelper type.
+//   Defines the GbdxHelper type.
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -24,9 +24,9 @@ namespace Gbdx
     using Gbdx.Properties;
 
     /// <summary>
-    /// The dgx cloud helper.
+    /// The gbdx cloud helper.
     /// </summary>
-    public static class DgxHelper
+    public static class GbdxHelper
     {
         /// <summary>
         /// Some components still use the old CAS authentication system.  This function is to accommodate those components.

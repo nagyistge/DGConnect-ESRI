@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="DgxComms.cs" company="DigitalGlobe">
+// <copyright file="GbdxComms.cs" company="DigitalGlobe">
 //   Copyright 2015 DigitalGlobe
 //   
 //      Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,9 +33,9 @@ namespace NetworkConnections
     using RestSharp;
 
     /// <summary>
-    /// The Dgx cloud comms.
+    /// The Gbdx cloud comms.
     /// </summary>
-    public class DgxComms : IDgxComms
+    public class GbdxComms : IGbdxComms
     {
         /// <summary>
         /// The logger.
@@ -63,7 +63,7 @@ namespace NetworkConnections
         private IRestClient client;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DgxComms"/> class.
+        /// Initializes a new instance of the <see cref="GbdxComms"/> class.
         /// </summary>
         /// <param name="logFile">
         /// The log file.
@@ -71,27 +71,27 @@ namespace NetworkConnections
         /// <param name="useConsole">
         /// The use console.
         /// </param>
-        public DgxComms(string logFile, bool useConsole)
+        public GbdxComms(string logFile, bool useConsole)
         {
             logger = new Logger(logFile, useConsole);
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DgxComms"/> class. 
+        /// Initializes a new instance of the <see cref="GbdxComms"/> class. 
         /// When no parameters are part of the constructor then logging will not be possible for the network calls.
         /// </summary>
-        public DgxComms()
+        public GbdxComms()
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="DgxComms"/> class. Allows a class implementing the IRestClient interface to be used
+        /// Initializes a new instance of the <see cref="GbdxComms"/> class. Allows a class implementing the IRestClient interface to be used
         /// instead of the default RestSharp class.  Particularly useful for unit tests.
         /// </summary>
         /// <param name="useThisClient">
         /// The use this client.
         /// </param>
-        public DgxComms(IRestClient useThisClient)
+        public GbdxComms(IRestClient useThisClient)
         {
             this.client = useThisClient;
         }

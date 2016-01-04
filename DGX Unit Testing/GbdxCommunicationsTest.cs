@@ -1,15 +1,18 @@
-﻿using Gbdx;
+﻿using NetworkConnections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Diagnostics;
 
-namespace Dgx_Unit_Testing
+namespace Gbdx_Unit_Testing
 {
+
+
     /// <summary>
-    ///This is a test class for smaClientTest and is intended
-    ///to contain all smaClientTest Unit Tests
+    ///This is a test class for SmaCommunicationsTest and is intended
+    ///to contain all SmaCommunicationsTest Unit Tests
     ///</summary>
     [TestClass()]
-    public class DgxClientTest
+    public class GbdxCommunicationsTest
     {
 
 
@@ -60,5 +63,6 @@ namespace Dgx_Unit_Testing
         //}
         //
         #endregion
+
     }
 }

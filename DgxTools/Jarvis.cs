@@ -238,11 +238,11 @@
         /// </summary>
         public static readonly Logger Logger =
             new Logger(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\DGX\\DGX.log",
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\GBDX\\GBDX.log",
                 false);
 
         /// <summary>
-        /// Open the DGX cloud workspace.  This defaults to the DGX cloud file GDB.
+        /// Open the GBDX cloud workspace.  This defaults to the GBDX cloud file GDB.
         /// </summary>
         /// <param name="path">
         /// File system path to the file GDB.
@@ -257,13 +257,13 @@
             var workspaceFactory = (IWorkspaceFactory)Activator.CreateInstance(factoryType);
 
             // If it already exists open otherwise create it.
-            if (workspaceFactory.IsWorkspace(path + "\\DGX.gdb"))
+            if (workspaceFactory.IsWorkspace(path + "\\GBDX.gdb"))
             {
-                workspace = workspaceFactory.OpenFromFile(path + "\\DGX.gdb", 0);
+                workspace = workspaceFactory.OpenFromFile(path + "\\GBDX.gdb", 0);
             }
             else
             {
-                var workspaceName = workspaceFactory.Create(path + "\\", "DGX.gdb", null, 0);
+                var workspaceName = workspaceFactory.Create(path + "\\", "GBDX.gdb", null, 0);
 
                 // Cast the workspace name object to the IName interface and open the workspace.
                 var name = (IName)workspaceName;
