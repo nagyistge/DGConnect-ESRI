@@ -78,7 +78,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DGX\Gbdx.csproj">
+    <ProjectReference Include="..\GBDX\Gbdx.csproj">
       <Project>{f6718f5f-772b-42e9-98e3-3f7a6c607120}</Project>
       <Name>Gbdx</Name>
     </ProjectReference>

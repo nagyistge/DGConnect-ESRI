@@ -9,8 +9,8 @@
     <ProjectGuid>{851AEC1A-15BB-4EA2-88AA-7886266E2A91}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dgx_Unit_Testing</RootNamespace>
-    <AssemblyName>Dgx Unit Testing</AssemblyName>
+    <RootNamespace>Unit_Testing</RootNamespace>
+    <AssemblyName>Unit Testing</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -113,7 +113,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DGX\Gbdx.csproj">
+    <ProjectReference Include="..\GBDX\Gbdx.csproj">
       <Project>{f6718f5f-772b-42e9-98e3-3f7a6c607120}</Project>
       <Name>Gbdx</Name>
     </ProjectReference>
