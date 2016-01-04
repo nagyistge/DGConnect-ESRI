@@ -39,7 +39,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="logfile" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">\DGX\DGX.log</Value>
+      <Value Profile="(Default)">\GBDX\GBDX.log</Value>
     </Setting>
     <Setting Name="casTicket" Type="System.String" Scope="Application">
       <Value Profile="(Default)">/cas/v1/tickets</Value>
@@ -54,7 +54,7 @@
       <Value Profile="(Default)">/raster-catalog/api/gbd/catalog/v1/search</Value>
     </Setting>
     <Setting Name="GbdOrders" Type="System.String" Scope="User">
-      <Value Profile="(Default)">\DGX\gbdOrders</Value>
+      <Value Profile="(Default)">\GBDX\gbdOrders</Value>
     </Setting>
   </Settings>
 </SettingsFile>

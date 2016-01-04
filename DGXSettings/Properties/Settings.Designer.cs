@@ -155,7 +155,7 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\DGX\\DGX.log")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\GBDX\\GBDX.log")]
         public string logfile {
             get {
                 return ((string)(this["logfile"]));
@@ -200,7 +200,7 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("\\DGX\\gbdOrders")]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\GBDX\\gbdOrders")]
         public string GbdOrders {
             get {
                 return ((string)(this["GbdOrders"]));
