@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Vector_Index.ESRI_Tools
+namespace Gbdx.Vector_Index.ESRI_Tools
 {
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Framework;
@@ -37,7 +37,7 @@ namespace Dgx.Vector_Index.ESRI_Tools
         protected override void OnClick()
         {
             UID theUid = new UIDClass();
-            theUid.Value = ThisAddIn.IDs.Dgx_Vector_Index_Forms_VectorIndexDockable;
+            theUid.Value = ThisAddIn.IDs.Gbdx_Vector_Index_Forms_VectorIndexDockable;
 
             IDockableWindow vectorIndexDockableWindow = ArcMap.DockableWindowManager.GetDockableWindow(theUid);
             vectorIndexDockableWindow.Show(!vectorIndexDockableWindow.IsVisible());

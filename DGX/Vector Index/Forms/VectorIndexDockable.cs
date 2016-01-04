@@ -21,7 +21,7 @@
 
 using DgxTools;
 
-namespace Dgx.Vector_Index.Forms
+namespace Gbdx.Vector_Index.Forms
 {
     using System;
     using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace Dgx.Vector_Index.Forms
 
     using Amib.Threading;
 
-    using Dgx.Properties;
+    using Gbdx.Properties;
 
     using Encryption;
 

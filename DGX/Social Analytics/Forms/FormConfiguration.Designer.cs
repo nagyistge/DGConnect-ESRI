@@ -1,4 +1,4 @@
-﻿namespace Dgx.Forms
+﻿namespace Gbdx
 {
     partial class FormConfiguration
     {

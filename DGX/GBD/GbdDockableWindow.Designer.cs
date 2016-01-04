@@ -1,4 +1,4 @@
-﻿namespace Dgx.Gbd
+﻿namespace Gbdx.Gbd
 {
     partial class GbdDockableWindow
     {

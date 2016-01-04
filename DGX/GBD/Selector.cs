@@ -16,14 +16,14 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Gbd
+namespace Gbdx.Gbd
 {
     using System.Windows.Forms;
 
-    using Dgx.Vector_Index;
-
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.Desktop.AddIns;
+
+    using Gbdx.Vector_Index;
 
     /// <summary>
     /// The selector.

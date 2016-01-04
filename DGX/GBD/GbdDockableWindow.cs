@@ -21,7 +21,7 @@ using Microsoft.Windows.Controls;
 
 using RestSharp.Deserializers;
 
-namespace Dgx.Gbd
+namespace Gbdx.Gbd
 {
     using System;
     using System.Collections;
@@ -924,14 +924,14 @@ namespace Dgx.Gbd
         {
             this.ResetGbd();
 
-            if (ArcMap.Application.CurrentTool.Name != ThisAddIn.IDs.Dgx_Gbd_Selector)
+            if (ArcMap.Application.CurrentTool.Name != ThisAddIn.IDs.Gbdx_Gbd_Selector)
             {
                 // if there was already a listener established close it.
                 GbdRelay.Instance.AoiHasBeenDrawn -= this.InstanceAoiHasBeenDrawn;
                 GbdRelay.Instance.AoiHasBeenDrawn += this.InstanceAoiHasBeenDrawn;
 
                 var commandBars = ArcMap.Application.Document.CommandBars;
-                var commandId = new UIDClass() { Value = ThisAddIn.IDs.Dgx_Gbd_Selector };
+                var commandId = new UIDClass() { Value = ThisAddIn.IDs.Gbdx_Gbd_Selector };
                 var commandItem = commandBars.Find(commandId, false, false);
 
                 if (commandItem != null)
@@ -1513,7 +1513,7 @@ namespace Dgx.Gbd
         /// The data grid that contains the imagery information.
         /// </param>
         /// <returns>
-        /// The <see cref="List"/>.
+        /// The <see cref="List{T}"/>.
         /// </returns>
         private static List<string> GetImageryToBeOrdered(DataGridView grid)
         {
@@ -1563,7 +1563,7 @@ namespace Dgx.Gbd
         /// <param name="filepath">
         /// </param>
         /// <returns>
-        /// The <see cref="List"/>.
+        /// The <see cref="List{T}"/>.
         /// </returns>
         private List<GbdOrder> LoadGbdOrdersFromFile(string filepath)
         {
@@ -1749,7 +1749,7 @@ namespace Dgx.Gbd
         /// The get order ids for refresh.
         /// </summary>
         /// <returns>
-        /// The <see cref="List"/>.
+        /// The <see cref="List{T}"/>.
         /// </returns>
         private List<string> GetOrderIdsForRefresh()
         {

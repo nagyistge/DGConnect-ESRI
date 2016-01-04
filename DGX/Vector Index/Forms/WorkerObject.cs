@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Vector_Index.Forms
+namespace Gbdx.Vector_Index.Forms
 {
     using System;
     using System.Collections.Generic;

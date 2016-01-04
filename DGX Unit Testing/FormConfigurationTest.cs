@@ -1,4 +1,4 @@
-﻿using Dgx.Forms;
+﻿using Gbdx;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 

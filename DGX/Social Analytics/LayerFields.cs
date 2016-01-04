@@ -15,7 +15,7 @@
 //      limitations under the License.
 // </copyright>
 
-namespace Dgx
+namespace Gbdx
 {
     using System;
 

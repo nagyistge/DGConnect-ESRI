@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Aggregations
+namespace Gbdx.Aggregations
 {
     using System;
     using System.Collections.Generic;
@@ -546,7 +546,7 @@ namespace Dgx.Aggregations
       AggregationRelay.Instance.AoiHasBeenDrawn += this.InstanceOnAoiHasBeenDrawn;
 
       var commandBars = ArcMap.Application.Document.CommandBars;
-      var commandId = new UIDClass() { Value = ThisAddIn.IDs.Dgx_Aggregations_AggregationSelector };
+      var commandId = new UIDClass() { Value = ThisAddIn.IDs.Gbdx_Aggregations_AggregationSelector };
       var commandItem = commandBars.Find(commandId, false, false);
 
       // save currently selected tool to be re-selected after the AOI has been drawn.

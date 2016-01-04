@@ -16,7 +16,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Gbd
+namespace Gbdx.Gbd
 {
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.Geometry;

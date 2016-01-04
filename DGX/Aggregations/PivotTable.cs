@@ -4,4 +4,4 @@ using System.Linq;
 using System.Text;
 
 
-namespace Dgx.Aggregations {public class PivotTable : List<PivotTableEntry> { } }
+namespace Gbdx.Aggregations {public class PivotTable : List<PivotTableEntry> { } }

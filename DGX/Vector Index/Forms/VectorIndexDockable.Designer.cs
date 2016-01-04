@@ -1,4 +1,4 @@
-﻿namespace Dgx.Vector_Index.Forms
+﻿namespace Gbdx.Vector_Index.Forms
 {
     partial class VectorIndexDockable
     {

@@ -16,7 +16,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx
+namespace Gbdx
 {
     using System.Collections.Generic;
 

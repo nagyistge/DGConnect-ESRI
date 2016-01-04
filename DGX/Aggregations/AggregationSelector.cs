@@ -4,11 +4,13 @@ using System.Text;
 using System.IO;
 using System.Windows.Forms;
 using Aggregations;
-using Dgx.Vector_Index;
+using Gbdx.Vector_Index;
 using ESRI.ArcGIS.Carto;
 
-namespace Dgx.Aggregations
+namespace Gbdx.Aggregations
 {
+    using Gbdx.Vector_Index;
+
     public class AggregationSelector : ESRI.ArcGIS.Desktop.AddIns.Tool
     {
         public AggregationSelector()

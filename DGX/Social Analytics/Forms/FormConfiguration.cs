@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Forms
+namespace Gbdx
 {
     using System;
     using System.Drawing;
@@ -28,7 +28,7 @@ namespace Dgx.Forms
     using System.Text.RegularExpressions;
     using System.Windows.Forms;
 
-    using Dgx.Properties;
+    using Gbdx.Properties;
 
     using Encryption;
 

@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx
+namespace Gbdx
 {
     using System;
     using System.Collections.Generic;
@@ -28,14 +28,15 @@ namespace Dgx
     using System.Net;
     using System.Windows.Forms;
 
-    using Dgx.Properties;
-    using Dgx.Social_Analytics.Forms;
+    using Gbdx.Properties;
 
     using DGXSettings;
 
     using Encryption;
 
     using ESRI.ArcGIS.Geometry;
+
+    using Gbdx.Social_Analytics.Forms;
 
     using NetworkConnections;
 

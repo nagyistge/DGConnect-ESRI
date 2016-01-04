@@ -21,11 +21,11 @@
 
 using DgxTools;
 
-namespace Dgx
+namespace Gbdx
 {
     using System;
 
-    using Dgx.Properties;
+    using Gbdx.Properties;
 
     using Encryption;
 

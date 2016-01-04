@@ -16,7 +16,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Aggregations
+namespace Gbdx.Aggregations
 {
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.esriSystem;
@@ -44,10 +44,10 @@ namespace Dgx.Aggregations
         /// </summary>
         protected override void OnClick()
         {
-            if (ArcMap.Application.CurrentTool.Name != ThisAddIn.IDs.Dgx_Aggregations_AggregationSelector)
+            if (ArcMap.Application.CurrentTool.Name != ThisAddIn.IDs.Gbdx_Aggregations_AggregationSelector)
             {
                 UID theUid = new UIDClass();
-                theUid.Value = ThisAddIn.IDs.Dgx_Aggregations_AggregationWindow;
+                theUid.Value = ThisAddIn.IDs.Gbdx_Aggregations_AggregationWindow;
                 var window = ArcMap.DockableWindowManager.GetDockableWindow(theUid);
                 window.Show(!window.IsVisible());
             }

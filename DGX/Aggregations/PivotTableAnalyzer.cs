@@ -5,13 +5,13 @@ using System.Text;
 
 using System.Text.RegularExpressions;
 
-namespace Dgx.Aggregations {
+namespace Gbdx.Aggregations {
  public class PivotTableAnalyzer {
 
-  private Dgx.Aggregations.SendAnInt pbarValueUpdate;
-  private Dgx.Aggregations.UpdateAggWindowPbar pbarUpdate;
+  private SendAnInt pbarValueUpdate;
+  private UpdateAggWindowPbar pbarUpdate;
 
-   public PivotTableAnalyzer(Dgx.Aggregations.SendAnInt pbarValueUpdate,Dgx.Aggregations.UpdateAggWindowPbar pbarUpdate) {
+   public PivotTableAnalyzer(SendAnInt pbarValueUpdate,UpdateAggWindowPbar pbarUpdate) {
      this.pbarValueUpdate = pbarValueUpdate;
      this.pbarUpdate = pbarUpdate;
    }

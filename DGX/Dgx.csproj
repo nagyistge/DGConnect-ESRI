@@ -8,8 +8,8 @@
     <ProjectGuid>{F6718F5F-772B-42E9-98E3-3F7A6C607120}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Dgx</RootNamespace>
-    <AssemblyName>Dgx</AssemblyName>
+    <RootNamespace>Gbdx</RootNamespace>
+    <AssemblyName>Gbdx</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>

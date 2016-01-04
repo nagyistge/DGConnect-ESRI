@@ -1,4 +1,4 @@
-﻿namespace Dgx
+﻿namespace Gbdx
 {
     partial class AboutBox
     {

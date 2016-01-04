@@ -16,7 +16,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Vector_Index.Tests
+namespace Gbdx.Vector_Index.Tests
 {
     using System.Collections.Generic;
     using System.IO;

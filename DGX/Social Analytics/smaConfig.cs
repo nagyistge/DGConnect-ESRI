@@ -19,11 +19,11 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx
+namespace Gbdx
 {
     using System.Windows.Forms;
 
-    using Dgx.Forms;
+    using Gbdx;
 
     using Button = ESRI.ArcGIS.Desktop.AddIns.Button;
 

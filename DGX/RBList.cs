@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx
+namespace Gbdx
 {
     using System;
     using System.Collections.Generic;

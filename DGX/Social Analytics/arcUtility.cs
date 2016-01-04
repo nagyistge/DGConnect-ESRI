@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx
+namespace Gbdx
 {
     using System;
     using System.Collections.Generic;
@@ -28,8 +28,8 @@ namespace Dgx
     using System.Web.Script.Serialization;
     using System.Windows.Forms;
 
-    using Dgx.Properties;
-    using Dgx.Vector_Index;
+    using Gbdx.Properties;
+    using Gbdx.Vector_Index;
 
     using ESRI.ArcGIS.ArcMapUI;
     using ESRI.ArcGIS.Carto;

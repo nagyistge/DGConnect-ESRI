@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace Dgx.Aggregations {
+namespace Gbdx.Aggregations {
   public static class PivotTableCache {
      static PivotTableCache() {
       PivotTableCache.Cache = new Dictionary<string, PivotTable>();

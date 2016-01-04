@@ -16,7 +16,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Social_Analytics.Forms
+namespace Gbdx.Social_Analytics.Forms
 {
     using System.Windows.Forms;
 

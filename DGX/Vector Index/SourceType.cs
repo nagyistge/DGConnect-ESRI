@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Vector_Index
+namespace Gbdx.Vector_Index
 {
     /// <summary>
     /// The source type.

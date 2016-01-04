@@ -19,14 +19,13 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx
+namespace Gbdx
 {
     using System;
     using System.ComponentModel;
     using System.Windows.Forms;
 
-    using Dgx.Properties;
-    using Dgx.Vector_Index;
+    using Gbdx.Properties;
 
     using DGXSettings;
 
@@ -35,6 +34,8 @@ namespace Dgx
     using ESRI.ArcGIS.Display;
     using ESRI.ArcGIS.Geodatabase;
     using ESRI.ArcGIS.Geometry;
+
+    using Gbdx.Vector_Index;
 
     using NetworkConnections;
 

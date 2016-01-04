@@ -16,7 +16,7 @@ namespace NetworkConnections.Tests
     using ESRI.ArcGIS;
     using ESRI.ArcGIS.esriSystem;
 
-    using Dgx.Vector_Index;
+    using Gbdx.Vector_Index;
 
     using NetworkConnectionsTests;
 

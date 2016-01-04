@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Gbd
+namespace Gbdx.Gbd
 {
     using ESRI.ArcGIS.Desktop.AddIns;
     using ESRI.ArcGIS.esriSystem;
@@ -41,13 +41,13 @@ namespace Dgx.Gbd
         /// </summary>
         protected override void OnClick()
         {
-            if (ArcMap.Application.CurrentTool.Name == ThisAddIn.IDs.Dgx_Gbd_Selector)
+            if (ArcMap.Application.CurrentTool.Name == ThisAddIn.IDs.Gbdx_Gbd_Selector)
             {
                 return;
             }
 
             UID theUid = new UIDClass();
-            theUid.Value = ThisAddIn.IDs.Dgx_Gbd_GbdDockableWindow;
+            theUid.Value = ThisAddIn.IDs.Gbdx_Gbd_GbdDockableWindow;
 
             var window = ArcMap.DockableWindowManager.GetDockableWindow(theUid);
             window.Show(!window.IsVisible());

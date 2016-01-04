@@ -19,9 +19,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx
+namespace Gbdx
 {
-    using Dgx.Properties;
+    using Gbdx.Properties;
 
     /// <summary>
     /// The dgx cloud helper.

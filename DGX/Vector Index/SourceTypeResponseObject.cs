@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace Dgx.Vector_Index
+namespace Gbdx.Vector_Index
 {
     using System.Collections.Generic;
 
