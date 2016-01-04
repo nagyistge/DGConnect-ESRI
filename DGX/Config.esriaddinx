@@ -1,5 +1,5 @@
 ﻿<ESRI.Configuration xmlns="http://schemas.esri.com/Desktop/AddIns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-  <Name>Dgx</Name>
+  <Name>GBDX</Name>
   <AddInID>{47f66660-0e07-4a42-9717-c3bc379a2776}</AddInID>
   <Description>Information and GBDX Platform is a DigitalGlobe product enabling social media, text, vector and raster search and analytics capabilities.</Description>
   <Version>1.2</Version>
