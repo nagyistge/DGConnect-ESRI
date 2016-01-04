@@ -298,6 +298,28 @@ namespace NetworkConnections
         }
 
         /// <summary>
+        /// Get the RestSharp client used in the wrapper interface.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="IRestClient"/>.
+        /// </returns>
+        public IRestClient GetClient()
+        {
+            return this.client;
+        }
+
+        /// <summary>
+        /// Returns the GBD access token.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        public string GetAccessToken()
+        {
+            return this.AccessToken;
+        }
+
+        /// <summary>
         /// Handle the delete request of a stored query workspace.
         /// </summary>
         /// <param name="netObject">

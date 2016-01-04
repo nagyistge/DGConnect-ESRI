@@ -197,5 +197,17 @@ namespace DGXSettings.Properties {
                 return ((string)(this["GbdSearchPath"]));
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("\\DGX\\gbdOrders")]
+        public string GbdOrders {
+            get {
+                return ((string)(this["GbdOrders"]));
+            }
+            set {
+                this["GbdOrders"] = value;
+            }
+        }
     }
 }

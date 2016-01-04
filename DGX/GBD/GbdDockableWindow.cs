@@ -1,26 +1,25 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GbdDockableWindow.cs" company="DigitalGlobe">
 //   Copyright 2015 DigitalGlobe
-//   
-//      Licensed under the Apache License, Version 2.0 (the "License");
-//      you may not use this file except in compliance with the License.
-//      You may obtain a copy of the License at
-//   
-//          http://www.apache.org/licenses/LICENSE-2.0
-//   
-//      Unless required by applicable law or agreed to in writing, software
-//      distributed under the License is distributed on an "AS IS" BASIS,
-//      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//      See the License for the specific language governing permissions and
-//      limitations under the License.
+//   //   //      Licensed under the Apache License, Version 2.0 (the "License");
+//   //   //      you may not use this file except in compliance with the License.
+//   //   //      You may obtain a copy of the License at
+//   //   //          http://www.apache.org/licenses/LICENSE-2.0
+//   //   //      Unless required by applicable law or agreed to in writing, software
+//   //   //      distributed under the License is distributed on an "AS IS" BASIS,
+//   //   //      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//   //   //      See the License for the specific language governing permissions and
+//   //   //      limitations under the License.
 // </copyright>
-// <summary>
-//   
-// </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
 using DgxTools;
+
 using Logging;
+
+using Microsoft.Windows.Controls;
+
+using RestSharp.Deserializers;
 
 namespace Dgx.Gbd
 {
@@ -35,8 +34,12 @@ namespace Dgx.Gbd
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Windows.Forms;
+
     using DGXSettings;
+    using DGXSettings.Properties;
+
     using Encryption;
+
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Framework;
@@ -49,7 +52,7 @@ namespace Dgx.Gbd
     using Newtonsoft.Json;
 
     using RestSharp;
-    
+
     using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
 
     /// <summary>
@@ -59,11 +62,18 @@ namespace Dgx.Gbd
     public partial class GbdDockableWindow : UserControl
     {
         #region Fields
+
         /// <summary>
         /// Regular expression for getting the catalog id out of a url address.-
         /// </summary>
         private readonly Regex catalogIdRegEx = new Regex("catalogId=(?<catId>.*?)&");
+
+        /// <summary>
+        /// The file path.
+        /// </summary>
+        private readonly string filePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Settings.Default.GbdOrders;
         
+
         /// <summary>
         /// GBD Comms that will talk with the GBD services.
         /// </summary>
@@ -110,6 +120,11 @@ namespace Dgx.Gbd
         private Thread worker4Thread;
 
         /// <summary>
+        /// Thread that will do status update checks.
+        /// </summary>
+        private Thread statusUpdateThread;
+
+        /// <summary>
         /// Thread control variable.  When set to false the threads will exit gracefully otherwise they will run until the work queue has been depleted.
         /// </summary>
         private volatile bool okToWork = true;
@@ -129,6 +144,7 @@ namespace Dgx.Gbd
         /// </summary>
         private Dictionary<string, Image> cachedImages;
         
+
         /// <summary>
         /// Hashset of the polygons that the user has selected.
         /// </summary>
@@ -148,7 +164,10 @@ namespace Dgx.Gbd
         /// Determines if all polygons should be displayed
         /// </summary>
         private bool displayAllPolgons;
-        
+
+        /// <summary>
+        /// The cb header.
+        /// </summary>
         private DataGridViewCheckBoxHeaderCell cbHeader;
 
         /// <summary>
@@ -161,14 +180,35 @@ namespace Dgx.Gbd
         /// </summary>
         private int itemsTotal = 0;
 
+        /// <summary>
+        /// The start time.
+        /// </summary>
         private DateTime startTime;
 
+        /// <summary>
+        /// The end time.
+        /// </summary>
         private DateTime endTime;
 
+        /// <summary>
+        /// The date time changing.
+        /// </summary>
         private bool dateTimeChanging = false;
 
+        /// <summary>
+        /// The log writer.
+        /// </summary>
         private Logger logWriter;
 
+        /// <summary>
+        /// The order table.
+        /// </summary>
+        private DataTable orderTable;
+
+        /// <summary>
+        /// The gbd order list.
+        /// </summary>
+        private List<GbdOrder> gbdOrderList;
         #endregion
 
         /// <summary>
@@ -180,7 +220,7 @@ namespace Dgx.Gbd
         public GbdDockableWindow(object hook)
         {
             // Check to make sure there are credentials for GBD account.
-            if (string.IsNullOrEmpty(DGXSettings.Properties.Settings.Default.username) || string.IsNullOrEmpty(DGXSettings.Properties.Settings.Default.password))
+            if (string.IsNullOrEmpty(Settings.Default.username) || string.IsNullOrEmpty(Settings.Default.password))
             {
                 MessageBox.Show(DgxResources.InvalidUserPass);
                 return;
@@ -192,7 +232,7 @@ namespace Dgx.Gbd
             this.logWriter = new Logger(Jarvis.LogFile,false);
 
             this.InitializeComponent();
-            this.VisibleChanged += this.GbdDockableWindow_VisibleChanged;
+            this.VisibleChanged += this.GbdDockableWindowVisibleChanged;
             this.Hook = hook;
             GbdRelay.Instance.AoiHasBeenDrawn += this.InstanceAoiHasBeenDrawn;
 
@@ -213,7 +253,7 @@ namespace Dgx.Gbd
 
             this.thumbnailPictureBox.LoadCompleted += this.ThumbnailPictureBoxLoadCompleted;
             this.cachedImages = new Dictionary<string, Image>();
-            this.thumbnailPictureBox.InitialImage = new Bitmap(DGXSettings.DgxResources.PleaseStandBy, new Size(309, 376));
+            this.thumbnailPictureBox.InitialImage = new Bitmap(DgxResources.PleaseStandBy, new Size(309, 376));
 
             this.displayAllPolgons = false;
 
@@ -239,11 +279,51 @@ namespace Dgx.Gbd
                 this.logWriter.Error(error);
             }
 
+            if (
+                Settings.Default.baseUrl.Equals(
+                    Settings.Default.DefaultBaseUrl))
+            {
+                this.exportButton.Text = "Export";
+            }
+            else
+            {
+                this.exportButton.Text = "Order";
+            }
 
             this.dataView.RowFilter = this.FilterSetup();
+            this.SetupOrderStatusTable();
+
+            // Allocate the memory for the object even if we don't have orders yet
+            this.gbdOrderList = new List<GbdOrder>();
+
+            // If we have orders saved then lets load them up
+            if (File.Exists(this.filePath))
+            {
+                this.gbdOrderList = this.LoadGbdOrdersFromFile(this.filePath);
+                UpdateOrderTable(this.gbdOrderList, ref this.orderTable);
+            }
         }
 
-        void GbdDockableWindow_VisibleChanged(object sender, EventArgs e)
+        /// <summary>
+        /// Setup up the order status data table.
+        /// </summary>
+        private void SetupOrderStatusTable()
+        {
+            this.orderTable = this.CreateOrderTable();
+            this.orderDataGridView.DataSource = this.orderTable;
+
+        }
+
+        /// <summary>
+        /// The GBD dockable window visible changed event handler
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void GbdDockableWindowVisibleChanged(object sender, EventArgs e)
         {
             this.ResetGbd();
         }
@@ -254,6 +334,16 @@ namespace Dgx.Gbd
         /// <param name="dt">data table that was constructed</param>
         /// <param name="responses">dictionary of the newly complete responses.</param>
         private delegate void DataTableDone(DataTable dt, Dictionary<string, Properties> responses);
+
+        private delegate void ExecuteAfterResponse(List<GbdOrder> orders);
+
+        /// <summary>
+        /// Callback to update the order status.  Will be fired from a background thread
+        /// </summary>
+        /// <param name="updateStatus">
+        /// The update status.
+        /// </param>
+        private delegate void UpdateStatusCallback(GbdOrder updateStatus);
 
         /// <summary>
         /// Gets or sets the hook object of the dockable window
@@ -281,6 +371,26 @@ namespace Dgx.Gbd
 
             var primary = new DataColumn[1];
             primary[0] = dt.Columns["Catalog ID"];
+            dt.PrimaryKey = primary;
+            return dt;
+        }
+
+        /// <summary>
+        /// Create Order Data Table
+        /// </summary>
+        /// <returns>
+        /// The <see cref="DataTable"/>.
+        /// </returns>
+        private DataTable CreateOrderTable()
+        {
+            var dt = new DataTable();
+
+            dt.Columns.Add(new DataColumn("Order ID", typeof(string)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("Order Date", typeof(string)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("Service Provider", typeof(string)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("Order Status", typeof (string)) {ReadOnly = false});
+            var primary = new DataColumn[1];
+            primary[0] = dt.Columns["Order ID"];
             dt.PrimaryKey = primary;
             return dt;
         }
@@ -337,6 +447,9 @@ namespace Dgx.Gbd
             this.UpdateSelectedAndTotalLabels();
         }
 
+        /// <summary>
+        /// Reset GBD window
+        /// </summary>
         private void ResetGbd()
         {
             this.okToWork = false;
@@ -348,10 +461,23 @@ namespace Dgx.Gbd
             this.ThreadLifeCheck(this.worker2Thread);
             this.ThreadLifeCheck(this.worker3Thread);
             this.ThreadLifeCheck(this.worker4Thread);
+            this.ThreadLifeCheck(this.statusUpdateThread);
 
             this.localDatatable.Clear();
             this.allResults.Clear();
             this.ClearPolygons();
+
+            // Check the domain to see which label should be on the export button
+            if (
+                Settings.Default.baseUrl.Equals(
+                    Settings.Default.DefaultBaseUrl))
+            {
+                this.exportButton.Text = "Export";
+            }
+            else
+            {
+                this.exportButton.Text = "Order";
+            }
         }
 
         #region Filtering
@@ -596,6 +722,7 @@ namespace Dgx.Gbd
         #endregion
 
         #region Thread Methods
+
         /// <summary>
         /// Go out and get the GBD data.
         /// </summary>
@@ -697,7 +824,7 @@ namespace Dgx.Gbd
 
                     string decryptedPassword;
                     var success = Aes.Instance.Decrypt128(
-                        DGXSettings.Properties.Settings.Default.password,
+                        Settings.Default.password,
                         out decryptedPassword);
                     if (!success)
                     {
@@ -705,17 +832,17 @@ namespace Dgx.Gbd
                     }
 
                     // Creating network object.
-                    NetObject netObj = new NetObject
+                    var netObj = new NetObject
                                            {
                                                AddressUrl =
-                                                   DGXSettings.Properties.Settings.Default.GbdSearchPath,
+                                                   Settings.Default.GbdSearchPath,
                                                BaseUrl =
                                                    DgxHelper.GetEndpointBase(
-                                                       DGXSettings.Properties.Settings.Default),
+                                                       Settings.Default),
                                                AuthEndpoint =
-                                                   DGXSettings.Properties.Settings.Default
+                                                   Settings.Default
                                                    .authenticationServer,
-                                               User = DGXSettings.Properties.Settings.Default.username,
+                                               User = Settings.Default.username,
                                                Password = decryptedPassword,
                                            };
 
@@ -818,9 +945,28 @@ namespace Dgx.Gbd
         /// <summary>
         /// Event handler for when the export button is clicked.
         /// </summary>
-        /// <param name="sender">the button that was clicked</param>
-        /// <param name="e">event arguments</param>
+        /// <param name="sender">
+        /// the button that was clicked
+        /// </param>
+        /// <param name="e">
+        /// event arguments
+        /// </param>
         private void ExportButtonClick(object sender, EventArgs e)
+        {
+            if(Settings.Default.baseUrl.Equals(Settings.Default.DefaultBaseUrl))
+            {
+                this.ExportSelectionToFile();
+            }
+            else
+            {
+                this.OrderImagery();
+            }
+        }
+
+        /// <summary>
+        /// The export selection to file for the user to order imagery.
+        /// </summary>
+        private void ExportSelectionToFile()
         {
             try
             {
@@ -878,7 +1024,7 @@ namespace Dgx.Gbd
                             writeRow = (bool)item.Cells[i].Value;
                             continue;
                         }
-                            
+
                         if (rowToBeWritten == string.Empty)
                         {
                             rowToBeWritten += item.Cells[i].Value.ToString();
@@ -890,7 +1036,7 @@ namespace Dgx.Gbd
                     }
 
                     // Write the comma delimited line to file
-                    if(writeRow)
+                    if (writeRow)
                     {
                         fileWriter.WriteLine(rowToBeWritten);
                     }
@@ -965,6 +1111,15 @@ namespace Dgx.Gbd
             }
         }
 
+        /// <summary>
+        /// The set date.
+        /// </summary>
+        /// <param name="picker">
+        /// The picker.
+        /// </param>
+        /// <param name="originalValue">
+        /// The original value.
+        /// </param>
         private void SetDate(ref DateTimePicker picker, ref DateTime originalValue)
         {
             // If the date change occurred in the same month no change is necessary.
@@ -987,6 +1142,12 @@ namespace Dgx.Gbd
             originalValue = picker.Value;
         }
 
+        /// <summary>
+        /// The check date time.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
         private void CheckDateTime(object sender)
         {
             if (sender.GetType() != typeof(DateTimePicker)||this.dateTimeChanging)
@@ -1189,7 +1350,7 @@ namespace Dgx.Gbd
                 }
 
                 // Throw up the please wait image
-                this.thumbnailPictureBox.Image = new Bitmap(DGXSettings.DgxResources.PleaseStandBy, this.thumbnailPictureBox.Size);
+                this.thumbnailPictureBox.Image = new Bitmap(DgxResources.PleaseStandBy, this.thumbnailPictureBox.Size);
                 
                 // get the image asynchronsly 
                 this.asyncHandle = this.client.ExecuteAsync(
@@ -1306,6 +1467,426 @@ namespace Dgx.Gbd
         }
 
         #endregion
+        
+        #region Imagery Ordering
+
+        /// <summary>
+        /// Update the order table with imagery that was ordered in the payload
+        /// </summary>
+        /// <param name="payload">
+        /// the GBD orders for the imagery
+        /// </param>
+        /// <param name="orderTable">
+        /// The order data table.
+        /// </param>
+        private static void UpdateOrderTable(IEnumerable<GbdOrder> payload, ref DataTable orderTable)
+        {
+            foreach (GbdOrder item in payload)
+            {
+                // Convert the timestamp received in the gbd order to something more useful.
+                var epochTime = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+                epochTime = epochTime.AddMilliseconds(item.header.messageDateTimeStamp);
+
+                var row = orderTable.NewRow();
+                row["Order ID"] = item.salesOrderNumber;
+                row["Order Date"] = epochTime.ToString("g");
+                row["Service Provider"] = item.header.serviceProvider;
+
+                if (item.lines.Count > 0)
+                {
+                    var status = item.lines[0].lineItemStatus;
+
+                    if (!string.IsNullOrEmpty(status))
+                    {
+                        row["Order Status"] = item.lines[0].lineItemStatus;
+                    }
+                }
+
+                orderTable.Rows.Add(row);
+            }
+        }
+
+        /// <summary>
+        /// Get the user selected imagery cat ids for ordering
+        /// </summary>
+        /// <param name="grid">
+        /// The data grid that contains the imagery information.
+        /// </param>
+        /// <returns>
+        /// The <see cref="List"/>.
+        /// </returns>
+        private static List<string> GetImageryToBeOrdered(DataGridView grid)
+        {
+            var catIdList = new List<string>();
+            foreach (DataGridViewRow item in grid.Rows)
+            {
+                var addRow = false;
+                for (int i = 0; i <= item.Cells.Count - 1; i++)
+                {
+                    // Don't record the value of if the polygon is being displayed or a null value.
+                    if (item.Cells[i].Value == null || item.Cells[i].OwningColumn.Name == "showPolygon")
+                    {
+                        continue;
+                    }
+
+                    if (addRow != true && item.Cells[i].OwningColumn.Name == "Selected")
+                    {
+                        addRow = (bool)item.Cells[i].Value;
+                        continue;
+                    }
+
+                    if (addRow && item.Cells[i].OwningColumn.Name == "Catalog ID")
+                    {
+                        catIdList.Add((string)item.Cells[i].Value);
+                    }
+                }
+            }
+
+            return catIdList;
+        }
+
+        /// <summary>
+        /// Write the GBD orders to file from the GBD Order's Table.
+        /// </summary>
+        /// <param name="orders">
+        /// The orders.
+        /// </param>
+        private void WriteGbdOrdersToFile(List<GbdOrder> orders)
+        {
+            var serializedOutput = JsonConvert.SerializeObject(orders);
+            File.WriteAllText(this.filePath, serializedOutput);
+        }
+
+        /// <summary>
+        /// Load the GBD orders from given file path.
+        /// </summary>
+        /// <param name="filepath">
+        /// </param>
+        /// <returns>
+        /// The <see cref="List"/>.
+        /// </returns>
+        private List<GbdOrder> LoadGbdOrdersFromFile(string filepath)
+        {
+            var serializedOutput = File.ReadAllText(this.filePath);
+
+            var list = JsonConvert.DeserializeObject<List<GbdOrder>>(serializedOutput);
+
+            return list;
+        }
+
+        /// <summary>
+        /// Order the selected imagery.  
+        /// </summary>
+        private void OrderImagery()
+        {
+            try
+            {
+                // get the ID's of the images to be ordered
+                var catIdList = GetImageryToBeOrdered(this.dataGridView1);
+
+                var output = JsonConvert.SerializeObject(catIdList);
+
+                // setup the request for the orders
+                var request = new RestRequest("/raster-catalog/api/gbd/orders/v1", Method.POST);
+                request.AddHeader("Authorization", "Bearer " + this.comms.GetAccessToken());
+                request.AddParameter("application/json", output, ParameterType.RequestBody);
+
+                var commsClient = this.comms.GetClient();
+
+                if (commsClient == null)
+                {
+                    commsClient = new RestClient(DgxHelper.GetEndpointBase(Settings.Default));
+                }
+
+                commsClient.ExecuteAsync<List<GbdOrder>>(
+                    request,
+                    resp => this.Invoke(new ExecuteAfterResponse(this.HandleOrderResponse), resp.Data));
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
+        }
+
+        /// <summary>
+        /// The handle order response.
+        /// </summary>
+        /// <param name="data">
+        /// The data.
+        /// </param>
+        private void HandleOrderResponse(List<GbdOrder> data)
+        {
+            try
+            {
+                UpdateOrderTable(data, ref this.orderTable);
+                this.gbdOrderList.AddRange(data);
+                this.WriteGbdOrdersToFile(this.gbdOrderList);
+                this.UpdateStatus();
+                this.tabControl1.SelectTab(this.statusPage);
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
+        }
+
+        /// <summary>
+        /// The create net object.
+        /// </summary>
+        /// <param name="success">
+        /// The success.
+        /// </param>
+        /// <returns>
+        /// The <see cref="NetObject"/>.
+        /// </returns>
+        private static NetObject CreateNetObject(ref bool success)
+        {
+            string decryptedPassword;
+            success = Aes.Instance.Decrypt128(
+                Settings.Default.password,
+                out decryptedPassword);
+            if (!success)
+            {
+                return null;
+            }
+
+            // Creating network object.
+            NetObject netObj = new NetObject
+            {
+                AddressUrl =
+                    Settings.Default.GbdSearchPath,
+                BaseUrl =
+                    DgxHelper.GetEndpointBase(
+                        Settings.Default),
+                AuthEndpoint =
+                    Settings.Default
+                    .authenticationServer,
+                User = Settings.Default.username,
+                Password = decryptedPassword,
+            };
+
+            return netObj;
+        }
+
+
+        #endregion
+
+        #region Status Refresh
+
+        /// <summary>
+        /// The refresh button click.
+        /// </summary>
+        /// <param name="sender">
+        /// The sender.
+        /// </param>
+        /// <param name="e">
+        /// The e.
+        /// </param>
+        private void RefreshButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                this.UpdateStatus();
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
+        }
+
+        private void CheckAccessToken()
+        {
+            if (this.comms.GetAccessToken() == null)
+            {
+                string decryptedPassword;
+                var success = Aes.Instance.Decrypt128(
+                    Settings.Default.password,
+                    out decryptedPassword);
+                if (!success)
+                {
+                    return;
+                }
+
+                var netObj = new NetObject
+                {
+                    AddressUrl =
+                        Settings.Default.GbdSearchPath,
+                    BaseUrl =
+                        DgxHelper.GetEndpointBase(
+                            Settings.Default),
+                    AuthEndpoint =
+                        Settings.Default
+                        .authenticationServer,
+                    User = Settings.Default.username,
+                    Password = decryptedPassword,
+                };
+
+                this.comms.AuthenticateNetworkObject(ref netObj);
+            }
+        }
+
+        private void UpdateStatus()
+        {
+            this.CheckAccessToken();
+
+            // make sure the thread isn't running.  if it is gracefully kill it ...
+            this.ThreadLifeCheck(this.statusUpdateThread);
+
+            // set up new thread
+            this.statusUpdateThread =
+                new Thread(
+                    () =>
+                    this.CheckOrderStatus(
+                        this.GetOrderIdsForRefresh(),
+                        new RestClient(DgxHelper.GetEndpointBase(Settings.Default)),
+                        this.comms.GetAccessToken()));
+
+            // execute the job
+            this.statusUpdateThread.Start();
+        }
+
+        /// <summary>
+        /// The get order ids for refresh.
+        /// </summary>
+        /// <returns>
+        /// The <see cref="List"/>.
+        /// </returns>
+        private List<string> GetOrderIdsForRefresh()
+        {
+            
+            List<string> list = new List<string>();
+            try
+            {
+                foreach (DataGridViewRow row in this.orderDataGridView.Rows)
+                {
+                    var item = row.Cells["Order ID"].Value.ToString();
+                    var currentStatus = row.Cells["Order Status"].Value.ToString();
+                    if (!string.IsNullOrEmpty(item))
+                    {
+                        if (!string.Equals(currentStatus, "DELIVERED"))
+                        {
+                            list.Add(item);
+                        }
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+            }
+
+            return list;
+        }
+
+        /// <summary>
+        /// The check order status.
+        /// </summary>
+        /// <param name="orderList">
+        /// The order list.
+        /// </param>
+        /// <param name="webClient">
+        /// The web client.
+        /// </param>
+        /// <param name="token">
+        /// The token.
+        /// </param>
+        private void CheckOrderStatus(List<string> orderList, IRestClient webClient, string token)
+        {
+            foreach (var id in orderList)
+            {
+                if (this.okToWork)
+                {
+                    var request = new RestRequest("/raster-catalog/api/gbd/orders/v1/status/" + id, Method.GET);
+                    request.AddHeader("Authorization", "Bearer " + token);
+
+                    var result = webClient.Execute<GbdOrder>(request);
+                    var keepRunning = true;
+                    var numTries = 0;
+                    while (keepRunning)
+                    {
+                        if (result.Data.salesOrderNumber == null && numTries <=5)
+                        {
+                            numTries++;
+                            result = webClient.Execute<GbdOrder>(request);
+                        }
+                        else
+                        {
+                            keepRunning = false;
+                        }
+                    }
+
+                    // Callback to the main UI thread to update the data table
+                    this.Invoke(new UpdateStatusCallback(this.UpdateRecordStatus), result.Data);
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Update record status
+        /// </summary>
+        /// <param name="orderStatusUpdate">
+        /// The order status update.
+        /// </param>
+        private void UpdateRecordStatus(GbdOrder orderStatusUpdate)
+        {
+            try
+            {
+                // Don't bother if the GBD Order is null
+                if (orderStatusUpdate.salesOrderNumber != null)
+                {
+                    foreach (DataRow row in this.orderTable.Rows)
+                    {
+                        var orderId = row["Order ID"].ToString();
+                        if (orderId != orderStatusUpdate.salesOrderNumber)
+                        {
+                            continue;
+                        }
+
+                        row["Order Status"] = orderStatusUpdate.lines[0].lineItemStatus;
+                        this.UpdateOrderListStatus(orderId, orderStatusUpdate.lines[0].lineItemStatus);
+                        this.WriteGbdOrdersToFile(this.gbdOrderList);
+
+                        // Since there should only be one order that has the specfied order id lets stop searching
+                        break;
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                this.logWriter.Error(error);
+                this.logWriter.Error(error);
+            }
+        }
+
+        /// <summary>
+        /// The update order list status.
+        /// </summary>
+        /// <param name="orderId">
+        /// The order id.
+        /// </param>
+        /// <param name="status">
+        /// The status.
+        /// </param>
+        private void UpdateOrderListStatus(string orderId, string status)
+        {
+            // should only be one item with that order id.
+            foreach (GbdOrder item in this.gbdOrderList.Where(item => item.salesOrderNumber == orderId))
+            {
+                if (item.lines.Count <= 0)
+                {
+                    continue;
+                }
+
+                var line = item.lines[0];
+                if (line != null)
+                {
+                    line.lineItemStatus = status;
+                }
+            }
+        }
+
+        #endregion
 
         #region Drawing Methods
 
@@ -1384,6 +1965,7 @@ namespace Dgx.Gbd
                         this.DrawPoly(itemToDraw, graphicsContainer);
                     }
                 }
+
                 ArcMap.Document.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, null);
             }
             catch (Exception error)
@@ -1392,6 +1974,12 @@ namespace Dgx.Gbd
             }
         }
 
+        /// <summary>
+        /// The draw aoi.
+        /// </summary>
+        /// <param name="graphicContainer">
+        /// The graphic container.
+        /// </param>
         private void DrawAoi(IGraphicsContainer graphicContainer)
         {
             graphicContainer.AddElement(this.localElement, 0);
@@ -1414,7 +2002,7 @@ namespace Dgx.Gbd
             {
                 var tempPoint = new PointClass();
                 tempPoint.PutCoords(pnt.X, pnt.Y);
-                tempPoint.SpatialReference = DgxTools.Jarvis.ProjectedCoordinateSystem;
+                tempPoint.SpatialReference = Jarvis.ProjectedCoordinateSystem;
                 tempPoint.Project(ArcMap.Document.ActiveView.Extent.SpatialReference);
                 poly.AddPoint(tempPoint);
             }

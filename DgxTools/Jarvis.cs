@@ -1,7 +1,9 @@
 ﻿namespace DgxTools
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Text.RegularExpressions;
 
@@ -11,6 +13,8 @@
   
     using Logging;
 
+    using Newtonsoft.Json;
+
     public class Jarvis
     {
 
@@ -19,6 +23,12 @@
         /// </summary>
         public static readonly string LogFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
                                                  + DGXSettings.Properties.Settings.Default.logfile;
+
+        /// <summary>
+        /// The file that contains the GBD order information.  i.e. order numbers etc.
+        /// </summary>
+        public static readonly string GbdOrderFile = Environment.GetFolderPath(
+            Environment.SpecialFolder.ApplicationData) + DGXSettings.Properties.Settings.Default.GbdOrders;
 
         /// <summary>
         /// The base 32 codes.
@@ -116,6 +126,41 @@
               throw new Exception("Jarvis hates you..." + ex.Message);                
             }
           
+        }
+
+        /// <summary>
+        /// Generic method to load objects of type T from file that are serialized via JSON.
+        /// </summary>
+        /// <param name="path">
+        /// The path.
+        /// </param>
+        /// <typeparam name="T">
+        /// Object that is serialized via JSON in the file
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="T[]"/>.
+        /// </returns>
+        public static T[] LoadObjectsFromFile<T>(string path)
+        {
+            var lines = File.ReadAllLines(path);
+            List<T> objects = new List<T>();
+            for (int i = 0; i <= lines.Length - 1; i++)
+            {
+                // Don't bother with empty or null strings
+                if (string.IsNullOrEmpty(lines[i]))
+                {
+                    continue;
+                }
+
+                // convert and if not null lets add it to the objects
+                var obj = JsonConvert.DeserializeObject<T>(lines[i]);
+                if (obj != null)
+                {
+                    objects.Add(obj);
+                }
+            }
+
+            return objects.ToArray();
         }
 
         public static double[] DecodeBbox(string hashString)
