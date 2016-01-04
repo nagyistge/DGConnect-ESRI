@@ -7,8 +7,8 @@
     <ProjectGuid>{95B5413E-160A-4AFB-8B0A-B0DF1B1C093B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>DgxTools</RootNamespace>
-    <AssemblyName>DgxTools</AssemblyName>
+    <RootNamespace>GbdxTools</RootNamespace>
+    <AssemblyName>GbdxTools</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

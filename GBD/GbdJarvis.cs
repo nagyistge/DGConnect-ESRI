@@ -24,7 +24,7 @@ namespace GBD
     using System;
     using System.Collections.Generic;
 
-    using DgxTools;
+    using GbdxTools;
 
     using ESRI.ArcGIS.Geometry;
 

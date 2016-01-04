@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using DgxTools;
+using GbdxTools;
 
 namespace Gbdx.Vector_Index.Forms
 {
@@ -188,9 +188,9 @@ namespace Gbdx.Vector_Index.Forms
             this.logWriter = new Logger(Jarvis.LogFile, ConsoleLogging);
 
             this.Hook = hook;
-            this.textBoxSearch.Text = DGXSettings.DgxResources.EnterSearchTerms;
+            this.textBoxSearch.Text = GbdxSettings.DgxResources.EnterSearchTerms;
             this.textBoxSearch.ForeColor = Color.DarkGray;
-            this.UserAuthenticationCheck(DGXSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, true);
+            this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, true);
             this.smartThreadPool = new SmartThreadPool();
             this.treeView1.AfterCheck += this.TreeView1AfterCheck;
             this.VisibleChanged += this.VectorIndexDockableVisibleChanged;
@@ -223,7 +223,7 @@ namespace Gbdx.Vector_Index.Forms
         {
             this.InitializeComponent();
             this.Hook = hook;
-            this.UserAuthenticationCheck(DGXSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, true);
+            this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, true);
             this.smartThreadPool = new SmartThreadPool();
             this.treeView1.AfterCheck += this.TreeView1AfterCheck;
             this.VisibleChanged += this.VectorIndexDockableVisibleChanged;
@@ -322,7 +322,7 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void SelectAreaButtonClick(object sender, EventArgs e)
         {
-            if (!this.UserAuthenticationCheck(DGXSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, false))
+            if (!this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, false))
             {
                 return;
             }
@@ -447,8 +447,8 @@ namespace Gbdx.Vector_Index.Forms
         /// </returns>
         private NetObject SetAuthenticationEndpoints(NetObject netObj)
         {
-            netObj.AuthEndpoint = DgxHelper.GetAuthenticationEndpoint(DGXSettings.Properties.Settings.Default);
-            netObj.BaseUrl = DgxHelper.GetEndpointBase(DGXSettings.Properties.Settings.Default);
+            netObj.AuthEndpoint = DgxHelper.GetAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
+            netObj.BaseUrl = DgxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default);
             return netObj;
         }
 
@@ -516,13 +516,13 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void ProcessSourceNodeClick(TreeNode sourceNode)
         {
-            sourceNode.Text = sourceNode.Text.Replace(DGXSettings.DgxResources.Source_ErrorMessage, string.Empty);
-            sourceNode.Text += DGXSettings.DgxResources.SearchingText;
+            sourceNode.Text = sourceNode.Text.Replace(GbdxSettings.DgxResources.Source_ErrorMessage, string.Empty);
+            sourceNode.Text += GbdxSettings.DgxResources.SearchingText;
 
             var node = (VectorIndexSourceNode)sourceNode;
             var work = new WorkerObject
                            {
-                               BaseUrl = DgxHelper.GetEndpointBase(DGXSettings.Properties.Settings.Default),
+                               BaseUrl = DgxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
                                BoundBox = this.bBox,
                                SourceNode = node,
                                NetworkObject = this.networkObject,
@@ -564,10 +564,10 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void ProcessQueryItemNodeClick(TreeNode itemNode)
         {
-            itemNode.Text = itemNode.Text.Replace(DGXSettings.DgxResources.Source_ErrorMessage, string.Empty);
+            itemNode.Text = itemNode.Text.Replace(GbdxSettings.DgxResources.Source_ErrorMessage, string.Empty);
             var work = new WorkerObject
                            {
-                               BaseUrl = DgxHelper.GetEndpointBase(DGXSettings.Properties.Settings.Default),
+                               BaseUrl = DgxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
                                BoundBox = this.bBox,
                                SourceNode = (VectorIndexSourceNode)itemNode.Parent,
                                GeometryNode = (VectorIndexGeometryNode)itemNode,
@@ -604,15 +604,15 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void ProcessGeometryNodeClick(TreeNode geometryNode)
         {
-            geometryNode.Text = geometryNode.Text.Replace(DGXSettings.DgxResources.Source_ErrorMessage, string.Empty);
-            geometryNode.Text += DGXSettings.DgxResources.SearchingText;
+            geometryNode.Text = geometryNode.Text.Replace(GbdxSettings.DgxResources.Source_ErrorMessage, string.Empty);
+            geometryNode.Text += GbdxSettings.DgxResources.SearchingText;
 
             var node = (VectorIndexGeometryNode)geometryNode;
 
             // Checking to see if the node is contained within the checkednodes type prevents multiple requests for data being fired off.
             var work = new WorkerObject
                            {
-                               BaseUrl = DgxHelper.GetEndpointBase(DGXSettings.Properties.Settings.Default),
+                               BaseUrl = DgxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
                                BoundBox = this.bBox,
                                SourceNode = (VectorIndexSourceNode)geometryNode.Parent,
                                GeometryNode = node,
@@ -642,7 +642,7 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void ProcessTypeNodeClick(TreeNode typeNode)
         {
-            typeNode.Text = typeNode.Text.Replace(DGXSettings.DgxResources.Source_ErrorMessage, string.Empty);
+            typeNode.Text = typeNode.Text.Replace(GbdxSettings.DgxResources.Source_ErrorMessage, string.Empty);
             var netO = new NetObject
                            {
                                AuthEndpoint = this.networkObject.AuthEndpoint,
@@ -655,7 +655,7 @@ namespace Gbdx.Vector_Index.Forms
                            };
             var work = new WorkerObject
                            {
-                               BaseUrl = DgxHelper.GetEndpointBase(DGXSettings.Properties.Settings.Default),
+                               BaseUrl = DgxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
                                BoundBox = this.bBox,
                                SourceNode = (VectorIndexSourceNode)typeNode.Parent.Parent,
                                GeometryNode = (VectorIndexGeometryNode)typeNode.Parent,
@@ -695,7 +695,7 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void TreeView1AfterCheck(object sender, TreeViewEventArgs e)
         {
-            if (!this.UserAuthenticationCheck(DGXSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, false))
+            if (!this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, false))
             {
                 return;
             }
@@ -731,7 +731,7 @@ namespace Gbdx.Vector_Index.Forms
                         {
                             // Currently the number of threads is at it's max so lets add to the queue
                             this.jobQueue.Enqueue(item);
-                            item.Text += DGXSettings.DgxResources.Queued;
+                            item.Text += GbdxSettings.DgxResources.Queued;
                             return;
                         }
 
@@ -755,7 +755,7 @@ namespace Gbdx.Vector_Index.Forms
                     {
                         // Currently the number of threads is at it's max so lets add to the queue
                         this.jobQueue.Enqueue(item);
-                        item.Text += DGXSettings.DgxResources.Queued;
+                        item.Text += GbdxSettings.DgxResources.Queued;
                         return;
                     }
 
@@ -779,7 +779,7 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void TextBoxSearchEnter(object sender, EventArgs e)
         {
-            if (this.textBoxSearch.Text.Equals(DGXSettings.DgxResources.EnterSearchTerms))
+            if (this.textBoxSearch.Text.Equals(GbdxSettings.DgxResources.EnterSearchTerms))
             {
                 this.textBoxSearch.Clear();
                 this.textBoxSearch.ForeColor = Color.Black;
@@ -799,7 +799,7 @@ namespace Gbdx.Vector_Index.Forms
         {
             if (string.IsNullOrEmpty(this.textBoxSearch.Text))
             {
-                this.textBoxSearch.Text = DGXSettings.DgxResources.EnterSearchTerms;
+                this.textBoxSearch.Text = GbdxSettings.DgxResources.EnterSearchTerms;
                 this.textBoxSearch.ForeColor = Color.DarkGray;
             }
         }
@@ -1154,7 +1154,7 @@ namespace Gbdx.Vector_Index.Forms
                 lock (this.locker)
                 {
                     var featureWorkspace =
-                        (IFeatureWorkspace)DgxTools.Jarvis.OpenWorkspace(DGXSettings.Properties.Settings.Default.geoDatabase);
+                        (IFeatureWorkspace)GbdxTools.Jarvis.OpenWorkspace(GbdxSettings.Properties.Settings.Default.geoDatabase);
                     var featureClass = featureWorkspace.OpenFeatureClass(workObj.TableName);
                     ILayer featureLayer;
                     featureLayer = VectorIndexHelper.CreateFeatureLayer(
@@ -1352,7 +1352,7 @@ namespace Gbdx.Vector_Index.Forms
         private object ProcessVectorIndexResponse2(object source)
         {
             var work = (WorkerObject)source;
-            var workspace = DgxTools.Jarvis.OpenWorkspace(work.WorkspacePath);
+            var workspace = GbdxTools.Jarvis.OpenWorkspace(work.WorkspacePath);
             var sourceNodeIndex = work.SourceNode.Index;
             var geometryNodeIndex = work.GeometryNode.Index;
             int typeNodeIndex = -1;
@@ -1469,7 +1469,7 @@ namespace Gbdx.Vector_Index.Forms
             {
                 var newItem = new VectorIndexSourceNode
                                   {
-                                      Text = DGXSettings.DgxResources.Source_ErrorMessage,
+                                      Text = GbdxSettings.DgxResources.Source_ErrorMessage,
                                       ResponseObject = work.ResponseObject
                                   };
                 this.treeView1.Nodes.Add(newItem);
@@ -1485,7 +1485,7 @@ namespace Gbdx.Vector_Index.Forms
                 var newItem = new VectorIndexSourceNode
                                   {
                                       Text =
-                                          DGXSettings.DgxResources
+                                          GbdxSettings.DgxResources
                                           .VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_,
                                       ResponseObject = work.ResponseObject
                                   };
@@ -1531,8 +1531,8 @@ namespace Gbdx.Vector_Index.Forms
                 this.treeView1.Nodes[worker.SourceNode.Index].Checked = false;
                 this.treeView1.Nodes[worker.SourceNode.Index].Text =
                     this.treeView1.Nodes[worker.SourceNode.Index].Text.Replace(
-                        DGXSettings.DgxResources.SearchingText,
-                        DGXSettings.DgxResources.Source_ErrorMessage);
+                        GbdxSettings.DgxResources.SearchingText,
+                        GbdxSettings.DgxResources.Source_ErrorMessage);
 
                 // Don't allow it to process further.
                 return;
@@ -1540,7 +1540,7 @@ namespace Gbdx.Vector_Index.Forms
 
             // Results were found so lets get rid of the searching text.
             this.treeView1.Nodes[worker.SourceNode.Index].Text =
-                this.treeView1.Nodes[worker.SourceNode.Index].Text.Replace(DGXSettings.DgxResources.SearchingText, string.Empty);
+                this.treeView1.Nodes[worker.SourceNode.Index].Text.Replace(GbdxSettings.DgxResources.SearchingText, string.Empty);
             foreach (var geoType in worker.GeometryTypes)
             {
                 var newItem = new VectorIndexGeometryNode()
@@ -1585,8 +1585,8 @@ namespace Gbdx.Vector_Index.Forms
                 this.treeView1.Nodes[worker.SourceNode.Index].Nodes[worker.GeometryNode.Index].Checked = false;
                 this.treeView1.Nodes[worker.SourceNode.Index].Nodes[worker.GeometryNode.Index].Text =
                     this.treeView1.Nodes[worker.SourceNode.Index].Nodes[worker.GeometryNode.Index].Text.Replace(
-                        DGXSettings.DgxResources.SearchingText,
-                        DGXSettings.DgxResources.Source_ErrorMessage);
+                        GbdxSettings.DgxResources.SearchingText,
+                        GbdxSettings.DgxResources.Source_ErrorMessage);
 
                 // Don't allow it to process further.
                 return;
@@ -1594,7 +1594,7 @@ namespace Gbdx.Vector_Index.Forms
 
             this.treeView1.Nodes[worker.SourceNode.Index].Nodes[worker.GeometryNode.Index].Text =
                 this.treeView1.Nodes[worker.SourceNode.Index].Nodes[worker.GeometryNode.Index].Text.Replace(
-                    DGXSettings.DgxResources.SearchingText,
+                    GbdxSettings.DgxResources.SearchingText,
                     string.Empty);
 
             foreach (var type in worker.Types)
@@ -1650,13 +1650,13 @@ namespace Gbdx.Vector_Index.Forms
                 this.treeView1.Nodes[work.SourceNode.Index].Nodes[work.GeometryNode.Index].Nodes[work.TypeNode.Index]
                     .Checked = false;
                 this.treeView1.Nodes[work.SourceNode.Index].Nodes[work.GeometryNode.Index].Nodes[work.TypeNode.Index]
-                    .Text += DGXSettings.DgxResources.Source_ErrorMessage;
+                    .Text += GbdxSettings.DgxResources.Source_ErrorMessage;
 
                 // Don't allow it to process further.
                 return;
             }
 
-            work.WorkspacePath = DGXSettings.Properties.Settings.Default.geoDatabase;
+            work.WorkspacePath = GbdxSettings.Properties.Settings.Default.geoDatabase;
             if (work.QuerySource)
             {
                 work.TableName = "VI_" + work.GeometryNode.GeometryType.Name.Replace(" ", "_") + "QUERY_Search_"
@@ -1687,11 +1687,11 @@ namespace Gbdx.Vector_Index.Forms
             if (this.networkObject == null)
             {
                 this.networkObject = this.SetupNetObject(
-                    DGXSettings.Properties.Settings.Default.username,
-                    DGXSettings.Properties.Settings.Default.password);
+                    GbdxSettings.Properties.Settings.Default.username,
+                    GbdxSettings.Properties.Settings.Default.password);
             }
 
-            this.networkObject.AuthEndpoint = DgxHelper.GetAuthenticationEndpoint(DGXSettings.Properties.Settings.Default);
+            this.networkObject.AuthEndpoint = DgxHelper.GetAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
             this.networkObject.AddressUrl = null;
             this.networkObject.Error = null;
             this.networkObject.ErrorOccurred = false;
@@ -1708,7 +1708,7 @@ namespace Gbdx.Vector_Index.Forms
 
             if (!ArcUtility.ValidateRoundedWgs84Polygon(envelope))
             {
-                MessageBox.Show(DGXSettings.DgxResources.invalidBoundingBox);
+                MessageBox.Show(GbdxSettings.DgxResources.invalidBoundingBox);
                 if (this.boundingBoxGraphicElement != null)
                 {
                     ArcUtility.DeleteElementFromGraphicContainer(
@@ -1732,7 +1732,7 @@ namespace Gbdx.Vector_Index.Forms
             // Setup worker object 
             var work = new WorkerObject
                            {
-                               BaseUrl = DgxHelper.GetEndpointBase(DGXSettings.Properties.Settings.Default),
+                               BaseUrl = DgxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
                                BoundBox = this.bBox,
                                Logger = this.logWriter
                            };
@@ -1740,7 +1740,7 @@ namespace Gbdx.Vector_Index.Forms
             var newNetObj = this.networkObject;
             work.NetworkObject = newNetObj;
 
-            if (this.textBoxSearch.Text.Equals(DGXSettings.DgxResources.EnterSearchTerms) || this.textBoxSearch.Text == string.Empty)
+            if (this.textBoxSearch.Text.Equals(GbdxSettings.DgxResources.EnterSearchTerms) || this.textBoxSearch.Text == string.Empty)
             {
                 this.usingQuerySource = false;
 
@@ -1761,7 +1761,7 @@ namespace Gbdx.Vector_Index.Forms
             }
 
             this.treeView1.CheckBoxes = false;
-            var searchingNode = new VectorIndexSourceNode { Text = DGXSettings.DgxResources.SearchingText };
+            var searchingNode = new VectorIndexSourceNode { Text = GbdxSettings.DgxResources.SearchingText };
             this.treeView1.Nodes.Add(searchingNode);
 
             work.ApplicationState = this.currentApplicationState;
@@ -1794,7 +1794,7 @@ namespace Gbdx.Vector_Index.Forms
         /// The <see cref="bool"/>.
         /// </returns>
         private bool UserAuthenticationCheck(
-            DGXSettings.Properties.Settings settings,
+            GbdxSettings.Properties.Settings settings,
             ref string user,
             ref string pass,
             IDgxComms cloudComms,
@@ -1804,7 +1804,7 @@ namespace Gbdx.Vector_Index.Forms
             {
                 if (!suppressMessageBox)
                 {
-                    MessageBox.Show(DGXSettings.DgxResources.InvalidUserPass);
+                    MessageBox.Show(GbdxSettings.DgxResources.InvalidUserPass);
                 }
 
                 return false;
@@ -1829,7 +1829,7 @@ namespace Gbdx.Vector_Index.Forms
                 pass = string.Empty;
                 if (!suppressMessageBox)
                 {
-                    MessageBox.Show(DGXSettings.DgxResources.InvalidUserPass);
+                    MessageBox.Show(GbdxSettings.DgxResources.InvalidUserPass);
                 }
 
                 return false;
@@ -1854,7 +1854,7 @@ namespace Gbdx.Vector_Index.Forms
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        private bool CheckCredentials(DGXSettings.Properties.Settings settings, ref string user, ref string pass)
+        private bool CheckCredentials(GbdxSettings.Properties.Settings settings, ref string user, ref string pass)
         {
             if (!string.Equals(settings.username, user) || !string.Equals(settings.password, pass))
             {
@@ -1886,7 +1886,7 @@ namespace Gbdx.Vector_Index.Forms
             }
 
             // Check user authentication
-            if (!this.UserAuthenticationCheck(DGXSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, false))
+            if (!this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, false))
             {
                 return;
             }
@@ -1929,7 +1929,7 @@ namespace Gbdx.Vector_Index.Forms
             var menuStrip = new UviContextMenuStrip(node);
             var downloadAllToolStrip = new ToolStripMenuItem
                                            {
-                                               Text = DGXSettings.DgxResources.Download_all_Below_100000,
+                                               Text = GbdxSettings.DgxResources.Download_all_Below_100000,
                                                Name = "DownloadAll"
                                            };
             downloadAllToolStrip.Click += this.DownloadAllToolStripOnClick;

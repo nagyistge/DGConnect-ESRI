@@ -37,7 +37,7 @@ namespace Gbdx
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        internal static string GetCasTicketEndpoint(DGXSettings.Properties.Settings userSettings)
+        internal static string GetCasTicketEndpoint(GbdxSettings.Properties.Settings userSettings)
         {
             if (string.IsNullOrEmpty(userSettings.baseUrl))
             {
@@ -56,7 +56,7 @@ namespace Gbdx
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        internal static string GetCasAuthenticationEndpoint(DGXSettings.Properties.Settings userSettings)
+        internal static string GetCasAuthenticationEndpoint(GbdxSettings.Properties.Settings userSettings)
         {
             if (string.IsNullOrEmpty(userSettings.baseUrl))
             {
@@ -75,7 +75,7 @@ namespace Gbdx
         /// <returns>
         /// The <see cref="string"/>.
         /// </returns>
-        internal static string GetCasBaseEndpoint(DGXSettings.Properties.Settings userSettings)
+        internal static string GetCasBaseEndpoint(GbdxSettings.Properties.Settings userSettings)
         {
             if (string.IsNullOrEmpty(userSettings.baseUrl))
             {
@@ -90,7 +90,7 @@ namespace Gbdx
         /// </summary>
         /// <param name="userSettings">user settings</param>
         /// <returns>authentication endpoint in string form</returns>
-        internal static string GetAuthenticationEndpoint(DGXSettings.Properties.Settings userSettings)
+        internal static string GetAuthenticationEndpoint(GbdxSettings.Properties.Settings userSettings)
         {
             if (string.IsNullOrEmpty(userSettings.baseUrl))
             {
@@ -105,7 +105,7 @@ namespace Gbdx
         /// </summary>
         /// <param name="userSettings">user settings</param>
         /// <returns>returns base url in string form</returns>
-        internal static string GetEndpointBase(DGXSettings.Properties.Settings userSettings)
+        internal static string GetEndpointBase(GbdxSettings.Properties.Settings userSettings)
         {
             if (string.IsNullOrEmpty(userSettings.baseUrl))
             {

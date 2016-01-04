@@ -30,7 +30,7 @@ namespace Gbdx
 
     using Gbdx.Properties;
 
-    using DGXSettings;
+    using GbdxSettings;
 
     using Encryption;
 
@@ -111,9 +111,9 @@ namespace Gbdx
         {
             this.InitializeComponent();
 
-            if (string.IsNullOrEmpty(DGXSettings.Properties.Settings.Default.username) || string.IsNullOrEmpty(DGXSettings.Properties.Settings.Default.password))
+            if (string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.username) || string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.password))
             {
-                MessageBox.Show(DGXSettings.DgxResources.InvalidUserPass);
+                MessageBox.Show(GbdxSettings.DgxResources.InvalidUserPass);
                 this.ValidAuthentication = false;
                 return;
             }
@@ -352,22 +352,22 @@ namespace Gbdx
             {
                 CookieJar = new CookieContainer(),
                 TimeoutSetting = 8000,
-                User = DGXSettings.Properties.Settings.Default.username,
-                BaseUrl = DgxHelper.GetCasBaseEndpoint(DGXSettings.Properties.Settings.Default)
+                User = GbdxSettings.Properties.Settings.Default.username,
+                BaseUrl = DgxHelper.GetCasBaseEndpoint(GbdxSettings.Properties.Settings.Default)
             };
-            netobj.AuthEndpoint = DgxHelper.GetCasAuthenticationEndpoint(DGXSettings.Properties.Settings.Default);
-            netobj.TicketEndpoint = DgxHelper.GetCasTicketEndpoint(DGXSettings.Properties.Settings.Default);
+            netobj.AuthEndpoint = DgxHelper.GetCasAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
+            netobj.TicketEndpoint = DgxHelper.GetCasTicketEndpoint(GbdxSettings.Properties.Settings.Default);
 
             // Decrypt the password.  If an error occurs inform the user and return an unusable object.
             string pass;
-            var success = Aes.Instance.Decrypt128(DGXSettings.Properties.Settings.Default.password, out pass);
+            var success = Aes.Instance.Decrypt128(GbdxSettings.Properties.Settings.Default.password, out pass);
             if (success)
             {
                 netobj.Password = pass;
             }
             else
             {
-                MessageBox.Show(DGXSettings.DgxResources.PasswordProblemCheckSettings);
+                MessageBox.Show(GbdxSettings.DgxResources.PasswordProblemCheckSettings);
                 return null;
             }
 
@@ -386,7 +386,7 @@ namespace Gbdx
         private void PictureBoxFavoriteClick(object sender, EventArgs e)
         {
             this.filledHeartImageShown = !this.filledHeartImageShown;
-            this.button1.Image = this.filledHeartImageShown ? DGXSettings.DgxResources.filledStar : DGXSettings.DgxResources.emptyStar;
+            this.button1.Image = this.filledHeartImageShown ? GbdxSettings.DgxResources.filledStar : GbdxSettings.DgxResources.emptyStar;
 
             // If True then lets save the query.
             if (this.filledHeartImageShown)
@@ -400,14 +400,14 @@ namespace Gbdx
         /// </summary>
         private void RestoreUserSelection()
         {
-            if (!string.IsNullOrEmpty(DGXSettings.Properties.Settings.Default.sma_time) && this.timeLimit != null)
+            if (!string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.sma_time) && this.timeLimit != null)
             {
-                this.timeLimit.RestoreSelection(DGXSettings.Properties.Settings.Default.sma_time);
+                this.timeLimit.RestoreSelection(GbdxSettings.Properties.Settings.Default.sma_time);
             }
 
-            if (!string.IsNullOrEmpty(DGXSettings.Properties.Settings.Default.sma_query_limit) && this.queryLimit != null)
+            if (!string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.sma_query_limit) && this.queryLimit != null)
             {
-                this.queryLimit.RestoreSelection(DGXSettings.Properties.Settings.Default.sma_query_limit);
+                this.queryLimit.RestoreSelection(GbdxSettings.Properties.Settings.Default.sma_query_limit);
             }
 
             if (this.timeLimit == null)
@@ -420,8 +420,8 @@ namespace Gbdx
                 return;
             }
 
-            this.dateTimePickerStart.Value = DGXSettings.Properties.Settings.Default.sma_date_from;
-            this.dateTimePickerEnd.Value = DGXSettings.Properties.Settings.Default.sma_date_to;
+            this.dateTimePickerStart.Value = GbdxSettings.Properties.Settings.Default.sma_date_from;
+            this.dateTimePickerEnd.Value = GbdxSettings.Properties.Settings.Default.sma_date_to;
         }
 
         #region Radio Button Event Handelers
@@ -488,7 +488,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(DGXSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
             }
         }
 
@@ -518,7 +518,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(DGXSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
             }
         }
 
@@ -548,7 +548,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(DGXSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
             }
         }
 
@@ -578,7 +578,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(DGXSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
             }
         }
 
@@ -608,7 +608,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(DGXSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
             }
         }
 
@@ -638,7 +638,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(DGXSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
             }
         }
 
@@ -668,7 +668,7 @@ namespace Gbdx
             }
             catch
             {
-                MessageBox.Show(DGXSettings.DgxResources.invalidDateTime);
+                MessageBox.Show(GbdxSettings.DgxResources.invalidDateTime);
             }
         }
 
@@ -710,7 +710,7 @@ namespace Gbdx
             if (this.advancedOptionsShown)
             {
                 this.Size = new Size(412, 585);
-                this.advancedOptionsLinkLabel.Text = DGXSettings.DgxResources.Hide_Advanced_Options;
+                this.advancedOptionsLinkLabel.Text = GbdxSettings.DgxResources.Hide_Advanced_Options;
                 this.tableLayoutPanel1.SetRow(this.buttonCancel, 5);
                 this.tableLayoutPanel1.SetRow(this.groupBox1, 2);
                 this.tableLayoutPanel1.SetRow(this.buttonRun, 5);
@@ -718,7 +718,7 @@ namespace Gbdx
             else
             {
                 this.Size = new Size(412, 220);
-                this.advancedOptionsLinkLabel.Text = DGXSettings.DgxResources.Show_Advanced_Options;
+                this.advancedOptionsLinkLabel.Text = GbdxSettings.DgxResources.Show_Advanced_Options;
                 this.tableLayoutPanel1.SetRow(this.buttonCancel, 2);
                 this.tableLayoutPanel1.SetRow(this.buttonRun, 2);
                 this.tableLayoutPanel1.SetRow(this.groupBox1, 5);
@@ -765,11 +765,11 @@ namespace Gbdx
             if (this.Validate())
             {
                 // Save the user selected settings
-                DGXSettings.Properties.Settings.Default.sma_date_from = this.dateTimePickerStart.Value;
-                DGXSettings.Properties.Settings.Default.sma_date_to = this.dateTimePickerEnd.Value;
-                DGXSettings.Properties.Settings.Default.sma_query_limit = this.queryLimit.SelectedText;
-                DGXSettings.Properties.Settings.Default.sma_time = this.timeLimit.SelectedText;
-                DGXSettings.Properties.Settings.Default.Save();
+                GbdxSettings.Properties.Settings.Default.sma_date_from = this.dateTimePickerStart.Value;
+                GbdxSettings.Properties.Settings.Default.sma_date_to = this.dateTimePickerEnd.Value;
+                GbdxSettings.Properties.Settings.Default.sma_query_limit = this.queryLimit.SelectedText;
+                GbdxSettings.Properties.Settings.Default.sma_time = this.timeLimit.SelectedText;
+                GbdxSettings.Properties.Settings.Default.Save();
 
                 this.DialogResult = DialogResult.OK;
                 this.Close();
@@ -1051,7 +1051,7 @@ namespace Gbdx
             this.queryLimit.RestoreSelection(queryMenuitem.SourceSavedQuery.properties.EsriAddin.QueryLimit);
 
             this.filledHeartImageShown = !this.filledHeartImageShown;
-            this.button1.Image = DGXSettings.DgxResources.filledStar;
+            this.button1.Image = GbdxSettings.DgxResources.filledStar;
         }
 
         /// <summary>
@@ -1097,7 +1097,7 @@ namespace Gbdx
         private void KeywordsTextChanged(object sender, EventArgs e)
         {
             this.filledHeartImageShown = !this.filledHeartImageShown;
-            this.button1.Image = DGXSettings.DgxResources.emptyStar;
+            this.button1.Image = GbdxSettings.DgxResources.emptyStar;
         }
     }
 }

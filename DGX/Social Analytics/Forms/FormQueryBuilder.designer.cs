@@ -324,7 +324,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Image = global::DGXSettings.DgxResources.emptyStar;
+            this.button1.Image = global::GbdxSettings.DgxResources.emptyStar;
             this.button1.Location = new System.Drawing.Point(372, 19);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(30, 30);

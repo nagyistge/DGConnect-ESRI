@@ -27,7 +27,7 @@ namespace Gbdx
 
     using Gbdx.Properties;
 
-    using DGXSettings;
+    using GbdxSettings;
 
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.Desktop.AddIns;
@@ -617,7 +617,7 @@ namespace Gbdx
 
             if (this.noResultsFound)
             {
-                MessageBox.Show(DGXSettings.DgxResources.VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_);
+                MessageBox.Show(GbdxSettings.DgxResources.VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_);
                 return;
             }
 

@@ -33,10 +33,10 @@ namespace Gbdx.Aggregations
     using System.Windows.Threading;
 
     using global::Aggregations;
-    using DGXSettings;
-    using DGXSettings.Properties;
+    using GbdxSettings;
+    using GbdxSettings.Properties;
 
-    using DgxTools;
+    using GbdxTools;
 
     using Encryption;
 

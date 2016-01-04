@@ -19,7 +19,7 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using DgxTools;
+using GbdxTools;
 
 namespace Gbdx
 {
@@ -192,13 +192,13 @@ namespace Gbdx
         private NetObject RunOrbit()
         {
             var responseFromServer = new NetObject();
-            responseFromServer.BaseUrl = DgxHelper.GetCasBaseEndpoint(DGXSettings.Properties.Settings.Default);
-            responseFromServer.AuthEndpoint = DgxHelper.GetCasAuthenticationEndpoint(DGXSettings.Properties.Settings.Default);
-            responseFromServer.TicketEndpoint = DgxHelper.GetCasTicketEndpoint(DGXSettings.Properties.Settings.Default);
-            responseFromServer.User = DGXSettings.Properties.Settings.Default.username;
+            responseFromServer.BaseUrl = DgxHelper.GetCasBaseEndpoint(GbdxSettings.Properties.Settings.Default);
+            responseFromServer.AuthEndpoint = DgxHelper.GetCasAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
+            responseFromServer.TicketEndpoint = DgxHelper.GetCasTicketEndpoint(GbdxSettings.Properties.Settings.Default);
+            responseFromServer.User = GbdxSettings.Properties.Settings.Default.username;
 
             var unEncryptedPassword = string.Empty;
-            var success = Aes.Instance.Decrypt128(DGXSettings.Properties.Settings.Default.password, out unEncryptedPassword);
+            var success = Aes.Instance.Decrypt128(GbdxSettings.Properties.Settings.Default.password, out unEncryptedPassword);
             if (success)
             {
                 responseFromServer.Password = unEncryptedPassword;

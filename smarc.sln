@@ -33,7 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aggregations", "Aggregation
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aggregation Unit Tests", "Aggregation Unit Tests\Aggregation Unit Tests.csproj", "{18AF8581-835E-43BB-BC46-7CEC41BCF0D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DgxTools", "DgxTools\DgxTools.csproj", "{95B5413E-160A-4AFB-8B0A-B0DF1B1C093B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GbdxTools", "DgxTools\GbdxTools.csproj", "{95B5413E-160A-4AFB-8B0A-B0DF1B1C093B}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution

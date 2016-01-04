@@ -57,27 +57,27 @@ namespace Gbdx
             this.InitializeComponent();
 
             // If the setting is not set default to my documents otherwise load the setting
-            if (string.IsNullOrEmpty(DGXSettings.Properties.Settings.Default.geoDatabase))
+            if (string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.geoDatabase))
             {
-                DGXSettings.Properties.Settings.Default.geoDatabase = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                GbdxSettings.Properties.Settings.Default.geoDatabase = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 this.fileGdbDirectoryTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             }
             else
             {
-                this.fileGdbDirectoryTextBox.Text = DGXSettings.Properties.Settings.Default.geoDatabase;
+                this.fileGdbDirectoryTextBox.Text = GbdxSettings.Properties.Settings.Default.geoDatabase;
             }
 
             //textBoxUrl.Text = Settings.Default.url;
-            this.UserNameTextBox.Text = DGXSettings.Properties.Settings.Default["username"].ToString();
+            this.UserNameTextBox.Text = GbdxSettings.Properties.Settings.Default["username"].ToString();
             var tempPassword = string.Empty;
 
-            if (Aes.Instance.Decrypt128(DGXSettings.Properties.Settings.Default["password"].ToString(), out tempPassword))
+            if (Aes.Instance.Decrypt128(GbdxSettings.Properties.Settings.Default["password"].ToString(), out tempPassword))
             {
                 this.PasswordTextBox.Text = tempPassword;
             }
             
             // Set the base url text box.
-            this.urlTextBox.Text = string.IsNullOrEmpty(DGXSettings.Properties.Settings.Default.baseUrl) ? DGXSettings.Properties.Settings.Default.DefaultBaseUrl : DGXSettings.Properties.Settings.Default.baseUrl;
+            this.urlTextBox.Text = string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.baseUrl) ? GbdxSettings.Properties.Settings.Default.DefaultBaseUrl : GbdxSettings.Properties.Settings.Default.baseUrl;
 
             this.comms = new DgxComms();
         }
@@ -175,22 +175,22 @@ namespace Gbdx
         /// </param>
         private void ButtonOkClick(object sender, EventArgs e)
         {
-            DGXSettings.Properties.Settings.Default["username"] = this.UserNameTextBox.Text;
-            DGXSettings.Properties.Settings.Default.geoDatabase = this.fileGdbDirectoryTextBox.Text;
-            DGXSettings.Properties.Settings.Default.baseUrl = this.urlTextBox.Text;
+            GbdxSettings.Properties.Settings.Default["username"] = this.UserNameTextBox.Text;
+            GbdxSettings.Properties.Settings.Default.geoDatabase = this.fileGdbDirectoryTextBox.Text;
+            GbdxSettings.Properties.Settings.Default.baseUrl = this.urlTextBox.Text;
             
             string temp;
             if (Aes.Instance.Encrypt128(this.PasswordTextBox.Text, out temp))
             {
-                DGXSettings.Properties.Settings.Default["password"] = temp;
+                GbdxSettings.Properties.Settings.Default["password"] = temp;
             }
             else
             {
-                MessageBox.Show(DGXSettings.DgxResources.ErrorSavingPassword);
+                MessageBox.Show(GbdxSettings.DgxResources.ErrorSavingPassword);
                 return;
             }
 
-            DGXSettings.Properties.Settings.Default.Save();
+            GbdxSettings.Properties.Settings.Default.Save();
             this.Close();
         }
 
@@ -207,7 +207,7 @@ namespace Gbdx
         {
             var netObj = new NetObject
                              {
-                                 AuthEndpoint = DGXSettings.Properties.Settings.Default.authenticationServer,
+                                 AuthEndpoint = GbdxSettings.Properties.Settings.Default.authenticationServer,
                                  BaseUrl = this.urlTextBox.Text,
                                  User = this.UserNameTextBox.Text,
                                  Password = this.PasswordTextBox.Text
@@ -221,19 +221,19 @@ namespace Gbdx
                 this.PasswordTextBox.BackColor = Color.GreenYellow;
                 this.UserNameTextBox.BackColor = Color.GreenYellow;
                 this.urlTextBox.BackColor = Color.GreenYellow;
-                MessageBox.Show(DGXSettings.DgxResources.SuccessfulConnection);
+                MessageBox.Show(GbdxSettings.DgxResources.SuccessfulConnection);
                 return;
             }
 
             if (netObj.ResponseStatusCode == HttpStatusCode.Unauthorized)
             {
-                MessageBox.Show(DGXSettings.DgxResources.InvalidUserPass);
+                MessageBox.Show(GbdxSettings.DgxResources.InvalidUserPass);
                 this.PasswordTextBox.BackColor = Color.Tomato;
                 this.UserNameTextBox.BackColor = Color.Tomato;
                 return;
             }
 
-            MessageBox.Show(DGXSettings.DgxResources.InvalidUrl);
+            MessageBox.Show(GbdxSettings.DgxResources.InvalidUrl);
             this.urlTextBox.BackColor = Color.Tomato;
             this.PasswordTextBox.BackColor = Color.White;
             this.UserNameTextBox.BackColor = Color.White;

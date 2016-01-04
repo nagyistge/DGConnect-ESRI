@@ -1,4 +1,4 @@
-﻿namespace DgxTools
+﻿namespace GbdxTools
 {
     using System;
     using System.Collections;
@@ -22,13 +22,13 @@
         /// Log file where all information should be written too.
         /// </summary>
         public static readonly string LogFile = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
-                                                 + DGXSettings.Properties.Settings.Default.logfile;
+                                                 + GbdxSettings.Properties.Settings.Default.logfile;
 
         /// <summary>
         /// The file that contains the GBD order information.  i.e. order numbers etc.
         /// </summary>
         public static readonly string GbdOrderFile = Environment.GetFolderPath(
-            Environment.SpecialFolder.ApplicationData) + DGXSettings.Properties.Settings.Default.GbdOrders;
+            Environment.SpecialFolder.ApplicationData) + GbdxSettings.Properties.Settings.Default.GbdOrders;
 
         /// <summary>
         /// The base 32 codes.

@@ -256,7 +256,7 @@ namespace Gbdx
             {
                 var response = JsonConvert.DeserializeObject<ResponseRss>(responseFromServer);
                 xyTable = CreateTable(
-                    DgxTools.Jarvis.OpenWorkspace(DGXSettings.Properties.Settings.Default.geoDatabase),
+                    GbdxTools.Jarvis.OpenWorkspace(GbdxSettings.Properties.Settings.Default.geoDatabase),
                     tableName,
                     LayerFields.CreateRssFields());
 
@@ -323,7 +323,7 @@ namespace Gbdx
                 var response = JsonConvert.DeserializeObject<ResponseRss>(responseFromServer);
 
                 xyTable = CreateTable(
-                    DgxTools.Jarvis.OpenWorkspace(DGXSettings.Properties.Settings.Default.geoDatabase),
+                    GbdxTools.Jarvis.OpenWorkspace(GbdxSettings.Properties.Settings.Default.geoDatabase),
                     tableName,
                     LayerFields.CreateRssFields());
 

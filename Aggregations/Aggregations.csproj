@@ -67,9 +67,9 @@
       <Project>{f96e1da5-a0cd-4569-8727-8fb3c2935731}</Project>
       <Name>DGXSettings</Name>
     </ProjectReference>
-    <ProjectReference Include="..\DgxTools\DgxTools.csproj">
+    <ProjectReference Include="..\DgxTools\GbdxTools.csproj">
       <Project>{95b5413e-160a-4afb-8b0a-b0df1b1c093b}</Project>
-      <Name>DgxTools</Name>
+      <Name>GbdxTools</Name>
     </ProjectReference>
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{f64278bf-afd4-4304-815f-3e5130d8f9e8}</Project>

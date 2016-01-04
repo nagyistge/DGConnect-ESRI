@@ -13,7 +13,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-using DgxTools;
+using GbdxTools;
 
 using Logging;
 
@@ -35,8 +35,8 @@ namespace Gbdx.Gbd
     using System.Threading;
     using System.Windows.Forms;
 
-    using DGXSettings;
-    using DGXSettings.Properties;
+    using GbdxSettings;
+    using GbdxSettings.Properties;
 
     using Encryption;
 
