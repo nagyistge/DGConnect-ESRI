@@ -167,12 +167,12 @@
 
         private static string CheckName(string name)
         {
-            if (DgxTools.Jarvis.invalidStartingChars.Contains(name[0]))
+            if (GbdxTools.Jarvis.invalidStartingChars.Contains(name[0]))
             {
                 name = "t_" + name;
             }
 
-            name = DgxTools.Jarvis.InvalidFieldCharacters.Replace(name, "_");
+            name = GbdxTools.Jarvis.InvalidFieldCharacters.Replace(name, "_");
             return name;
         }
     }

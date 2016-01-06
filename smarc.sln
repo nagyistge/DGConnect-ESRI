@@ -9,9 +9,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkConnections", "NetworkConnections\NetworkConnections.csproj", "{F3BB8B18-B4E2-42D1-8E46-F09C13F41465}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dgx", "DGX\Dgx.csproj", "{F6718F5F-772B-42E9-98E3-3F7A6C607120}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Gbdx", "GBDX\Gbdx.csproj", "{F6718F5F-772B-42E9-98E3-3F7A6C607120}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsightCloud Unit Testing", "DGX Unit Testing\InsightCloud Unit Testing.csproj", "{851AEC1A-15BB-4EA2-88AA-7886266E2A91}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InsightCloud Unit Testing", "Unit Testing\InsightCloud Unit Testing.csproj", "{851AEC1A-15BB-4EA2-88AA-7886266E2A91}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unit Test Projects", "Unit Test Projects", "{1550284F-5B85-4205-8A14-947A754F0EA4}"
 EndProject
@@ -27,13 +27,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GBD", "GBD\GBD.csproj", "{E
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GBDTests", "GBDTests\GBDTests.csproj", "{F37D477E-08A6-4676-8640-0176D41319DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DGXSettings", "DGXSettings\DGXSettings.csproj", "{F96E1DA5-A0CD-4569-8727-8FB3C2935731}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GBDXSettings", "GBDXSettings\GBDXSettings.csproj", "{F96E1DA5-A0CD-4569-8727-8FB3C2935731}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aggregations", "Aggregations\Aggregations.csproj", "{F6BD5FAF-14C8-4AA6-B90C-03043B0E54FE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Aggregation Unit Tests", "Aggregation Unit Tests\Aggregation Unit Tests.csproj", "{18AF8581-835E-43BB-BC46-7CEC41BCF0D9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DgxTools", "DgxTools\DgxTools.csproj", "{95B5413E-160A-4AFB-8B0A-B0DF1B1C093B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GbdxTools", "GbdxTools\GbdxTools.csproj", "{95B5413E-160A-4AFB-8B0A-B0DF1B1C093B}"
 EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution

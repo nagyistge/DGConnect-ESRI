@@ -31,9 +31,9 @@ namespace NetworkConnections
     using RestSharp;
 
     /// <summary>
-    /// The Dgx comms.
+    /// Implments the IGbdxComms interface(s)
     /// </summary>
-    public class SmaComms : IDgxComms
+    public class SmaComms : IGbdxComms
     {
         /// <summary>
         /// The logger.
@@ -67,7 +67,7 @@ namespace NetworkConnections
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SmaComms"/> class. 
-        /// Initializes a new instance of the <see cref="DgxComms"/> class.
+        /// Initializes a new instance of the <see cref="GbdxComms"/> class.
         /// </summary>
         /// <param name="logFile">
         /// The log file.
@@ -82,7 +82,7 @@ namespace NetworkConnections
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SmaComms"/> class. 
-        /// Initializes a new instance of the <see cref="DgxComms"/> class. 
+        /// Initializes a new instance of the <see cref="GbdxComms"/> class. 
         /// When no parameters are part of the constructor then logging will not be possible for the network calls.
         /// </summary>
         public SmaComms()
