@@ -1002,7 +1002,12 @@ namespace Gbdx.Vector_Index.Forms
                     // Get the staged request.  If no error return true.
                     success = gbdxComms.StagedRequest(ref networkObj, formParams);
 
-                    // Download didn't start so lets try it again.  but after a 50 ms nap to give the service a chance to catch up
+                    var pagedResult = JsonConvert.DeserializeObject<PagedData>(networkObj.Result);
+
+                    networkObj.PageId = pagedResult.next_paging_id;
+                    networkObj.PageItemCount = Convert.ToInt32( pagedResult.item_count);
+
+                    // Download didn't start so lets try it again.  but after a 250 ms nap to give the service a chance to catch up
                     if (itemsReceived == 0 && !success)
                     {
                         if (work.NumberOfAttempts <= 5)
@@ -1043,7 +1048,8 @@ namespace Gbdx.Vector_Index.Forms
                     }
 
                     // Check to see if the last page has been received otherwise process it.
-                    if (string.Equals(networkObj.Result, "{}", StringComparison.OrdinalIgnoreCase))
+                    //if (string.Equals(pagedResult.ToString(), "{}", StringComparison.OrdinalIgnoreCase))
+                    if(networkObj.PageItemCount == 0)
                     {
                         done = true;
                     }
@@ -1065,7 +1071,7 @@ namespace Gbdx.Vector_Index.Forms
                             }
 
                             work.NumberOfLines++;
-                            file.WriteLine(networkObj.Result);
+                            file.WriteLine(pagedResult.data.ToString());
                            }
 
                         // close If(success)

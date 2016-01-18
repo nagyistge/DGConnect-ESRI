@@ -243,6 +243,7 @@
       <DependentUpon>VectorIndexDockable.cs</DependentUpon>
     </Compile>
     <Compile Include="Vector Index\Forms\WorkerObject.cs" />
+    <Compile Include="Vector Index\PagedData.cs" />
     <Compile Include="Vector Index\PageId.cs" />
     <Compile Include="Vector Index\SourceType.cs" />
     <Compile Include="Vector Index\SourceTypeResponseObject.cs" />
