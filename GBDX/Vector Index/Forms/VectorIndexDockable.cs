@@ -1071,7 +1071,8 @@ namespace Gbdx.Vector_Index.Forms
                             }
 
                             work.NumberOfLines++;
-                            file.WriteLine(pagedResult.data.ToString());
+                            var outputStr = pagedResult.data.ToString().Replace("\r", "").Replace("\n","");
+                            file.WriteLine(outputStr);
                            }
 
                         // close If(success)
