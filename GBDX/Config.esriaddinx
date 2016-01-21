@@ -13,7 +13,6 @@
   <AddIn language="CLR" library="Gbdx.dll" namespace="Gbdx">
     <ArcMap>
       <Commands>
-        <Tool id="DigitalGlobe_Inc_sma_rssPolygon" class="Gbdx.RssPolygon" message="Identify region for search by drawing a rectangular area. Hold the shift key down for Circular area of interest" caption="Text Search" tip="Text Search" category="Add-In Controls" image="Images\rssPolygon.png" />
         <Button id="DigitalGlobe_Inc_sma_smaConfig" class="Gbdx.SmaConfig" message="Various user settings and advanced configurations available for the platform" caption="Information and GBDX Platform Settings" tip="Information and GBDX Platform Settings" category="Add-In Controls" image="Images\smaConfig.png" />
         <Tool id="DigitalGlobe_Inc_sma_VectorIndex" class="Gbdx.Vector_Index.VectorIndex" message="On the dockable window enter search terms and select area" caption="Unified Commercial Vector Search" tip="Unified Commercial Vector Search" category="Add-In Controls" image="Images\VectorIndex.png" />
         <Button id="DigitalGlobe_Inc_GbdxAboutButton" class="Gbdx.GbdxAboutButton" message="A DigitalGlobe Inc. platform providing social media, text, vector and raster search and analytics capabilities" caption="About Information and GBDX Platform" tip="About Information and GBDX Platform" category="Add-In Controls" image="Images\GbdxAboutButton.png" />
@@ -26,7 +25,6 @@
       <Toolbars>
         <Toolbar id="DigitalGlobe_Inc_sma_Social_Media_Analytics" caption="GBDX Toolbar" showInitially="true">
           <Items>
-            <Tool refID="DigitalGlobe_Inc_sma_rssPolygon" />
             <Button refID="DigitalGlobe_Inc_VectorIndexButton" />
             <Button refID="DigitalGlobe_Inc_GbdButton" />
             <Button refID="DigitalGlobe_Inc_AggregationButton" />
