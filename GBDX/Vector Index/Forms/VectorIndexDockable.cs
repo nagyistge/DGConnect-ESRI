@@ -37,8 +37,6 @@ namespace Gbdx.Vector_Index.Forms
 
     using Amib.Threading;
 
-    using Gbdx.Properties;
-
     using Encryption;
 
     using ESRI.ArcGIS.Carto;

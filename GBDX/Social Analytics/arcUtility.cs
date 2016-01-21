@@ -27,10 +27,7 @@ namespace Gbdx
     using System.Text.RegularExpressions;
     using System.Web.Script.Serialization;
     using System.Windows.Forms;
-
-    using Gbdx.Properties;
-    using Gbdx.Vector_Index;
-
+    
     using ESRI.ArcGIS.ArcMapUI;
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.Display;
@@ -246,29 +243,6 @@ namespace Gbdx
         }
 
         /// <summary>
-        /// The trim rows.
-        /// </summary>
-        /// <param name="field">
-        /// The field.
-        /// </param>
-        /// <param name="value">
-        /// The value.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        public static string TrimRows(IField field, string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            return value.Length > field.Length ? value.Substring(0, field.Length - 1) : value;
-        }
-
-
-        /// <summary>
         /// Returns the distance between the two points
         /// </summary>
         /// <param name="point1">
@@ -423,85 +397,6 @@ namespace Gbdx
             }
 
             return distance;
-        }
-
-        /// <summary>
-        /// Creates a table with some default fields.
-        /// </summary>
-        /// <param name="workspace">
-        /// An IWorkspace2 interface
-        /// </param>
-        /// <param name="tableName">
-        /// A System.String of the table name in the workspace. Example: "owners"
-        /// </param>
-        /// <param name="fields">
-        /// An IFields interface or Nothing
-        /// </param>
-        /// <returns>
-        /// An ITable interface or Nothing
-        /// </returns>
-        /// <remarks>
-        /// Notes:
-        /// (1) If an IFields interface is supplied for the 'fields' collection it will be used to create the
-        ///    table. If a Nothing value is supplied for the 'fields' collection, a table will be created using 
-        ///    default values in the method.
-        /// (2) If a table with the supplied 'tableName' exists in the workspace an ITable will be returned.
-        ///    if table does not exit a new one will be created.
-        /// </remarks>
-        public static ITable CreateTable(IWorkspace workspace, string tableName, IFields fields)
-        {
-            // create the behavior class-id for the featureclass
-            UID uid = new UIDClass();
-
-            if (workspace == null)
-            {
-                return null; // valid feature workspace not passed in as an argument to the method
-            }
-
-            IFeatureWorkspace featureWorkspace = (IFeatureWorkspace)workspace; // Explicit Cast
-            ITable table;
-
-            uid.Value = "esriGeoDatabase.Object";
-
-            IObjectClassDescription objectClassDescription = new ObjectClassDescriptionClass();
-
-            // if a fields collection is not passed in then supply our own
-            if (fields == null)
-            {
-                // create the fields using the required fields method
-                fields = objectClassDescription.RequiredFields;
-                IFieldsEdit fieldsEdit = (IFieldsEdit)fields; // Explicit Cast
-
-                IField xfield = new FieldClass();
-                IFieldEdit xfieldEdit = (IFieldEdit)xfield;
-                xfieldEdit.Name_2 = "X";
-                xfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
-                xfieldEdit.Length_2 = 20;
-
-                IField yfield = new FieldClass();
-                IFieldEdit yfieldEdit = (IFieldEdit)yfield;
-                yfieldEdit.Name_2 = "Y";
-                yfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
-                yfieldEdit.Length_2 = 20;
-
-                // add field to field collection
-                fieldsEdit.AddField(xfield);
-                fieldsEdit.AddField(yfield);
-                fields = (IFields)fieldsEdit; // Explicit Cast
-            }
-
-            // Use IFieldChecker to create a validated fields collection.
-            IFieldChecker fieldChecker = new FieldCheckerClass();
-            IEnumFieldError enumFieldError = null;
-            IFields validatedFields = null;
-            fieldChecker.ValidateWorkspace = workspace;
-            fieldChecker.Validate(fields, out enumFieldError, out validatedFields);
-
-            // The enumFieldError enumerator can be inspected at this point to determine 
-            // which fields were modified during validation.
-            // create and return the table
-            table = featureWorkspace.CreateTable(tableName, validatedFields, uid, null, string.Empty);
-            return table;
         }
 
         /// <summary>

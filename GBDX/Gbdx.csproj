@@ -199,19 +199,12 @@
     <Compile Include="GbdxAboutButton.cs" />
     <Compile Include="GbdxHelper.cs" />
     <Compile Include="RBList.cs" />
-    <Compile Include="Social Analytics\Forms\CustomMenuItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Social Analytics\Forms\FavoriteMenuStripItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Social Analytics\Forms\FormConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Social Analytics\Forms\FormConfiguration.Designer.cs">
       <DependentUpon>FormConfiguration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Social Analytics\Settings.cs" />
     <Compile Include="Social Analytics\smaConfig.cs" />
     <Compile Include="Social Analytics\arcUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
