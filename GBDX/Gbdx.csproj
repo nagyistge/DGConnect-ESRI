@@ -240,13 +240,7 @@
     </AddInContent>
   </ItemGroup>
   <ItemGroup>
-    <AddInContent Include="Images\sma.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\smaQuery.png" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ESRI.ArcGIS.ArcMapUI">
@@ -283,15 +277,6 @@
     <EmbeddedResource Include="Vector Index\Forms\VectorIndexDockable.resx">
       <DependentUpon>VectorIndexDockable.cs</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\smaCircleQuery.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\rssPolygon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\rssCircle.png" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\smaConfig.png" />
@@ -341,13 +326,6 @@
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\VectorIndexButton.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Images\emptyStar.png" />
-    <EmbeddedResource Include="Images\filledStar.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\Tool1.png" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\GbdDockableWindow.png" />

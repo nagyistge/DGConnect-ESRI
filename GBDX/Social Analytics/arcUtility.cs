@@ -25,9 +25,7 @@ namespace Gbdx
     using System.Collections.Generic;
     using System.Drawing;
     using System.Text.RegularExpressions;
-    using System.Web.Script.Serialization;
-    using System.Windows.Forms;
-    
+
     using ESRI.ArcGIS.ArcMapUI;
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.Display;
@@ -35,8 +33,6 @@ namespace Gbdx
     using ESRI.ArcGIS.Geodatabase;
     using ESRI.ArcGIS.Geometry;
     using ESRI.ArcGIS.LocationUI;
-
-    using Newtonsoft.Json;
 
     using Path = System.IO.Path;
 
