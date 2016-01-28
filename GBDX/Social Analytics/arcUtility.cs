@@ -25,11 +25,6 @@ namespace Gbdx
     using System.Collections.Generic;
     using System.Drawing;
     using System.Text.RegularExpressions;
-    using System.Web.Script.Serialization;
-    using System.Windows.Forms;
-
-    using Gbdx.Properties;
-    using Gbdx.Vector_Index;
 
     using ESRI.ArcGIS.ArcMapUI;
     using ESRI.ArcGIS.Carto;
@@ -38,8 +33,6 @@ namespace Gbdx
     using ESRI.ArcGIS.Geodatabase;
     using ESRI.ArcGIS.Geometry;
     using ESRI.ArcGIS.LocationUI;
-
-    using Newtonsoft.Json;
 
     using Path = System.IO.Path;
 
@@ -196,19 +189,6 @@ namespace Gbdx
         }
 
         /// <summary>
-        /// The delete graphics refresh active view.
-        /// </summary>
-        /// <param name="activeView">
-        /// The active view.
-        /// </param>
-        public static void DeleteGraphicsRefreshActiveView(IActiveView activeView)
-        {
-            var graphicsContainer = activeView.GraphicsContainer;
-            graphicsContainer.DeleteAllElements();
-            activeView.Refresh();
-        }
-
-        /// <summary>
         /// Deletes the targeted Element from the maps graphics container.
         /// </summary>
         /// <param name="activeView">
@@ -234,145 +214,7 @@ namespace Gbdx
                 // We had a problem in attempting the deletion of the target element.  
             }
         }
-
-        /// <summary>
-        /// The read rss response to JSON.
-        /// </summary>
-        /// <param name="responseFromServer">
-        /// The response from server.
-        /// </param>
-        /// <param name="tableName">
-        /// The table name.
-        /// </param>
-        /// <param name="xyTable">
-        /// The XY table.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Exception"/>.
-        /// </returns>
-        public static Exception ReadRssResponseToJson(string responseFromServer, string tableName, ref ITable xyTable)
-        {
-            try
-            {
-                var response = JsonConvert.DeserializeObject<ResponseRss>(responseFromServer);
-                xyTable = CreateTable(
-                    GbdxTools.Jarvis.OpenWorkspace(GbdxSettings.Properties.Settings.Default.geoDatabase),
-                    tableName,
-                    LayerFields.CreateRssFields());
-
-                var sizeResponse = response.Hits.Hits.Length;
-                for (int i = 0; i < sizeResponse; i++)
-                {
-                    var row = xyTable.CreateRow();
-                    row.Value[1] = response.Hits.Hits[i].Source.Geo.Lon;
-                    row.Value[2] = response.Hits.Hits[i].Source.Geo.Lat;
-                    row.Value[3] = response.Hits.Hits[i].Source.TitleNegative;
-                    row.Value[4] = response.Hits.Hits[i].Source.DescriptionPositive;
-                    row.Value[5] = response.Hits.Hits[i].Source.LuceneScore;
-                    row.Value[6] = response.Hits.Hits[i].Source.NegativeSentiment;
-                    row.Value[7] = response.Hits.Hits[i].Source.PositiveSentiment;
-                    row.Value[8] = response.Hits.Hits[i].Source.DescriptionNegative;
-                    row.Value[9] = response.Hits.Hits[i].Source.TitlePositive;
-                    row.Value[10] = TrimRows(row.Fields.Field[10], response.Hits.Hits[i].Source.Url);
-                    row.Value[11] = TrimRows(row.Fields.Field[11], response.Hits.Hits[i].Source.CountryCode);
-                    row.Store();
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex;
-            }
-
-            return null;
-        }
-
-        /// <summary>
-        /// The read rss response to JSON circle.
-        /// </summary>
-        /// <param name="responseFromServer">
-        /// The response from server.
-        /// </param>
-        /// <param name="tableName">
-        /// The table name.
-        /// </param>
-        /// <param name="radius">
-        /// The radius.
-        /// </param>
-        /// <param name="center">
-        /// The center.
-        /// </param>
-        /// <param name="origSpatialReference">
-        /// The original spatial reference.
-        /// </param>
-        /// <param name="xyTable">
-        /// The XY table.
-        /// </param>
-        /// <returns>
-        /// The <see cref="Exception"/>.
-        /// </returns>
-        public static Exception ReadRssResponseToJsonCircle(
-            string responseFromServer,
-            string tableName,
-            double radius,
-            IPoint center,
-            ISpatialReference origSpatialReference,
-            ref ITable xyTable)
-        {
-            try
-            {
-                var response = JsonConvert.DeserializeObject<ResponseRss>(responseFromServer);
-
-                xyTable = CreateTable(
-                    GbdxTools.Jarvis.OpenWorkspace(GbdxSettings.Properties.Settings.Default.geoDatabase),
-                    tableName,
-                    LayerFields.CreateRssFields());
-
-                var sizeResponse = response.Hits.Hits.Length;
-                for (int i = 0; i < sizeResponse; i++)
-                {
-                    // Create a point and project it to the original spatial reference.
-                    IPoint point = new PointClass();
-                    point.PutCoords(response.Hits.Hits[i].Source.Geo.Lon, response.Hits.Hits[i].Source.Geo.Lat);
-                    ISpatialReferenceFactory spatialReferenceFactory = new SpatialReferenceEnvironment();
-                    var geographicCoordinateSystem =
-                        spatialReferenceFactory.CreateGeographicCoordinateSystem(
-                            (int) esriSRGeoCSType.esriSRGeoCS_WGS1984);
-                    
-                    IGeometry geometry = point;
-                    geometry.SpatialReference = geographicCoordinateSystem;
-                    geometry.Project(origSpatialReference);
-                    point = (IPoint) geometry;
-
-                    // Calculate the distance from the center to the point.  If the distance is greater than the radius
-                    // it will not be displayed to the end user.
-                    var newDist = DistanceTo(center, point);
-
-                    if (newDist <= radius)
-                    {
-                        var row = xyTable.CreateRow();
-                        row.Value[1] = response.Hits.Hits[i].Source.Geo.Lon;
-                        row.Value[2] = response.Hits.Hits[i].Source.Geo.Lat;
-                        row.Value[3] = response.Hits.Hits[i].Source.TitleNegative;
-                        row.Value[4] = response.Hits.Hits[i].Source.DescriptionPositive;
-                        row.Value[5] = response.Hits.Hits[i].Source.LuceneScore;
-                        row.Value[6] = response.Hits.Hits[i].Source.NegativeSentiment;
-                        row.Value[7] = response.Hits.Hits[i].Source.PositiveSentiment;
-                        row.Value[8] = response.Hits.Hits[i].Source.DescriptionNegative;
-                        row.Value[9] = response.Hits.Hits[i].Source.TitlePositive;
-                        row.Value[10] = TrimRows(row.Fields.Field[10], response.Hits.Hits[i].Source.Url);
-                        row.Value[11] = TrimRows(row.Fields.Field[11], response.Hits.Hits[i].Source.CountryCode);
-                        row.Store();
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                return ex;
-            }
-
-            return null;
-        }
-
+        
         /// <summary>
         /// The create table name.
         /// </summary>
@@ -395,29 +237,6 @@ namespace Gbdx
             output = rgx.Replace(output, string.Empty);
             return output;
         }
-
-        /// <summary>
-        /// The trim rows.
-        /// </summary>
-        /// <param name="field">
-        /// The field.
-        /// </param>
-        /// <param name="value">
-        /// The value.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        public static string TrimRows(IField field, string value)
-        {
-            if (string.IsNullOrEmpty(value))
-            {
-                return string.Empty;
-            }
-
-            return value.Length > field.Length ? value.Substring(0, field.Length - 1) : value;
-        }
-
 
         /// <summary>
         /// Returns the distance between the two points
@@ -574,85 +393,6 @@ namespace Gbdx
             }
 
             return distance;
-        }
-
-        /// <summary>
-        /// Creates a table with some default fields.
-        /// </summary>
-        /// <param name="workspace">
-        /// An IWorkspace2 interface
-        /// </param>
-        /// <param name="tableName">
-        /// A System.String of the table name in the workspace. Example: "owners"
-        /// </param>
-        /// <param name="fields">
-        /// An IFields interface or Nothing
-        /// </param>
-        /// <returns>
-        /// An ITable interface or Nothing
-        /// </returns>
-        /// <remarks>
-        /// Notes:
-        /// (1) If an IFields interface is supplied for the 'fields' collection it will be used to create the
-        ///    table. If a Nothing value is supplied for the 'fields' collection, a table will be created using 
-        ///    default values in the method.
-        /// (2) If a table with the supplied 'tableName' exists in the workspace an ITable will be returned.
-        ///    if table does not exit a new one will be created.
-        /// </remarks>
-        public static ITable CreateTable(IWorkspace workspace, string tableName, IFields fields)
-        {
-            // create the behavior class-id for the featureclass
-            UID uid = new UIDClass();
-
-            if (workspace == null)
-            {
-                return null; // valid feature workspace not passed in as an argument to the method
-            }
-
-            IFeatureWorkspace featureWorkspace = (IFeatureWorkspace)workspace; // Explicit Cast
-            ITable table;
-
-            uid.Value = "esriGeoDatabase.Object";
-
-            IObjectClassDescription objectClassDescription = new ObjectClassDescriptionClass();
-
-            // if a fields collection is not passed in then supply our own
-            if (fields == null)
-            {
-                // create the fields using the required fields method
-                fields = objectClassDescription.RequiredFields;
-                IFieldsEdit fieldsEdit = (IFieldsEdit)fields; // Explicit Cast
-
-                IField xfield = new FieldClass();
-                IFieldEdit xfieldEdit = (IFieldEdit)xfield;
-                xfieldEdit.Name_2 = "X";
-                xfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
-                xfieldEdit.Length_2 = 20;
-
-                IField yfield = new FieldClass();
-                IFieldEdit yfieldEdit = (IFieldEdit)yfield;
-                yfieldEdit.Name_2 = "Y";
-                yfieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
-                yfieldEdit.Length_2 = 20;
-
-                // add field to field collection
-                fieldsEdit.AddField(xfield);
-                fieldsEdit.AddField(yfield);
-                fields = (IFields)fieldsEdit; // Explicit Cast
-            }
-
-            // Use IFieldChecker to create a validated fields collection.
-            IFieldChecker fieldChecker = new FieldCheckerClass();
-            IEnumFieldError enumFieldError = null;
-            IFields validatedFields = null;
-            fieldChecker.ValidateWorkspace = workspace;
-            fieldChecker.Validate(fields, out enumFieldError, out validatedFields);
-
-            // The enumFieldError enumerator can be inspected at this point to determine 
-            // which fields were modified during validation.
-            // create and return the table
-            table = featureWorkspace.CreateTable(tableName, validatedFields, uid, null, string.Empty);
-            return table;
         }
 
         /// <summary>

@@ -139,20 +139,20 @@ namespace NetworkConnections
                 var response = this.client.Execute(request);
                 netObject.Result = response.Content;
 
-                // get the paging id from the response headers
-                var retrievedPageId = response.Headers.FirstOrDefault(id => id.Name == "Vector-Paging-Id");
-                if (retrievedPageId != null)
-                {
-                    netObject.PageId = retrievedPageId.Value.ToString();
-                }
+                //// get the paging id from the response headers
+                //var retrievedPageId = response.Headers.FirstOrDefault(id => id.Name == "Vector-Paging-Id");
+                //if (retrievedPageId != null)
+                //{
+                //    netObject.PageId = retrievedPageId.Value.ToString();
+                //}
 
-                // get the number of vector items in the page from the response headers.
-                var retrievedItemCount = response.Headers.FirstOrDefault(item => item.Name == "Vector-Item-Count");
-                if (retrievedItemCount != null)
-                {
-                    netObject.PageItemCount =
-                        Convert.ToInt32(retrievedItemCount.Value.ToString());
-                }
+                //// get the number of vector items in the page from the response headers.
+                //var retrievedItemCount = response.Headers.FirstOrDefault(item => item.Name == "Vector-Item-Count");
+                //if (retrievedItemCount != null)
+                //{
+                //    netObject.PageItemCount =
+                //        Convert.ToInt32(retrievedItemCount.Value.ToString());
+                //}
 
                 netObject = this.CheckForErrors(response, netObject);
             }

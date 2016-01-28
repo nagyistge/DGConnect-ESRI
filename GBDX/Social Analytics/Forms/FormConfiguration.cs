@@ -24,11 +24,7 @@ namespace Gbdx
     using System;
     using System.Drawing;
     using System.Net;
-    using System.Net.Configuration;
-    using System.Text.RegularExpressions;
     using System.Windows.Forms;
-
-    using Gbdx.Properties;
 
     using Encryption;
 
