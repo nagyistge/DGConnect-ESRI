@@ -3,10 +3,10 @@ GBDX platform is a DigitalGlobe product enabling social media, text, vectors, ra
 
 
 ## Purpose
-This tools purpose is to provide a window into the GBDX platform capabilities to allow developers to enhance this tool or create new tools using our APIs.
+This tool's purpose is to provide a window into the GBDX platform capabilities to present analysts with geospatial solutions and to allow developers to enhance this tool or create new tools using our APIs.
 
 ## Installation
-Double click on the ESRI addin file to install into ArcMap.
+Download the ESRI AddIn file located in the 'ESRI AddIn Releases' subdirectory. Once downloaded, double click the Gbdx.esriAddIn file to install the Addin to ArcMap. Please go to the wiki tab for more details.
 
 ## Install Requirements
 - ArcMap 10.2
@@ -16,6 +16,14 @@ Double click on the ESRI addin file to install into ArcMap.
 - Arc Desktop 10.2
 - Arc Objects SDK 10.2
 
+## Open Source Projects Used
+- Extended WPF Toolkit
+- Json.NET
+- NLog
+- RestSharp
+- RhinoMocks
+- SmartThreadPool.dll
+- WPF Toolkit
 
 ## Contributors
 We welcome anyone and everyone to help maintain and enhance this tool to do new and exciting things.
@@ -32,12 +40,3 @@ We welcome anyone and everyone to help maintain and enhance this tool to do new 
       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
       See the License for the specific language governing permissions and
       limitations under the License.
-
-## Open Source Projects Used
-- Extended WPF Toolkit
-- Json.NET
-- NLog
-- RestSharp
-- RhinoMocks
-- SmartThreadPool.dll
-- WPF Toolkit
