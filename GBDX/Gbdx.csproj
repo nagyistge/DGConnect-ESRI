@@ -199,35 +199,14 @@
     <Compile Include="GbdxAboutButton.cs" />
     <Compile Include="GbdxHelper.cs" />
     <Compile Include="RBList.cs" />
-    <Compile Include="Social Analytics\Forms\CustomMenuItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Social Analytics\Forms\FavoriteMenuStripItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="Social Analytics\Forms\FormConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Social Analytics\Forms\FormConfiguration.Designer.cs">
       <DependentUpon>FormConfiguration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Social Analytics\Response\Hits.cs" />
-    <Compile Include="Social Analytics\Response\HitsBody.cs" />
-    <Compile Include="Social Analytics\Response\HitSource.cs" />
-    <Compile Include="Social Analytics\Response\PostResponse.cs" />
-    <Compile Include="Social Analytics\Response\ResponseRss.cs" />
-    <Compile Include="Social Analytics\Response\RssHits.cs" />
-    <Compile Include="Social Analytics\Response\RssHitsBody.cs" />
-    <Compile Include="Social Analytics\Settings.cs" />
     <Compile Include="Social Analytics\smaConfig.cs" />
     <Compile Include="Social Analytics\arcUtility.cs" />
-    <Compile Include="Social Analytics\Forms\FormQueryBuilder.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Social Analytics\Forms\FormQueryBuilder.designer.cs">
-      <DependentUpon>FormQueryBuilder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Social Analytics\LayerFields.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vector Index\BoundingBox.cs" />
     <Compile Include="Vector Index\ESRI Tools\VectorIndex.cs" />
@@ -243,6 +222,7 @@
       <DependentUpon>VectorIndexDockable.cs</DependentUpon>
     </Compile>
     <Compile Include="Vector Index\Forms\WorkerObject.cs" />
+    <Compile Include="Vector Index\PagedData.cs" />
     <Compile Include="Vector Index\PageId.cs" />
     <Compile Include="Vector Index\SourceType.cs" />
     <Compile Include="Vector Index\SourceTypeResponseObject.cs" />
@@ -260,19 +240,7 @@
     </AddInContent>
   </ItemGroup>
   <ItemGroup>
-    <AddInContent Include="Images\sma.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Social Analytics\Response\HitPoint.cs" />
-    <Compile Include="Social Analytics\Response\RssHitSource.cs" />
-    <Compile Include="Social Analytics\ESRI Tools\rssPolygon.cs">
-      <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
-    </Compile>
-    <Compile Include="Social Analytics\smaClient.cs" />
-    <AddInContent Include="Images\smaQuery.png" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ESRI.ArcGIS.ArcMapUI">
@@ -306,22 +274,9 @@
     <EmbeddedResource Include="Social Analytics\Forms\FormConfiguration.resx">
       <DependentUpon>FormConfiguration.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Social Analytics\Forms\FormQueryBuilder.resx">
-      <DependentUpon>FormQueryBuilder.cs</DependentUpon>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
     <EmbeddedResource Include="Vector Index\Forms\VectorIndexDockable.resx">
       <DependentUpon>VectorIndexDockable.cs</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\smaCircleQuery.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\rssPolygon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\rssCircle.png" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\smaConfig.png" />
@@ -373,13 +328,6 @@
     <AddInContent Include="Images\VectorIndexButton.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Images\emptyStar.png" />
-    <EmbeddedResource Include="Images\filledStar.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\Tool1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <AddInContent Include="Images\GbdDockableWindow.png" />
   </ItemGroup>
   <ItemGroup>
@@ -404,6 +352,7 @@
   <ItemGroup>
     <AddInContent Include="Images\AggregationWindow.png" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>
     <AddInTargetProduct>Desktop</AddInTargetProduct>

@@ -21,7 +21,7 @@
 
 namespace Gbdx
 {
-    using Gbdx.Properties;
+    using Gbdx;
 
     /// <summary>
     /// The gbdx cloud helper.
