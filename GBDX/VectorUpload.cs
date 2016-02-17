@@ -1,0 +1,120 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using System.IO;
+
+
+namespace Gbdx
+{
+    using System.Windows.Forms;
+
+    using ESRI.ArcGIS.Carto;
+    using ESRI.ArcGIS.DataSourcesFile;
+    using ESRI.ArcGIS.Geodatabase;
+    using ESRI.ArcGIS.Geometry;
+
+    using Gbdx.Utilities_and_Configuration.Forms;
+
+    using Ionic.Zip;
+
+    using Path = System.IO.Path;
+
+    public class VectorUpload : ESRI.ArcGIS.Desktop.AddIns.Button
+    {
+        public VectorUpload()
+        {
+        }
+
+        protected override void OnClick()
+        {
+            try
+            {
+                var openFileDialog = new OpenFileDialog() { Multiselect = false, Filter = "Shape Files (*.shp)|*.shp" };
+
+                if (openFileDialog.ShowDialog() == DialogResult.OK)
+                {
+                    var directoryPath = Path.GetDirectoryName(openFileDialog.FileName);
+
+                    var newZip = directoryPath + "\\"
+                                 + (long)(DateTime.Now - new DateTime(1970, 1, 1)).TotalMilliseconds + ".zip";
+
+                    MappingForm mapForm = new MappingForm();
+
+                    if (mapForm.ShowDialog() == DialogResult.OK)
+                    {
+                        string mappingProps = "mapping.properties";
+                        const string UserContributions = "User Contributions";
+                        string itemType = mapForm.ItemName;
+                        string spatialReference = GetSpatialReference(openFileDialog.FileName);
+
+                        // Write the mapping.properties file.
+                        if (!File.Exists(mappingProps))
+                        {
+                            using (var sw = File.CreateText(mappingProps))
+                            {
+                                sw.WriteLine("vector.crs={0}", spatialReference);
+                                sw.WriteLine("vector.ingestSource={0}", UserContributions);
+                                sw.WriteLine("vector.itemType={0}", itemType);
+                                sw.WriteLine(
+                                    "vector.index=vector-{0}-{1}-{2}",
+                                    UserContributions,
+                                    itemType,
+                                    DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'"));
+                                sw.WriteLine("tagger_id=source");
+                                sw.WriteLine("id=name");
+                                sw.Flush();
+                                sw.Close();
+                            }
+                        }
+                        using (var zip = new ZipFile())
+                        {
+                            AddFile(zip, openFileDialog.FileName);
+                            AddFile(zip, openFileDialog.FileName + ".xml");
+                            AddFile(zip, Path.ChangeExtension(openFileDialog.FileName, ".dbf"));
+                            AddFile(zip, Path.ChangeExtension(openFileDialog.FileName, ".shx"));
+                            AddFile(zip, Path.ChangeExtension(openFileDialog.FileName, ".prj"));
+                            AddFile(zip, Path.ChangeExtension(openFileDialog.FileName, ".CPG"));
+                            zip.AddFile(mappingProps);
+                            zip.Save(newZip);
+                        }
+
+                        File.Delete(mappingProps);
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+            }
+        }
+
+        private static bool AddFile(ZipFile zip, string path)
+        {
+            if (File.Exists(path))
+            {
+                zip.AddFile(path, "");
+                return true;
+            }
+            return false;
+        }
+
+        private static string GetSpatialReference(string shapeFilePath)
+        {
+            var workspaceFactory = new ShapefileWorkspaceFactoryClass();
+            var featureWorkspace = (IFeatureWorkspace)workspaceFactory.OpenFromFile(Path.GetDirectoryName(shapeFilePath), 0);
+            var featureClass = featureWorkspace.OpenFeatureClass(Path.GetFileNameWithoutExtension(shapeFilePath));
+
+            ISpatialReference spatialReference = null;
+            if (featureClass != null)
+            {
+                IGeoDataset geoDataset = featureClass as IGeoDataset;
+                spatialReference = geoDataset.SpatialReference;
+                return "EPSG:"+spatialReference.FactoryCode;
+            }
+            return string.Empty;
+        }
+
+        protected override void OnUpdate()
+        {
+        }
+    }
+}

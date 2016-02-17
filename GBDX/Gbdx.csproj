@@ -54,6 +54,14 @@
     <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AWSSDK.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.Core.3.1.4.3\lib\net35\AWSSDK.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AWSSDK.S3, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.S3.3.1.3.10\lib\net35\AWSSDK.S3.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Encryption, Version=1.2.5672.25579, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libraries\Encryption.dll</HintPath>
@@ -113,6 +121,10 @@
     </Reference>
     <Reference Include="ESRI.ArcGIS.System">
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.8.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.9.8\lib\net20\Ionic.Zip.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -190,6 +202,12 @@
     </Compile>
     <Compile Include="Gbd\GbdRelay.cs" />
     <Compile Include="Gbd\Selector.cs" />
+    <Compile Include="Utilities and Configuration\Forms\MappingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Utilities and Configuration\Forms\MappingForm.Designer.cs">
+      <DependentUpon>MappingForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Vector Index\AboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -199,14 +217,14 @@
     <Compile Include="GbdxAboutButton.cs" />
     <Compile Include="GbdxHelper.cs" />
     <Compile Include="RBList.cs" />
-    <Compile Include="Social Analytics\Forms\FormConfiguration.cs">
+    <Compile Include="Utilities and Configuration\Forms\FormConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Social Analytics\Forms\FormConfiguration.Designer.cs">
+    <Compile Include="Utilities and Configuration\Forms\FormConfiguration.Designer.cs">
       <DependentUpon>FormConfiguration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Social Analytics\smaConfig.cs" />
-    <Compile Include="Social Analytics\arcUtility.cs" />
+    <Compile Include="Utilities and Configuration\smaConfig.cs" />
+    <Compile Include="Utilities and Configuration\arcUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vector Index\BoundingBox.cs" />
     <Compile Include="Vector Index\ESRI Tools\VectorIndex.cs" />
@@ -231,6 +249,7 @@
     <Compile Include="Vector Index\VectorIndexRelay.cs" />
     <Compile Include="Vector Index\VectorIndexSourceNode.cs" />
     <Compile Include="Vector Index\VectorIndexTypeNode.cs" />
+    <Compile Include="VectorUpload.cs" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Config.esriaddinx">
@@ -268,10 +287,13 @@
     <EmbeddedResource Include="Gbd\GbdDockableWindow.resx">
       <DependentUpon>GbdDockableWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Utilities and Configuration\Forms\MappingForm.resx">
+      <DependentUpon>MappingForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Vector Index\AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Social Analytics\Forms\FormConfiguration.resx">
+    <EmbeddedResource Include="Utilities and Configuration\Forms\FormConfiguration.resx">
       <DependentUpon>FormConfiguration.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Vector Index\Forms\VectorIndexDockable.resx">
@@ -352,7 +374,9 @@
   <ItemGroup>
     <AddInContent Include="Images\AggregationWindow.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <AddInContent Include="Images\VectorUpload.png" />
+  </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>
     <AddInTargetProduct>Desktop</AddInTargetProduct>
