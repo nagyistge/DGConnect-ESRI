@@ -45,6 +45,8 @@ namespace Gbdx.Vector_Index.Forms
     using ESRI.ArcGIS.Geodatabase;
     using ESRI.ArcGIS.Geometry;
 
+    using GbdxSettings.Properties;
+
     using Logging;
 
     using NetworkConnections;
@@ -1822,7 +1824,9 @@ namespace Gbdx.Vector_Index.Forms
 
                 // Re create the network object
                 this.networkObject = this.SetupNetObject(settings.username, settings.password);
-                
+                this.networkObject.AuthUrl = string.IsNullOrEmpty(Settings.Default.AuthBase)
+                                                 ? Settings.Default.DefaultAuthBase
+                                                 : Settings.Default.AuthBase;
                 // Authorize the network object if it fails inform the user.
                 if (cloudComms.AuthenticateNetworkObject(ref this.networkObject))
                 {

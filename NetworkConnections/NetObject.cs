@@ -121,5 +121,10 @@ namespace NetworkConnections
         /// Gets or sets the base url.
         /// </summary>
         public string BaseUrl { get; set; }
+
+        /// <summary>
+        /// Gets or sets the auth url.
+        /// </summary>
+        public string AuthUrl { get; set; }
     }
 }

@@ -221,7 +221,7 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://geobigdata.io")]
         public string AuthBase {
             get {
                 return ((string)(this["AuthBase"]));

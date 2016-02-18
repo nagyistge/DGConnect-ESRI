@@ -240,6 +240,11 @@ namespace NetworkConnections
                     return netObject;
                 }
 
+                if (!this.client.BaseUrl.ToString().Contains(netObject.BaseUrl))
+                {
+                    this.client = new RestClient(netObject.BaseUrl);
+                }
+
                 var request = new RestRequest(netObject.AddressUrl);
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 var response = this.client.Execute(request);
@@ -371,24 +376,22 @@ namespace NetworkConnections
         /// </returns>
         private static bool Authenticate(ref NetObject nobj, ref IRestClient client)
         {
-            if (client == null || client.BaseUrl == null ||client.BaseUrl != new Uri(nobj.BaseUrl))
-            {
-                client = new RestClient(nobj.BaseUrl);
-            }
+            //if (client == null || client.BaseUrl == null ||client.BaseUrl != new Uri(nobj.BaseUrl))
+            //{
+            //    client = new RestClient(nobj.BaseUrl);
+            //}
+            client = new RestClient(nobj.AuthUrl);
 
             IRestRequest request = new RestRequest(nobj.AuthEndpoint, Method.POST);
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            // Convert userpass to 64 base string.  i.e. username:password => 64 base string representation
-            var passBytes = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", nobj.User, nobj.Password));
-            var string64 = Convert.ToBase64String(passBytes);
-
             // Add the 64 base string representation to the header
-            request.AddHeader("Authorization", string.Format("Basic {0}", string64));
+            request.AddHeader("Authorization", "Basic S0w5LjZZT1RZSj1FLk9TSThzWnl4ZTIwTjsyam01QTVweURQVTItRDo3Z3NQOjVAT2cxSj9qNUdvWXFUWWNmUG1zSHRySnVERTJuYjEuQTZhOU1VNTY3enZueDJteHBDS1JiZDQ3a1FaOWpHOVdVTmpKUU9QU3pCRHRLbHBkd1lhNDNwejFsZE9Ka1VmMUwwQWhEUjVsNmpGcHE1cWRYVWdqWC0tS0NWNg==");
 
             request.AddParameter("grant_type", "password");
             request.AddParameter("username", nobj.User);
             request.AddParameter("password", nobj.Password);
+            
 
             IRestResponse<AccessToken> response = client.Execute<AccessToken>(request);
 
@@ -428,14 +431,16 @@ namespace NetworkConnections
         /// </returns>
         private bool CheckSettings(ref IRestClient restClient, ref NetObject netObject, ref string user, ref string pass, ref string authEndpoint)
         {
-            if (restClient == null || restClient.BaseUrl == null || restClient.BaseUrl != new Uri(netObject.BaseUrl))
+            if (restClient == null)
             {
                 restClient = new RestClient(netObject.BaseUrl);
                 this.client = restClient;
                 user = netObject.User;
                 pass = netObject.Password;
                 authEndpoint = netObject.AuthEndpoint;
-                return this.AuthenticateNetworkObject(ref netObject);
+                var authResult = this.AuthenticateNetworkObject(ref netObject);
+                this.client = new RestClient(netObject.BaseUrl);
+                return authResult;
             }
 
             // Check to make sure the username andpasword hasn't changed.

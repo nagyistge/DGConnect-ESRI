@@ -215,6 +215,7 @@ namespace Gbdx
                                  AuthEndpoint = GbdxSettings.Properties.Settings.Default.authenticationServer,
                                  BaseUrl = this.urlTextBox.Text,
                                  User = this.UserNameTextBox.Text,
+                                 AuthUrl =  this.authTextBox.Text,
                                  Password = this.PasswordTextBox.Text
                              };
 

@@ -1719,6 +1719,8 @@ namespace Gbdx.Gbd
                         .authenticationServer,
                     User = Settings.Default.username,
                     Password = decryptedPassword,
+
+                    AuthUrl = string.IsNullOrEmpty(Settings.Default.AuthBase)?Settings.Default.DefaultAuthBase: Settings.Default.AuthBase,
                 };
 
                 this.comms.AuthenticateNetworkObject(ref netObj);
