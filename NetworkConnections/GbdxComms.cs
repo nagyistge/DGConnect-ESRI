@@ -24,6 +24,7 @@ namespace NetworkConnections
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.IO;
     using System.Linq;
     using System.Net;
     using System.Text;
@@ -138,22 +139,7 @@ namespace NetworkConnections
 
                 var response = this.client.Execute(request);
                 netObject.Result = response.Content;
-
-                //// get the paging id from the response headers
-                //var retrievedPageId = response.Headers.FirstOrDefault(id => id.Name == "Vector-Paging-Id");
-                //if (retrievedPageId != null)
-                //{
-                //    netObject.PageId = retrievedPageId.Value.ToString();
-                //}
-
-                //// get the number of vector items in the page from the response headers.
-                //var retrievedItemCount = response.Headers.FirstOrDefault(item => item.Name == "Vector-Item-Count");
-                //if (retrievedItemCount != null)
-                //{
-                //    netObject.PageItemCount =
-                //        Convert.ToInt32(retrievedItemCount.Value.ToString());
-                //}
-
+               
                 netObject = this.CheckForErrors(response, netObject);
             }
             catch (Exception excp)
@@ -288,6 +274,11 @@ namespace NetworkConnections
                 return default(T);
             }
 
+            if (!this.client.BaseUrl.ToString().Contains(netObject.BaseUrl))
+            {
+                this.client = new RestClient(netObject.BaseUrl);
+            }
+
             var request = new RestRequest(netObject.AddressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.AccessToken);
             request.AddParameter("application/json", jsonDataPayLoad, ParameterType.RequestBody);
@@ -300,6 +291,35 @@ namespace NetworkConnections
             }
 
             return default(T);
+        }
+
+        public HttpStatusCode UploadFile(NetObject netObject, string filepath)
+        {
+            // Check the settings if valid processing will continue;
+            if (!this.CheckSettings(
+                ref this.client,
+                ref netObject,
+                ref this.localUsername,
+                ref this.localPassword,
+                ref this.authenticationEndpoint))
+            {
+                // return null in generic method terms.
+                return HttpStatusCode.Unauthorized;
+            }
+
+            if (!this.client.BaseUrl.ToString().Contains(netObject.BaseUrl))
+            {
+                this.client = new RestClient(netObject.BaseUrl);
+            }
+
+            IRestRequest request = new RestRequest(netObject.AddressUrl, Method.POST);
+            request.AddHeader("Authorization", "Bearer " + this.AccessToken);
+            request.AddFile(Path.GetFileName(filepath),filepath);
+
+            var response = this.client.Execute(request);
+
+            return response.StatusCode;
+
         }
 
         /// <summary>

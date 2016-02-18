@@ -22,6 +22,7 @@
 namespace NetworkConnections
 {
     using System.Collections.Specialized;
+    using System.Net;
 
     using RestSharp;
 
@@ -116,5 +117,13 @@ namespace NetworkConnections
         /// The <see cref="string"/>.
         /// </returns>
         string GetAccessToken();
+
+        /// <summary>
+        /// Upload file to vector services
+        /// </summary>
+        /// <param name="netObject">contains authentication information required to perform the upload</param>
+        /// <param name="filepath">path of the file to be uploaded</param>
+        /// <returns></returns>
+        HttpStatusCode UploadFile(NetObject netObject, string filepath);
     }
 }

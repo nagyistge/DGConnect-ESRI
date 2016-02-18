@@ -8,6 +8,8 @@ namespace Gbdx
 {
     using System.Windows.Forms;
 
+    using Encryption;
+
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.DataSourcesFile;
     using ESRI.ArcGIS.Geodatabase;
@@ -15,14 +17,24 @@ namespace Gbdx
 
     using Gbdx.Utilities_and_Configuration.Forms;
 
+    using GbdxSettings.Properties;
+
+    using GbdxTools;
+
     using Ionic.Zip;
+
+    using NetworkConnections;
 
     using Path = System.IO.Path;
 
     public class VectorUpload : ESRI.ArcGIS.Desktop.AddIns.Button
     {
+
+        private readonly IGbdxComms comms;
+
         public VectorUpload()
         {
+            this.comms = new GbdxComms(Jarvis.LogFile, false);
         }
 
         protected override void OnClick()
@@ -56,12 +68,13 @@ namespace Gbdx
                                 sw.WriteLine("vector.ingestSource={0}", UserContributions);
                                 sw.WriteLine("vector.itemType={0}", itemType);
 
-                                var indexLine = string.Format("vector.index=vector-{0}-{1}-{2}",
+                                var indexLine = string.Format(
+                                    "vector.index=vector-{0}-{1}-{2}",
                                     UserContributions,
                                     itemType,
                                     DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'"));
-                                indexLine = indexLine.ToLower().Replace(":", "").Replace(" ","");
-                                
+                                indexLine = indexLine.ToLower().Replace(":", "").Replace(" ", "");
+
                                 sw.WriteLine(indexLine);
                                 sw.WriteLine("tagger_id=source");
                                 sw.WriteLine("id=name");
@@ -82,6 +95,28 @@ namespace Gbdx
                         }
 
                         File.Delete(mappingProps);
+
+                        NetObject netobj = new NetObject()
+                                               {
+                                                   BaseUrl = Settings.Default.baseUrl,
+                                                   AuthUrl =
+                                                       string.IsNullOrEmpty(Settings.Default.AuthBase)
+                                                           ? Settings.Default.DefaultAuthBase
+                                                           : Settings.Default.AuthBase,
+                                                   AuthEndpoint = Settings.Default.authenticationServer,
+                                                   User = Settings.Default.username,
+                                               };
+
+                        string decryptedPassword;
+                        var success = Aes.Instance.Decrypt128(Settings.Default.password, out decryptedPassword);
+                        if (!success)
+                        {
+                            MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
+                            return;
+                        }
+                        netobj.Password = decryptedPassword;
+
+                        this.comms.UploadFile(netobj, newZip);
                     }
                 }
             }

@@ -288,6 +288,11 @@ namespace NetworkConnections
             throw new NotImplementedException();
         }
 
+        public HttpStatusCode UploadFile(NetObject netObject, string filepath)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Will authenticate the NetObject's cookie container.  
         /// This is a useful way to pre-authenticate prior to sending a request.  
