@@ -55,11 +55,14 @@ namespace Gbdx
                                 sw.WriteLine("vector.crs={0}", spatialReference);
                                 sw.WriteLine("vector.ingestSource={0}", UserContributions);
                                 sw.WriteLine("vector.itemType={0}", itemType);
-                                sw.WriteLine(
-                                    "vector.index=vector-{0}-{1}-{2}",
+
+                                var indexLine = string.Format("vector.index=vector-{0}-{1}-{2}",
                                     UserContributions,
                                     itemType,
                                     DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'"));
+                                indexLine = indexLine.ToLower().Replace(":", "").Replace(" ","");
+                                
+                                sw.WriteLine(indexLine);
                                 sw.WriteLine("tagger_id=source");
                                 sw.WriteLine("id=name");
                                 sw.Flush();
