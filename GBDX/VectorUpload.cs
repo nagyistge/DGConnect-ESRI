@@ -59,6 +59,14 @@ namespace Gbdx
                         string itemType = mapForm.ItemName;
                         string spatialReference = GetSpatialReference(openFileDialog.FileName);
 
+
+                        // If the spatial projection doesn't match tell the user what's up and stop processing from there
+                        if (!string.Equals("EPSG:4326", spatialReference))
+                        {
+                            MessageBox.Show(GbdxSettings.GbdxResources.wrongSpatialReference);
+                            return;
+                        }
+
                         // Write the mapping.properties file.
                         if (!File.Exists(mappingProps))
                         {
@@ -96,27 +104,27 @@ namespace Gbdx
 
                         File.Delete(mappingProps);
 
-                        NetObject netobj = new NetObject()
-                                               {
-                                                   BaseUrl = Settings.Default.baseUrl,
-                                                   AuthUrl =
-                                                       string.IsNullOrEmpty(Settings.Default.AuthBase)
-                                                           ? Settings.Default.DefaultAuthBase
-                                                           : Settings.Default.AuthBase,
-                                                   AuthEndpoint = Settings.Default.authenticationServer,
-                                                   User = Settings.Default.username,
-                                               };
+                        //NetObject netobj = new NetObject()
+                        //                       {
+                        //                           BaseUrl = Settings.Default.baseUrl,
+                        //                           AuthUrl =
+                        //                               string.IsNullOrEmpty(Settings.Default.AuthBase)
+                        //                                   ? Settings.Default.DefaultAuthBase
+                        //                                   : Settings.Default.AuthBase,
+                        //                           AuthEndpoint = Settings.Default.authenticationServer,
+                        //                           User = Settings.Default.username,
+                        //                       };
 
-                        string decryptedPassword;
-                        var success = Aes.Instance.Decrypt128(Settings.Default.password, out decryptedPassword);
-                        if (!success)
-                        {
-                            MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
-                            return;
-                        }
-                        netobj.Password = decryptedPassword;
+                        //string decryptedPassword;
+                        //var success = Aes.Instance.Decrypt128(Settings.Default.password, out decryptedPassword);
+                        //if (!success)
+                        //{
+                        //    MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
+                        //    return;
+                        //}
+                        //netobj.Password = decryptedPassword;
 
-                        this.comms.UploadFile(netobj, newZip);
+                        //this.comms.UploadFile(netobj, newZip);
                     }
                 }
             }

@@ -325,5 +325,14 @@ namespace GbdxSettings {
                 return ResourceManager.GetString("VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Spatial Projection needs to be WGS 1984..
+        /// </summary>
+        public static string wrongSpatialReference {
+            get {
+                return ResourceManager.GetString("wrongSpatialReference", resourceCulture);
+            }
+        }
     }
 }

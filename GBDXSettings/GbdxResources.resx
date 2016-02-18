@@ -206,4 +206,7 @@ Only letters and the '.' are allowed.</value>
   <data name="upgradeRequired" xml:space="preserve">
     <value>In order to access this functionality, upgrade your account.</value>
   </data>
+  <data name="wrongSpatialReference" xml:space="preserve">
+    <value>Spatial Projection needs to be WGS 1984.</value>
+  </data>
 </root>
