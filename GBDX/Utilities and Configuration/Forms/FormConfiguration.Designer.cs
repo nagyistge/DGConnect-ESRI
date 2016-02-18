@@ -42,13 +42,15 @@
             this.fileGdbDirectoryTextBox = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.urlTextBox = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.authTextBox = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
             // buttonOk
             // 
             this.buttonOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.buttonOk.Location = new System.Drawing.Point(499, 141);
+            this.buttonOk.Location = new System.Drawing.Point(499, 175);
             this.buttonOk.Margin = new System.Windows.Forms.Padding(4);
             this.buttonOk.Name = "buttonOk";
             this.buttonOk.Size = new System.Drawing.Size(92, 27);
@@ -61,7 +63,7 @@
             // 
             this.buttonTest.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.tableLayoutPanel1.SetColumnSpan(this.buttonTest, 2);
-            this.buttonTest.Location = new System.Drawing.Point(4, 143);
+            this.buttonTest.Location = new System.Drawing.Point(4, 177);
             this.buttonTest.Margin = new System.Windows.Forms.Padding(4);
             this.buttonTest.Name = "buttonTest";
             this.buttonTest.Size = new System.Drawing.Size(205, 23);
@@ -74,10 +76,10 @@
             // 
             this.UserNameTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.tableLayoutPanel1.SetColumnSpan(this.UserNameTextBox, 5);
-            this.UserNameTextBox.Location = new System.Drawing.Point(104, 6);
+            this.UserNameTextBox.Location = new System.Drawing.Point(111, 5);
             this.UserNameTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.UserNameTextBox.Name = "UserNameTextBox";
-            this.UserNameTextBox.Size = new System.Drawing.Size(485, 22);
+            this.UserNameTextBox.Size = new System.Drawing.Size(480, 22);
             this.UserNameTextBox.TabIndex = 2;
             this.UserNameTextBox.TextChanged += new System.EventHandler(this.TextBoxUrlTextChanged);
             // 
@@ -85,7 +87,7 @@
             // 
             this.UsernameLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.UsernameLabel.AutoSize = true;
-            this.UsernameLabel.Location = new System.Drawing.Point(19, 9);
+            this.UsernameLabel.Location = new System.Drawing.Point(26, 8);
             this.UsernameLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.UsernameLabel.Name = "UsernameLabel";
             this.UsernameLabel.Size = new System.Drawing.Size(77, 17);
@@ -96,7 +98,7 @@
             // 
             this.PasswordLabel.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.PasswordLabel.AutoSize = true;
-            this.PasswordLabel.Location = new System.Drawing.Point(23, 43);
+            this.PasswordLabel.Location = new System.Drawing.Point(30, 40);
             this.PasswordLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.PasswordLabel.Name = "PasswordLabel";
             this.PasswordLabel.Size = new System.Drawing.Size(73, 17);
@@ -107,18 +109,18 @@
             // 
             this.PasswordTextBox.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.tableLayoutPanel1.SetColumnSpan(this.PasswordTextBox, 5);
-            this.PasswordTextBox.Location = new System.Drawing.Point(104, 41);
+            this.PasswordTextBox.Location = new System.Drawing.Point(111, 38);
             this.PasswordTextBox.Margin = new System.Windows.Forms.Padding(4);
             this.PasswordTextBox.Name = "PasswordTextBox";
             this.PasswordTextBox.PasswordChar = '*';
-            this.PasswordTextBox.Size = new System.Drawing.Size(485, 22);
+            this.PasswordTextBox.Size = new System.Drawing.Size(480, 22);
             this.PasswordTextBox.TabIndex = 3;
             this.PasswordTextBox.TextChanged += new System.EventHandler(this.TextBoxUrlTextChanged);
             // 
             // CancelButton
             // 
             this.CancelButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.CancelButton.Location = new System.Drawing.Point(424, 141);
+            this.CancelButton.Location = new System.Drawing.Point(424, 175);
             this.CancelButton.Margin = new System.Windows.Forms.Padding(4);
             this.CancelButton.Name = "CancelButton";
             this.CancelButton.Size = new System.Drawing.Size(67, 27);
@@ -133,43 +135,46 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.ColumnCount = 6;
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 116F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 107F));
+            this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 109F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 111F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 75F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
             this.tableLayoutPanel1.Controls.Add(this.UsernameLabel, 0, 0);
             this.tableLayoutPanel1.Controls.Add(this.PasswordLabel, 0, 1);
-            this.tableLayoutPanel1.Controls.Add(this.CancelButton, 4, 4);
             this.tableLayoutPanel1.Controls.Add(this.label2, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.buttonOk, 5, 4);
             this.tableLayoutPanel1.Controls.Add(this.browseButton, 5, 2);
-            this.tableLayoutPanel1.Controls.Add(this.buttonTest, 0, 4);
             this.tableLayoutPanel1.Controls.Add(this.fileGdbDirectoryTextBox, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.PasswordTextBox, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.UserNameTextBox, 1, 0);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.urlTextBox, 1, 3);
+            this.tableLayoutPanel1.Controls.Add(this.buttonTest, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.CancelButton, 4, 5);
+            this.tableLayoutPanel1.Controls.Add(this.buttonOk, 5, 5);
+            this.tableLayoutPanel1.Controls.Add(this.label3, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.authTextBox, 1, 4);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(16, 12);
             this.tableLayoutPanel1.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 5;
+            this.tableLayoutPanel1.RowCount = 6;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.1462F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 24.1228F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.5848F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 31F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25.1462F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 50F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(595, 173);
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(595, 215);
             this.tableLayoutPanel1.TabIndex = 9;
             // 
             // label2
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(5, 78);
+            this.label2.Location = new System.Drawing.Point(12, 73);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(92, 17);
             this.label2.TabIndex = 9;
@@ -178,7 +183,7 @@
             // browseButton
             // 
             this.browseButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.browseButton.Location = new System.Drawing.Point(498, 75);
+            this.browseButton.Location = new System.Drawing.Point(498, 70);
             this.browseButton.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.browseButton.Name = "browseButton";
             this.browseButton.Size = new System.Drawing.Size(94, 23);
@@ -191,17 +196,17 @@
             // 
             this.fileGdbDirectoryTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.fileGdbDirectoryTextBox, 4);
-            this.fileGdbDirectoryTextBox.Location = new System.Drawing.Point(103, 76);
+            this.fileGdbDirectoryTextBox.Location = new System.Drawing.Point(110, 71);
             this.fileGdbDirectoryTextBox.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.fileGdbDirectoryTextBox.Name = "fileGdbDirectoryTextBox";
-            this.fileGdbDirectoryTextBox.Size = new System.Drawing.Size(389, 22);
+            this.fileGdbDirectoryTextBox.Size = new System.Drawing.Size(382, 22);
             this.fileGdbDirectoryTextBox.TabIndex = 10;
             // 
             // label1
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(37, 112);
+            this.label1.Location = new System.Drawing.Point(40, 106);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(26, 17);
             this.label1.TabIndex = 13;
@@ -211,17 +216,36 @@
             // 
             this.urlTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.urlTextBox, 5);
-            this.urlTextBox.Location = new System.Drawing.Point(103, 109);
+            this.urlTextBox.Location = new System.Drawing.Point(110, 103);
             this.urlTextBox.Name = "urlTextBox";
-            this.urlTextBox.Size = new System.Drawing.Size(489, 22);
+            this.urlTextBox.Size = new System.Drawing.Size(482, 22);
             this.urlTextBox.TabIndex = 14;
             this.urlTextBox.TextChanged += new System.EventHandler(this.TextBoxUrlTextChanged);
+            // 
+            // label3
+            // 
+            this.label3.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(4, 138);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(98, 17);
+            this.label3.TabIndex = 15;
+            this.label3.Text = "Authentication";
+            // 
+            // authTextBox
+            // 
+            this.authTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel1.SetColumnSpan(this.authTextBox, 5);
+            this.authTextBox.Location = new System.Drawing.Point(110, 135);
+            this.authTextBox.Name = "authTextBox";
+            this.authTextBox.Size = new System.Drawing.Size(482, 22);
+            this.authTextBox.TabIndex = 16;
             // 
             // FormConfiguration
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(619, 197);
+            this.ClientSize = new System.Drawing.Size(619, 239);
             this.Controls.Add(this.tableLayoutPanel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
@@ -254,5 +278,7 @@
         private System.Windows.Forms.Button browseButton;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox urlTextBox;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.TextBox authTextBox;
     }
 }

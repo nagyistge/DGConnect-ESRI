@@ -63,6 +63,15 @@ namespace Gbdx
                 this.fileGdbDirectoryTextBox.Text = GbdxSettings.Properties.Settings.Default.geoDatabase;
             }
 
+            if (string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.AuthBase))
+            {
+                this.authTextBox.Text = GbdxSettings.Properties.Settings.Default.DefaultAuthBase;
+            }
+            else
+            {
+                this.authTextBox.Text = GbdxSettings.Properties.Settings.Default.AuthBase;
+            }
+
             //textBoxUrl.Text = Settings.Default.url;
             this.UserNameTextBox.Text = GbdxSettings.Properties.Settings.Default["username"].ToString();
             var tempPassword = string.Empty;
@@ -174,7 +183,7 @@ namespace Gbdx
             GbdxSettings.Properties.Settings.Default["username"] = this.UserNameTextBox.Text;
             GbdxSettings.Properties.Settings.Default.geoDatabase = this.fileGdbDirectoryTextBox.Text;
             GbdxSettings.Properties.Settings.Default.baseUrl = this.urlTextBox.Text;
-            
+            GbdxSettings.Properties.Settings.Default.AuthBase = this.authTextBox.Text;
             string temp;
             if (Aes.Instance.Encrypt128(this.PasswordTextBox.Text, out temp))
             {

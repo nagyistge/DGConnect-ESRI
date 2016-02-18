@@ -58,7 +58,7 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/cas/oauth/token")]
+        [global::System.Configuration.DefaultSettingValueAttribute("/auth/v1/oauth/token")]
         public string authenticationServer {
             get {
                 return ((string)(this["authenticationServer"]));
@@ -207,6 +207,27 @@ namespace GbdxSettings.Properties {
             }
             set {
                 this["GbdOrders"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://geobigdata.io")]
+        public string DefaultAuthBase {
+            get {
+                return ((string)(this["DefaultAuthBase"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AuthBase {
+            get {
+                return ((string)(this["AuthBase"]));
+            }
+            set {
+                this["AuthBase"] = value;
             }
         }
     }
