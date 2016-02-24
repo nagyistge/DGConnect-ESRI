@@ -104,27 +104,28 @@ namespace Gbdx
 
                         File.Delete(mappingProps);
 
-                        //NetObject netobj = new NetObject()
-                        //                       {
-                        //                           BaseUrl = Settings.Default.baseUrl,
-                        //                           AuthUrl =
-                        //                               string.IsNullOrEmpty(Settings.Default.AuthBase)
-                        //                                   ? Settings.Default.DefaultAuthBase
-                        //                                   : Settings.Default.AuthBase,
-                        //                           AuthEndpoint = Settings.Default.authenticationServer,
-                        //                           User = Settings.Default.username,
-                        //                       };
+                        NetObject netobj = new NetObject()
+                                               {
+                                                   BaseUrl = Settings.Default.baseUrl,
+                                                   AddressUrl = "/insight-vector/api/vector/vector-upload",
+                                                   AuthUrl =
+                                                       string.IsNullOrEmpty(Settings.Default.AuthBase)
+                                                           ? Settings.Default.DefaultAuthBase
+                                                           : Settings.Default.AuthBase,
+                                                   AuthEndpoint = Settings.Default.authenticationServer,
+                                                   User = Settings.Default.username,
+                                               };
 
-                        //string decryptedPassword;
-                        //var success = Aes.Instance.Decrypt128(Settings.Default.password, out decryptedPassword);
-                        //if (!success)
-                        //{
-                        //    MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
-                        //    return;
-                        //}
-                        //netobj.Password = decryptedPassword;
+                        string decryptedPassword;
+                        var success = Aes.Instance.Decrypt128(Settings.Default.password, out decryptedPassword);
+                        if (!success)
+                        {
+                            MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
+                            return;
+                        }
+                        netobj.Password = decryptedPassword;
 
-                        //this.comms.UploadFile(netobj, newZip);
+                        this.comms.UploadFile(netobj, newZip);
                     }
                 }
             }
