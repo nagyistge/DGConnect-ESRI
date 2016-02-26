@@ -123,6 +123,11 @@ namespace NetworkConnections
         public string BaseUrl { get; set; }
 
         /// <summary>
+        /// Gets or sets the API Key
+        /// </summary>
+        public string ApiKey { get; set; }
+
+        /// <summary>
         /// Gets or sets the auth url.
         /// </summary>
         public string AuthUrl { get; set; }

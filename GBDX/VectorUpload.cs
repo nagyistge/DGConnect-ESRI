@@ -55,7 +55,7 @@ namespace Gbdx
                     if (mapForm.ShowDialog() == DialogResult.OK)
                     {
                         string mappingProps = "mapping.properties";
-                        const string UserContributions = "User Contributions";
+                        const string userContributions = "User Contributions";
                         string itemType = mapForm.ItemName;
                         string spatialReference = GetSpatialReference(openFileDialog.FileName);
 
@@ -73,12 +73,12 @@ namespace Gbdx
                             using (var sw = File.CreateText(mappingProps))
                             {
                                 sw.WriteLine("vector.crs={0}", spatialReference);
-                                sw.WriteLine("vector.ingestSource={0}", UserContributions);
+                                sw.WriteLine("vector.ingestSource={0}", userContributions);
                                 sw.WriteLine("vector.itemType={0}", itemType);
 
                                 var indexLine = string.Format(
                                     "vector.index=vector-{0}-{1}-{2}",
-                                    UserContributions,
+                                    userContributions,
                                     itemType,
                                     DateTime.Now.ToString("yyyy-MM-dd'T'HH:mm:ss.fff'Z'"));
                                 indexLine = indexLine.ToLower().Replace(":", "").Replace(" ", "");

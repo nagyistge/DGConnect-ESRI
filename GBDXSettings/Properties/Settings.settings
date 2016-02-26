@@ -62,5 +62,8 @@
     <Setting Name="AuthBase" Type="System.String" Scope="User">
       <Value Profile="(Default)">https://geobigdata.io</Value>
     </Setting>
+    <Setting Name="apiKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>
