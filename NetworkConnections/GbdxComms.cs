@@ -406,7 +406,7 @@ namespace NetworkConnections
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 
             // Add the 64 base string representation to the header
-            request.AddHeader("Authorization", "Basic S0w5LjZZT1RZSj1FLk9TSThzWnl4ZTIwTjsyam01QTVweURQVTItRDo3Z3NQOjVAT2cxSj9qNUdvWXFUWWNmUG1zSHRySnVERTJuYjEuQTZhOU1VNTY3enZueDJteHBDS1JiZDQ3a1FaOWpHOVdVTmpKUU9QU3pCRHRLbHBkd1lhNDNwejFsZE9Ka1VmMUwwQWhEUjVsNmpGcHE1cWRYVWdqWC0tS0NWNg==");
+            request.AddHeader("Authorization", string.Format("Basic {0}",nobj.ApiKey));
 
             request.AddParameter("grant_type", "password");
             request.AddParameter("username", nobj.User);

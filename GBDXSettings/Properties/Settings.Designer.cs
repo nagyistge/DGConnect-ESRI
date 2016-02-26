@@ -134,7 +134,7 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://iipbeta.digitalglobe.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://vector.geobigdata.io")]
         public string DefaultBaseUrl {
             get {
                 return ((string)(this["DefaultBaseUrl"]));

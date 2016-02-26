@@ -114,6 +114,7 @@ namespace Gbdx
                                                            : Settings.Default.AuthBase,
                                                    AuthEndpoint = Settings.Default.authenticationServer,
                                                    User = Settings.Default.username,
+                                                   ApiKey = Settings.Default.apiKey,
                                                };
 
                         string decryptedPassword;

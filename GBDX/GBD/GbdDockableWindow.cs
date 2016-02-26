@@ -844,6 +844,8 @@ namespace Gbdx.Gbd
                                                    .authenticationServer,
                                                User = Settings.Default.username,
                                                Password = decryptedPassword,
+                                               ApiKey = Settings.Default.apiKey,
+                                               AuthUrl = Settings.Default.AuthBase,
                                            };
 
                     var result = this.comms.Post<GbdResponse>(netObj, serializedstring);
@@ -1721,6 +1723,7 @@ namespace Gbdx.Gbd
                     Password = decryptedPassword,
 
                     AuthUrl = string.IsNullOrEmpty(Settings.Default.AuthBase)?Settings.Default.DefaultAuthBase: Settings.Default.AuthBase,
+                    ApiKey = Settings.Default.apiKey,
                 };
 
                 this.comms.AuthenticateNetworkObject(ref netObj);

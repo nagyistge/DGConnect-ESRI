@@ -33,7 +33,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DefaultBaseUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://iipbeta.digitalglobe.com</Value>
+      <Value Profile="(Default)">https://vector.geobigdata.io</Value>
     </Setting>
     <Setting Name="baseUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
