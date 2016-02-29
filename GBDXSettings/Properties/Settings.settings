@@ -51,7 +51,7 @@
       <Value Profile="(Default)">/monocle-3</Value>
     </Setting>
     <Setting Name="GbdSearchPath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">/raster-catalog/api/gbd/catalog/v1/search</Value>
+      <Value Profile="(Default)">/catalog/v1/search?includeRelationships=false</Value>
     </Setting>
     <Setting Name="GbdOrders" Type="System.String" Scope="User">
       <Value Profile="(Default)">\GBDX\gbdOrders</Value>

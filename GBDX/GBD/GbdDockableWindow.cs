@@ -836,16 +836,14 @@ namespace Gbdx.Gbd
                                            {
                                                AddressUrl =
                                                    Settings.Default.GbdSearchPath,
-                                               BaseUrl =
-                                                   GbdxHelper.GetEndpointBase(
-                                                       Settings.Default),
+                                               BaseUrl = Settings.Default.DefaultAuthBase,
                                                AuthEndpoint =
                                                    Settings.Default
                                                    .authenticationServer,
                                                User = Settings.Default.username,
                                                Password = decryptedPassword,
                                                ApiKey = Settings.Default.apiKey,
-                                               AuthUrl = Settings.Default.AuthBase,
+                                               AuthUrl = Settings.Default.DefaultAuthBase,
                                            };
 
                     var result = this.comms.Post<GbdResponse>(netObj, serializedstring);

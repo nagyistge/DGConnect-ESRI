@@ -451,7 +451,7 @@ namespace NetworkConnections
         /// </returns>
         private bool CheckSettings(ref IRestClient restClient, ref NetObject netObject, ref string user, ref string pass, ref string authEndpoint)
         {
-            if (restClient == null)
+            if (restClient == null || !restClient.BaseUrl.ToString().Equals(netObject.BaseUrl))
             {
                 restClient = new RestClient(netObject.BaseUrl);
                 this.client = restClient;

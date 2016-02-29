@@ -191,7 +191,7 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/raster-catalog/api/gbd/catalog/v1/search")]
+        [global::System.Configuration.DefaultSettingValueAttribute("/catalog/v1/search?includeRelationships=false")]
         public string GbdSearchPath {
             get {
                 return ((string)(this["GbdSearchPath"]));
