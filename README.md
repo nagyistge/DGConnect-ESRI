@@ -1,7 +1,6 @@
 ## Welcome To GBDX
 GBDX platform is a DigitalGlobe product enabling social media, text, vectors, raster search and analytic capabilities on various commercial and free to use data sources.  
 
-
 ## Purpose
 This tool's purpose is to provide a window into the GBDX platform capabilities to present analysts with geospatial solutions and to allow developers to enhance this tool or create new tools using our APIs.
 
@@ -40,3 +39,7 @@ We welcome anyone and everyone to help maintain and enhance this tool to do new 
       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
       See the License for the specific language governing permissions and
       limitations under the License.
+
+##
+For FAQs and detailed explanations of GBDX functionality and REST API, [see the full GBDX userguide](http://gbdxdocs.digitalglobe.com/v1).
+##
