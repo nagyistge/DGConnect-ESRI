@@ -960,7 +960,8 @@ namespace Gbdx.Vector_Index.Forms
             work.NetworkObject.Result = string.Empty;
             work.NetworkObject.AddressUrl = work.OriginalPagingIdUrl;
             work.NetworkObject.BaseUrl = work.BaseUrl;
-
+            work.NetworkObject.AuthUrl = Settings.Default.AuthBase;
+            work.NetworkObject.AuthEndpoint = Settings.Default.authenticationServer;
             var netobj = work.NetworkObject;
 
             // Set the result and page id back empty string. only needed when this function gets called again.  

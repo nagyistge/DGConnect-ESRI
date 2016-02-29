@@ -396,10 +396,6 @@ namespace NetworkConnections
         /// </returns>
         private static bool Authenticate(ref NetObject nobj, ref IRestClient client)
         {
-            //if (client == null || client.BaseUrl == null ||client.BaseUrl != new Uri(nobj.BaseUrl))
-            //{
-            //    client = new RestClient(nobj.BaseUrl);
-            //}
             client = new RestClient(nobj.AuthUrl);
 
             IRestRequest request = new RestRequest(nobj.AuthEndpoint, Method.POST);
@@ -451,7 +447,7 @@ namespace NetworkConnections
         /// </returns>
         private bool CheckSettings(ref IRestClient restClient, ref NetObject netObject, ref string user, ref string pass, ref string authEndpoint)
         {
-            if (restClient == null || !restClient.BaseUrl.ToString().Equals(netObject.BaseUrl))
+            if (restClient == null || !restClient.BaseUrl.Equals(new Uri(netObject.BaseUrl)))
             {
                 restClient = new RestClient(netObject.BaseUrl);
                 this.client = restClient;
