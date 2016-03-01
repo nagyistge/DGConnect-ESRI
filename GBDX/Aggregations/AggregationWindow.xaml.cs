@@ -973,7 +973,9 @@ namespace Gbdx.Aggregations
                 double sim = Graph[key][innerKey];
                 formattedGraph += "\t" + innerKey + " :: " + sim + "\n";
               }
-              MessageBox.Show(formattedGraph);
+                ScrollableMessageBox box = new ScrollableMessageBox();
+                box.Show(formattedGraph);
+                //MessageBox.Show(formattedGraph);
             }
             DialogResult resGraph = MessageBox.Show("Continue?", "Graph", MessageBoxButtons.YesNoCancel);
             if (resGraph == DialogResult.No || resGraph == DialogResult.Cancel) {
