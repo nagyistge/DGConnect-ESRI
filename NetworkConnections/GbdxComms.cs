@@ -294,6 +294,12 @@ namespace NetworkConnections
             return default(T);
         }
 
+        /// <summary>
+        /// Uploads file to the endpoint detailed in the NetworkObject.  The file is uploaded in the body of the request.
+        /// </summary>
+        /// <param name="netObject">network object that contains base url and endpoint url along with other information</param>
+        /// <param name="filepath">path to the file to be uploaded</param>
+        /// <returns>HttpStatusCode based on the success of the upload</returns>
         public HttpStatusCode UploadFile(NetObject netObject, string filepath)
         {
             // Check the settings if valid processing will continue;
@@ -315,9 +321,8 @@ namespace NetworkConnections
 
             IRestRequest request = new RestRequest(netObject.AddressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.AccessToken);
-            //request.AddFile(Path.GetFileName(filepath),filepath);
-
-            request.AddFile(Path.GetFileName(filepath), this.ReadToEnd(filepath), "vector-Upload");
+            var postData = ReadToEnd(filepath);
+            request.AddParameter("application/octet-stream", postData, ParameterType.RequestBody);
 
             var response = this.client.Execute(request);
 
@@ -325,8 +330,12 @@ namespace NetworkConnections
 
         }
 
-        //method for converting stream to byte[]
-        public byte[] ReadToEnd(string  filepath)
+        /// <summary>
+        /// Returns the byte array of the file.
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <returns></returns>
+        private static byte[] ReadToEnd(string  filepath)
         {
 
             Stream stream = File.OpenRead(filepath);
