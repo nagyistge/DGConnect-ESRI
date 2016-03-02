@@ -16,5 +16,15 @@ namespace Aggregations
             this.messageBox.Text = message;
             return this.ShowDialog();
         }
+
+        private void cancelButton_Click(object sender, System.EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void okButton_Click(object sender, System.EventArgs e)
+        {
+            this.Close();
+        }
     }
 }
