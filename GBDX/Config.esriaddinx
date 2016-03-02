@@ -29,7 +29,7 @@
             <Button refID="DigitalGlobe_Inc_VectorIndexButton" />
             <Button refID="DigitalGlobe_Inc_GbdButton" />
             <Button refID="DigitalGlobe_Inc_AggregationButton" />
-            <!--<Button refID="DigitalGlobe_Inc_Gbdx_VectorUpload"/>-->
+            <Button refID="DigitalGlobe_Inc_Gbdx_VectorUpload"/>
             <Button refID="DigitalGlobe_Inc_sma_smaConfig" separator="true" />
             <Button refID="DigitalGlobe_Inc_GbdxAboutButton" />
           </Items>
