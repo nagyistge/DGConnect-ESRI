@@ -58,7 +58,7 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/cas/oauth/token")]
+        [global::System.Configuration.DefaultSettingValueAttribute("/auth/v1/oauth/token")]
         public string authenticationServer {
             get {
                 return ((string)(this["authenticationServer"]));
@@ -134,7 +134,7 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("https://iipbeta.digitalglobe.com")]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://vector.geobigdata.io")]
         public string DefaultBaseUrl {
             get {
                 return ((string)(this["DefaultBaseUrl"]));
@@ -191,7 +191,7 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/raster-catalog/api/gbd/catalog/v1/search")]
+        [global::System.Configuration.DefaultSettingValueAttribute("/catalog/v1/search?includeRelationships=false")]
         public string GbdSearchPath {
             get {
                 return ((string)(this["GbdSearchPath"]));
@@ -207,6 +207,39 @@ namespace GbdxSettings.Properties {
             }
             set {
                 this["GbdOrders"] = value;
+            }
+        }
+        
+        [global::System.Configuration.ApplicationScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://geobigdata.io")]
+        public string DefaultAuthBase {
+            get {
+                return ((string)(this["DefaultAuthBase"]));
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("https://geobigdata.io")]
+        public string AuthBase {
+            get {
+                return ((string)(this["AuthBase"]));
+            }
+            set {
+                this["AuthBase"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string apiKey {
+            get {
+                return ((string)(this["apiKey"]));
+            }
+            set {
+                this["apiKey"] = value;
             }
         }
     }

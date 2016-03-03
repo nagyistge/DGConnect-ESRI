@@ -24,11 +24,7 @@ namespace Gbdx
     using System;
     using System.Drawing;
     using System.Net;
-    using System.Net.Configuration;
-    using System.Text.RegularExpressions;
     using System.Windows.Forms;
-
-    using Gbdx.Properties;
 
     using Encryption;
 
@@ -67,8 +63,20 @@ namespace Gbdx
                 this.fileGdbDirectoryTextBox.Text = GbdxSettings.Properties.Settings.Default.geoDatabase;
             }
 
-            //textBoxUrl.Text = Settings.Default.url;
+
+            if (string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.AuthBase))
+            {
+                this.authTextBox.Text = GbdxSettings.Properties.Settings.Default.DefaultAuthBase;
+            }
+            else
+            {
+                this.authTextBox.Text = GbdxSettings.Properties.Settings.Default.AuthBase;
+            }
+
+            this.apiKeyRichTextBox.Text = GbdxSettings.Properties.Settings.Default.apiKey;
+
             this.UserNameTextBox.Text = GbdxSettings.Properties.Settings.Default["username"].ToString();
+
             var tempPassword = string.Empty;
 
             if (Aes.Instance.Decrypt128(GbdxSettings.Properties.Settings.Default["password"].ToString(), out tempPassword))
@@ -162,6 +170,8 @@ namespace Gbdx
             this.PasswordTextBox.BackColor = Color.White;
             this.UserNameTextBox.BackColor = Color.White;
             this.urlTextBox.BackColor = Color.White;
+            this.authTextBox.BackColor = Color.White;
+            this.apiKeyRichTextBox.BackColor = Color.White;
         }
 
         /// <summary>
@@ -178,7 +188,9 @@ namespace Gbdx
             GbdxSettings.Properties.Settings.Default["username"] = this.UserNameTextBox.Text;
             GbdxSettings.Properties.Settings.Default.geoDatabase = this.fileGdbDirectoryTextBox.Text;
             GbdxSettings.Properties.Settings.Default.baseUrl = this.urlTextBox.Text;
-            
+            GbdxSettings.Properties.Settings.Default.AuthBase = this.authTextBox.Text;
+            GbdxSettings.Properties.Settings.Default.apiKey = this.apiKeyRichTextBox.Text;
+
             string temp;
             if (Aes.Instance.Encrypt128(this.PasswordTextBox.Text, out temp))
             {
@@ -210,7 +222,9 @@ namespace Gbdx
                                  AuthEndpoint = GbdxSettings.Properties.Settings.Default.authenticationServer,
                                  BaseUrl = this.urlTextBox.Text,
                                  User = this.UserNameTextBox.Text,
-                                 Password = this.PasswordTextBox.Text
+                                 AuthUrl =  this.authTextBox.Text,
+                                 Password = this.PasswordTextBox.Text,
+                                 ApiKey = this.apiKeyRichTextBox.Text
                              };
 
             var result = this.comms.AuthenticateNetworkObject(ref netObj);
@@ -221,6 +235,8 @@ namespace Gbdx
                 this.PasswordTextBox.BackColor = Color.GreenYellow;
                 this.UserNameTextBox.BackColor = Color.GreenYellow;
                 this.urlTextBox.BackColor = Color.GreenYellow;
+                this.authTextBox.BackColor = Color.GreenYellow;
+                this.apiKeyRichTextBox.BackColor = Color.GreenYellow;
                 MessageBox.Show(GbdxSettings.GbdxResources.SuccessfulConnection);
                 return;
             }
@@ -230,11 +246,14 @@ namespace Gbdx
                 MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
                 this.PasswordTextBox.BackColor = Color.Tomato;
                 this.UserNameTextBox.BackColor = Color.Tomato;
+                this.apiKeyRichTextBox.BackColor = Color.Tomato;
                 return;
             }
 
             MessageBox.Show(GbdxSettings.GbdxResources.InvalidUrl);
             this.urlTextBox.BackColor = Color.Tomato;
+            this.authTextBox.BackColor = Color.Tomato;
+            this.apiKeyRichTextBox.BackColor = Color.White;
             this.PasswordTextBox.BackColor = Color.White;
             this.UserNameTextBox.BackColor = Color.White;
         }

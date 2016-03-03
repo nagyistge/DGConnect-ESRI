@@ -54,6 +54,14 @@
     <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AWSSDK.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.Core.3.1.4.3\lib\net35\AWSSDK.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AWSSDK.S3, Version=3.1.0.0, Culture=neutral, PublicKeyToken=885c28607f98e604, processorArchitecture=MSIL">
+      <HintPath>..\packages\AWSSDK.S3.3.1.3.10\lib\net35\AWSSDK.S3.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Encryption, Version=1.2.5672.25579, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libraries\Encryption.dll</HintPath>
@@ -113,6 +121,10 @@
     </Reference>
     <Reference Include="ESRI.ArcGIS.System">
       <Private>False</Private>
+    </Reference>
+    <Reference Include="Ionic.Zip, Version=1.9.8.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
+      <HintPath>..\packages\DotNetZip.1.9.8\lib\net20\Ionic.Zip.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -190,6 +202,12 @@
     </Compile>
     <Compile Include="Gbd\GbdRelay.cs" />
     <Compile Include="Gbd\Selector.cs" />
+    <Compile Include="Utilities and Configuration\Forms\MappingForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Utilities and Configuration\Forms\MappingForm.Designer.cs">
+      <DependentUpon>MappingForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Vector Index\AboutBox.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -199,35 +217,14 @@
     <Compile Include="GbdxAboutButton.cs" />
     <Compile Include="GbdxHelper.cs" />
     <Compile Include="RBList.cs" />
-    <Compile Include="Social Analytics\Forms\CustomMenuItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Social Analytics\Forms\FavoriteMenuStripItem.cs">
-      <SubType>Component</SubType>
-    </Compile>
-    <Compile Include="Social Analytics\Forms\FormConfiguration.cs">
+    <Compile Include="Utilities and Configuration\Forms\FormConfiguration.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Social Analytics\Forms\FormConfiguration.Designer.cs">
+    <Compile Include="Utilities and Configuration\Forms\FormConfiguration.Designer.cs">
       <DependentUpon>FormConfiguration.cs</DependentUpon>
     </Compile>
-    <Compile Include="Social Analytics\Response\Hits.cs" />
-    <Compile Include="Social Analytics\Response\HitsBody.cs" />
-    <Compile Include="Social Analytics\Response\HitSource.cs" />
-    <Compile Include="Social Analytics\Response\PostResponse.cs" />
-    <Compile Include="Social Analytics\Response\ResponseRss.cs" />
-    <Compile Include="Social Analytics\Response\RssHits.cs" />
-    <Compile Include="Social Analytics\Response\RssHitsBody.cs" />
-    <Compile Include="Social Analytics\Settings.cs" />
-    <Compile Include="Social Analytics\smaConfig.cs" />
-    <Compile Include="Social Analytics\arcUtility.cs" />
-    <Compile Include="Social Analytics\Forms\FormQueryBuilder.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="Social Analytics\Forms\FormQueryBuilder.designer.cs">
-      <DependentUpon>FormQueryBuilder.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Social Analytics\LayerFields.cs" />
+    <Compile Include="Utilities and Configuration\smaConfig.cs" />
+    <Compile Include="Utilities and Configuration\arcUtility.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Vector Index\BoundingBox.cs" />
     <Compile Include="Vector Index\ESRI Tools\VectorIndex.cs" />
@@ -243,6 +240,7 @@
       <DependentUpon>VectorIndexDockable.cs</DependentUpon>
     </Compile>
     <Compile Include="Vector Index\Forms\WorkerObject.cs" />
+    <Compile Include="Vector Index\PagedData.cs" />
     <Compile Include="Vector Index\PageId.cs" />
     <Compile Include="Vector Index\SourceType.cs" />
     <Compile Include="Vector Index\SourceTypeResponseObject.cs" />
@@ -251,6 +249,7 @@
     <Compile Include="Vector Index\VectorIndexRelay.cs" />
     <Compile Include="Vector Index\VectorIndexSourceNode.cs" />
     <Compile Include="Vector Index\VectorIndexTypeNode.cs" />
+    <Compile Include="VectorUpload.cs" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Config.esriaddinx">
@@ -260,19 +259,7 @@
     </AddInContent>
   </ItemGroup>
   <ItemGroup>
-    <AddInContent Include="Images\sma.png" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="System.Windows.Forms" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Social Analytics\Response\HitPoint.cs" />
-    <Compile Include="Social Analytics\Response\RssHitSource.cs" />
-    <Compile Include="Social Analytics\ESRI Tools\rssPolygon.cs">
-      <ExcludeFromStyleCop>False</ExcludeFromStyleCop>
-    </Compile>
-    <Compile Include="Social Analytics\smaClient.cs" />
-    <AddInContent Include="Images\smaQuery.png" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="ESRI.ArcGIS.ArcMapUI">
@@ -300,28 +287,18 @@
     <EmbeddedResource Include="Gbd\GbdDockableWindow.resx">
       <DependentUpon>GbdDockableWindow.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Utilities and Configuration\Forms\MappingForm.resx">
+      <DependentUpon>MappingForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Vector Index\AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Social Analytics\Forms\FormConfiguration.resx">
+    <EmbeddedResource Include="Utilities and Configuration\Forms\FormConfiguration.resx">
       <DependentUpon>FormConfiguration.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Social Analytics\Forms\FormQueryBuilder.resx">
-      <DependentUpon>FormQueryBuilder.cs</DependentUpon>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Vector Index\Forms\VectorIndexDockable.resx">
       <DependentUpon>VectorIndexDockable.cs</DependentUpon>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\smaCircleQuery.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\rssPolygon.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\rssCircle.png" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\smaConfig.png" />
@@ -373,13 +350,6 @@
     <AddInContent Include="Images\VectorIndexButton.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Images\emptyStar.png" />
-    <EmbeddedResource Include="Images\filledStar.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <AddInContent Include="Images\Tool1.png" />
-  </ItemGroup>
-  <ItemGroup>
     <AddInContent Include="Images\GbdDockableWindow.png" />
   </ItemGroup>
   <ItemGroup>
@@ -403,6 +373,9 @@
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\AggregationWindow.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\VectorUpload.png" />
   </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>

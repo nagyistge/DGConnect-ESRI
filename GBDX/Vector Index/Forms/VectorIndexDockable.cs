@@ -37,8 +37,6 @@ namespace Gbdx.Vector_Index.Forms
 
     using Amib.Threading;
 
-    using Gbdx.Properties;
-
     using Encryption;
 
     using ESRI.ArcGIS.Carto;
@@ -46,6 +44,8 @@ namespace Gbdx.Vector_Index.Forms
     using ESRI.ArcGIS.Framework;
     using ESRI.ArcGIS.Geodatabase;
     using ESRI.ArcGIS.Geometry;
+
+    using GbdxSettings.Properties;
 
     using Logging;
 
@@ -190,7 +190,7 @@ namespace Gbdx.Vector_Index.Forms
             this.Hook = hook;
             this.textBoxSearch.Text = GbdxSettings.GbdxResources.EnterSearchTerms;
             this.textBoxSearch.ForeColor = Color.DarkGray;
-            this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, true);
+            this.UserAuthenticationCheck(Settings.Default, ref this.username, ref this.password, this.comms, true);
             this.smartThreadPool = new SmartThreadPool();
             this.treeView1.AfterCheck += this.TreeView1AfterCheck;
             this.VisibleChanged += this.VectorIndexDockableVisibleChanged;
@@ -223,7 +223,7 @@ namespace Gbdx.Vector_Index.Forms
         {
             this.InitializeComponent();
             this.Hook = hook;
-            this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, true);
+            this.UserAuthenticationCheck(Settings.Default, ref this.username, ref this.password, this.comms, true);
             this.smartThreadPool = new SmartThreadPool();
             this.treeView1.AfterCheck += this.TreeView1AfterCheck;
             this.VisibleChanged += this.VectorIndexDockableVisibleChanged;
@@ -322,7 +322,7 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void SelectAreaButtonClick(object sender, EventArgs e)
         {
-            if (!this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, false))
+            if (!this.UserAuthenticationCheck(Settings.Default, ref this.username, ref this.password, this.comms, false))
             {
                 return;
             }
@@ -431,7 +431,11 @@ namespace Gbdx.Vector_Index.Forms
             
             netObj.CookieJar = this.cookieContainer;
 
+            netObj.AuthUrl = Settings.Default.AuthBase;
+            netObj.ApiKey = Settings.Default.apiKey;
+
             netObj = this.SetAuthenticationEndpoints(netObj);
+
 
             return netObj;
         }
@@ -447,8 +451,8 @@ namespace Gbdx.Vector_Index.Forms
         /// </returns>
         private NetObject SetAuthenticationEndpoints(NetObject netObj)
         {
-            netObj.AuthEndpoint = GbdxHelper.GetAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
-            netObj.BaseUrl = GbdxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default);
+            netObj.AuthEndpoint = GbdxHelper.GetAuthenticationEndpoint(Settings.Default);
+            netObj.BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default);
             return netObj;
         }
 
@@ -522,7 +526,7 @@ namespace Gbdx.Vector_Index.Forms
             var node = (VectorIndexSourceNode)sourceNode;
             var work = new WorkerObject
                            {
-                               BaseUrl = GbdxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
+                               BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
                                BoundBox = this.bBox,
                                SourceNode = node,
                                NetworkObject = this.networkObject,
@@ -567,7 +571,7 @@ namespace Gbdx.Vector_Index.Forms
             itemNode.Text = itemNode.Text.Replace(GbdxSettings.GbdxResources.Source_ErrorMessage, string.Empty);
             var work = new WorkerObject
                            {
-                               BaseUrl = GbdxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
+                               BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
                                BoundBox = this.bBox,
                                SourceNode = (VectorIndexSourceNode)itemNode.Parent,
                                GeometryNode = (VectorIndexGeometryNode)itemNode,
@@ -612,7 +616,7 @@ namespace Gbdx.Vector_Index.Forms
             // Checking to see if the node is contained within the checkednodes type prevents multiple requests for data being fired off.
             var work = new WorkerObject
                            {
-                               BaseUrl = GbdxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
+                               BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
                                BoundBox = this.bBox,
                                SourceNode = (VectorIndexSourceNode)geometryNode.Parent,
                                GeometryNode = node,
@@ -655,7 +659,7 @@ namespace Gbdx.Vector_Index.Forms
                            };
             var work = new WorkerObject
                            {
-                               BaseUrl = GbdxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
+                               BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
                                BoundBox = this.bBox,
                                SourceNode = (VectorIndexSourceNode)typeNode.Parent.Parent,
                                GeometryNode = (VectorIndexGeometryNode)typeNode.Parent,
@@ -695,7 +699,7 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void TreeView1AfterCheck(object sender, TreeViewEventArgs e)
         {
-            if (!this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, false))
+            if (!this.UserAuthenticationCheck(Settings.Default, ref this.username, ref this.password, this.comms, false))
             {
                 return;
             }
@@ -956,7 +960,8 @@ namespace Gbdx.Vector_Index.Forms
             work.NetworkObject.Result = string.Empty;
             work.NetworkObject.AddressUrl = work.OriginalPagingIdUrl;
             work.NetworkObject.BaseUrl = work.BaseUrl;
-
+            work.NetworkObject.AuthUrl = Settings.Default.AuthBase;
+            work.NetworkObject.AuthEndpoint = Settings.Default.authenticationServer;
             var netobj = work.NetworkObject;
 
             // Set the result and page id back empty string. only needed when this function gets called again.  
@@ -1002,7 +1007,12 @@ namespace Gbdx.Vector_Index.Forms
                     // Get the staged request.  If no error return true.
                     success = gbdxComms.StagedRequest(ref networkObj, formParams);
 
-                    // Download didn't start so lets try it again.  but after a 50 ms nap to give the service a chance to catch up
+                    var pagedResult = JsonConvert.DeserializeObject<PagedData>(networkObj.Result);
+
+                    networkObj.PageId = pagedResult.next_paging_id;
+                    networkObj.PageItemCount = Convert.ToInt32( pagedResult.item_count);
+
+                    // Download didn't start so lets try it again.  but after a 250 ms nap to give the service a chance to catch up
                     if (itemsReceived == 0 && !success)
                     {
                         if (work.NumberOfAttempts <= 5)
@@ -1043,7 +1053,8 @@ namespace Gbdx.Vector_Index.Forms
                     }
 
                     // Check to see if the last page has been received otherwise process it.
-                    if (string.Equals(networkObj.Result, "{}", StringComparison.OrdinalIgnoreCase))
+                    //if (string.Equals(pagedResult.ToString(), "{}", StringComparison.OrdinalIgnoreCase))
+                    if(networkObj.PageItemCount == 0)
                     {
                         done = true;
                     }
@@ -1065,7 +1076,8 @@ namespace Gbdx.Vector_Index.Forms
                             }
 
                             work.NumberOfLines++;
-                            file.WriteLine(networkObj.Result);
+                            var outputStr = pagedResult.data.ToString().Replace("\r", "").Replace("\n","");
+                            file.WriteLine(outputStr);
                            }
 
                         // close If(success)
@@ -1154,7 +1166,7 @@ namespace Gbdx.Vector_Index.Forms
                 lock (this.locker)
                 {
                     var featureWorkspace =
-                        (IFeatureWorkspace)GbdxTools.Jarvis.OpenWorkspace(GbdxSettings.Properties.Settings.Default.geoDatabase);
+                        (IFeatureWorkspace)Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
                     var featureClass = featureWorkspace.OpenFeatureClass(workObj.TableName);
                     ILayer featureLayer;
                     featureLayer = VectorIndexHelper.CreateFeatureLayer(
@@ -1352,7 +1364,7 @@ namespace Gbdx.Vector_Index.Forms
         private object ProcessVectorIndexResponse2(object source)
         {
             var work = (WorkerObject)source;
-            var workspace = GbdxTools.Jarvis.OpenWorkspace(work.WorkspacePath);
+            var workspace = Jarvis.OpenWorkspace(work.WorkspacePath);
             var sourceNodeIndex = work.SourceNode.Index;
             var geometryNodeIndex = work.GeometryNode.Index;
             int typeNodeIndex = -1;
@@ -1656,7 +1668,7 @@ namespace Gbdx.Vector_Index.Forms
                 return;
             }
 
-            work.WorkspacePath = GbdxSettings.Properties.Settings.Default.geoDatabase;
+            work.WorkspacePath = Settings.Default.geoDatabase;
             if (work.QuerySource)
             {
                 work.TableName = "VI_" + work.GeometryNode.GeometryType.Name.Replace(" ", "_") + "QUERY_Search_"
@@ -1687,15 +1699,17 @@ namespace Gbdx.Vector_Index.Forms
             if (this.networkObject == null)
             {
                 this.networkObject = this.SetupNetObject(
-                    GbdxSettings.Properties.Settings.Default.username,
-                    GbdxSettings.Properties.Settings.Default.password);
+                    Settings.Default.username,
+                    Settings.Default.password);
             }
 
-            this.networkObject.AuthEndpoint = GbdxHelper.GetAuthenticationEndpoint(GbdxSettings.Properties.Settings.Default);
+            this.networkObject.AuthEndpoint = GbdxHelper.GetAuthenticationEndpoint(Settings.Default);
             this.networkObject.AddressUrl = null;
             this.networkObject.Error = null;
             this.networkObject.ErrorOccurred = false;
             this.networkObject.PageId = string.Empty;
+            this.networkObject.ApiKey = Settings.Default.apiKey;
+            this.networkObject.AuthUrl = Settings.Default.AuthBase;
 
             // There was a problem in creating the network object so dont proceed.
             if (this.networkObject == null)
@@ -1732,7 +1746,7 @@ namespace Gbdx.Vector_Index.Forms
             // Setup worker object 
             var work = new WorkerObject
                            {
-                               BaseUrl = GbdxHelper.GetEndpointBase(GbdxSettings.Properties.Settings.Default),
+                               BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
                                BoundBox = this.bBox,
                                Logger = this.logWriter
                            };
@@ -1794,7 +1808,7 @@ namespace Gbdx.Vector_Index.Forms
         /// The <see cref="bool"/>.
         /// </returns>
         private bool UserAuthenticationCheck(
-            GbdxSettings.Properties.Settings settings,
+            Settings settings,
             ref string user,
             ref string pass,
             IGbdxComms cloudComms,
@@ -1817,7 +1831,9 @@ namespace Gbdx.Vector_Index.Forms
 
                 // Re create the network object
                 this.networkObject = this.SetupNetObject(settings.username, settings.password);
-                
+                this.networkObject.AuthUrl = string.IsNullOrEmpty(Settings.Default.AuthBase)
+                                                 ? Settings.Default.DefaultAuthBase
+                                                 : Settings.Default.AuthBase;
                 // Authorize the network object if it fails inform the user.
                 if (cloudComms.AuthenticateNetworkObject(ref this.networkObject))
                 {
@@ -1854,7 +1870,7 @@ namespace Gbdx.Vector_Index.Forms
         /// <returns>
         /// The <see cref="bool"/>.
         /// </returns>
-        private bool CheckCredentials(GbdxSettings.Properties.Settings settings, ref string user, ref string pass)
+        private bool CheckCredentials(Settings settings, ref string user, ref string pass)
         {
             if (!string.Equals(settings.username, user) || !string.Equals(settings.password, pass))
             {
@@ -1886,7 +1902,7 @@ namespace Gbdx.Vector_Index.Forms
             }
 
             // Check user authentication
-            if (!this.UserAuthenticationCheck(GbdxSettings.Properties.Settings.Default, ref this.username, ref this.password, this.comms, false))
+            if (!this.UserAuthenticationCheck(Settings.Default, ref this.username, ref this.password, this.comms, false))
             {
                 return;
             }

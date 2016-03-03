@@ -12,7 +12,7 @@
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="authenticationServer" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">/cas/oauth/token</Value>
+      <Value Profile="(Default)">/auth/v1/oauth/token</Value>
     </Setting>
     <Setting Name="geoDatabase" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -33,7 +33,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="DefaultBaseUrl" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">https://iipbeta.digitalglobe.com</Value>
+      <Value Profile="(Default)">https://vector.geobigdata.io</Value>
     </Setting>
     <Setting Name="baseUrl" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
@@ -51,10 +51,19 @@
       <Value Profile="(Default)">/monocle-3</Value>
     </Setting>
     <Setting Name="GbdSearchPath" Type="System.String" Scope="Application">
-      <Value Profile="(Default)">/raster-catalog/api/gbd/catalog/v1/search</Value>
+      <Value Profile="(Default)">/catalog/v1/search?includeRelationships=false</Value>
     </Setting>
     <Setting Name="GbdOrders" Type="System.String" Scope="User">
       <Value Profile="(Default)">\GBDX\gbdOrders</Value>
+    </Setting>
+    <Setting Name="DefaultAuthBase" Type="System.String" Scope="Application">
+      <Value Profile="(Default)">https://geobigdata.io</Value>
+    </Setting>
+    <Setting Name="AuthBase" Type="System.String" Scope="User">
+      <Value Profile="(Default)">https://geobigdata.io</Value>
+    </Setting>
+    <Setting Name="apiKey" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
     </Setting>
   </Settings>
 </SettingsFile>

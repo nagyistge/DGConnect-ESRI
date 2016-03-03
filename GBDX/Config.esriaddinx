@@ -6,14 +6,13 @@
   <Image>Images\Atlas_Icon.ico</Image>
   <Author>DigitalGlobe Inc.</Author>
   <Company>DigitalGlobe Inc.</Company>
-  <Date>11/13/2015</Date>
+  <Date>1/28/2016</Date>
   <Targets>
     <Target name="Desktop" version="10.2" />
   </Targets>
   <AddIn language="CLR" library="Gbdx.dll" namespace="Gbdx">
     <ArcMap>
       <Commands>
-        <Tool id="DigitalGlobe_Inc_sma_rssPolygon" class="Gbdx.RssPolygon" message="Identify region for search by drawing a rectangular area. Hold the shift key down for Circular area of interest" caption="Text Search" tip="Text Search" category="Add-In Controls" image="Images\rssPolygon.png" />
         <Button id="DigitalGlobe_Inc_sma_smaConfig" class="Gbdx.SmaConfig" message="Various user settings and advanced configurations available for the platform" caption="Information and GBDX Platform Settings" tip="Information and GBDX Platform Settings" category="Add-In Controls" image="Images\smaConfig.png" />
         <Tool id="DigitalGlobe_Inc_sma_VectorIndex" class="Gbdx.Vector_Index.VectorIndex" message="On the dockable window enter search terms and select area" caption="Unified Commercial Vector Search" tip="Unified Commercial Vector Search" category="Add-In Controls" image="Images\VectorIndex.png" />
         <Button id="DigitalGlobe_Inc_GbdxAboutButton" class="Gbdx.GbdxAboutButton" message="A DigitalGlobe Inc. platform providing social media, text, vector and raster search and analytics capabilities" caption="About Information and GBDX Platform" tip="About Information and GBDX Platform" category="Add-In Controls" image="Images\GbdxAboutButton.png" />
@@ -22,14 +21,15 @@
         <Button id="DigitalGlobe_Inc_GbdButton" class="Gbdx.Gbd.GbdButton" message="Allows searching of the GBDX imagery catalog." caption="Allows searching of the GBDX imagery catalog." tip="Catalog" category="Add-In Controls" image="Images\GbdButton.png" />
         <Button id="DigitalGlobe_Inc_AggregationButton" class="Gbdx.Aggregations.AggregationButton" message="Tool used for doing aggregations on GBDX data." caption="Aggregation" tip="Aggregation" category="Add-In Controls" image="Images\AggregationButton.png" />
         <Tool id="DigitalGlobe_Inc_AggregationSelector" class="Gbdx.Aggregations.AggregationSelector" message="When used will select the AOI that will be used by the Aggregation query service" caption="Select AOI for aggregation service" tip="Selects the AOI for the Aggregation service" category="Add-In Controls" image="Images\AggregationSelector.png" />
+        <Button id="DigitalGlobe_Inc_Gbdx_VectorUpload" class="VectorUpload" message="Allows the user to upload a shapefile to the vector index." caption="Upload a Vector shapefile to the UVI" tip="Upload a Vector shapefile to the UVI" category="Add-In Controls" image="Images\VectorUpload.png" />
       </Commands>
       <Toolbars>
         <Toolbar id="DigitalGlobe_Inc_sma_Social_Media_Analytics" caption="GBDX Toolbar" showInitially="true">
           <Items>
-            <Tool refID="DigitalGlobe_Inc_sma_rssPolygon" />
             <Button refID="DigitalGlobe_Inc_VectorIndexButton" />
             <Button refID="DigitalGlobe_Inc_GbdButton" />
             <Button refID="DigitalGlobe_Inc_AggregationButton" />
+            <!--<Button refID="DigitalGlobe_Inc_Gbdx_VectorUpload"/>-->
             <Button refID="DigitalGlobe_Inc_sma_smaConfig" separator="true" />
             <Button refID="DigitalGlobe_Inc_GbdxAboutButton" />
           </Items>

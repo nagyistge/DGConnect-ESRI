@@ -135,22 +135,21 @@ namespace Gbdx.Aggregations
     /// The run Async.
     /// </param>
     private void Authenticate(string user, string pass, IRestClient client, string auth, bool runAsync) {
+
+        var tempClient = new RestClient(Settings.Default.AuthBase);
+
       var request = new RestRequest(auth, Method.POST);
       request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 
-      // Convert userpass to 64 base string.  i.e. username:password => 64 base string representation
-      var passBytes = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", user, pass));
-      var string64 = Convert.ToBase64String(passBytes);
-
       // Add the 64 base string representation to the header
-      request.AddHeader("Authorization", string.Format("Basic {0}", string64));
+      request.AddHeader("Authorization", string.Format("Basic {0}", Settings.Default.apiKey));
 
       request.AddParameter("grant_type", "password");
       request.AddParameter("username", user);
       request.AddParameter("password", pass);
 
       if (runAsync) {
-        client.ExecuteAsync<AccessToken>(
+        tempClient.ExecuteAsync<AccessToken>(
             request,
             resp => {
               if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null) {
@@ -162,7 +161,7 @@ namespace Gbdx.Aggregations
             });
       }
       else {
-        var response = client.Execute<AccessToken>(request);
+        var response = tempClient.Execute<AccessToken>(request);
         if (response.StatusCode == HttpStatusCode.OK && response.Data != null) {
           this.Authorization = response.Data;
         }
@@ -200,7 +199,7 @@ namespace Gbdx.Aggregations
           return "terms:ingest_source";
 
         case "What is the twitter sentiment in the region?":
-          return "avg:attributes.sentiment.positive.dbl";
+          return "avg:attributes.sentiment_positive_dbl";
 
         case "What type of data is available in the region?":
           return "terms:item_type";
@@ -974,7 +973,8 @@ namespace Gbdx.Aggregations
                 double sim = Graph[key][innerKey];
                 formattedGraph += "\t" + innerKey + " :: " + sim + "\n";
               }
-              MessageBox.Show(formattedGraph);
+              var box = new ScrollableMessageBox();
+              box.Show(formattedGraph);
             }
             DialogResult resGraph = MessageBox.Show("Continue?", "Graph", MessageBoxButtons.YesNoCancel);
             if (resGraph == DialogResult.No || resGraph == DialogResult.Cancel) {

@@ -24,6 +24,7 @@ namespace NetworkConnections
     using System;
     using System.Collections.Generic;
     using System.Collections.Specialized;
+    using System.IO;
     using System.Linq;
     using System.Net;
     using System.Text;
@@ -138,22 +139,7 @@ namespace NetworkConnections
 
                 var response = this.client.Execute(request);
                 netObject.Result = response.Content;
-
-                // get the paging id from the response headers
-                var retrievedPageId = response.Headers.FirstOrDefault(id => id.Name == "Vector-Paging-Id");
-                if (retrievedPageId != null)
-                {
-                    netObject.PageId = retrievedPageId.Value.ToString();
-                }
-
-                // get the number of vector items in the page from the response headers.
-                var retrievedItemCount = response.Headers.FirstOrDefault(item => item.Name == "Vector-Item-Count");
-                if (retrievedItemCount != null)
-                {
-                    netObject.PageItemCount =
-                        Convert.ToInt32(retrievedItemCount.Value.ToString());
-                }
-
+               
                 netObject = this.CheckForErrors(response, netObject);
             }
             catch (Exception excp)
@@ -240,6 +226,11 @@ namespace NetworkConnections
                     return netObject;
                 }
 
+                if (!this.client.BaseUrl.ToString().Contains(netObject.BaseUrl))
+                {
+                    this.client = new RestClient(netObject.BaseUrl);
+                }
+
                 var request = new RestRequest(netObject.AddressUrl);
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 var response = this.client.Execute(request);
@@ -283,6 +274,11 @@ namespace NetworkConnections
                 return default(T);
             }
 
+            if (!this.client.BaseUrl.ToString().Contains(netObject.BaseUrl))
+            {
+                this.client = new RestClient(netObject.BaseUrl);
+            }
+
             var request = new RestRequest(netObject.AddressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.AccessToken);
             request.AddParameter("application/json", jsonDataPayLoad, ParameterType.RequestBody);
@@ -295,6 +291,35 @@ namespace NetworkConnections
             }
 
             return default(T);
+        }
+
+        public HttpStatusCode UploadFile(NetObject netObject, string filepath)
+        {
+            // Check the settings if valid processing will continue;
+            if (!this.CheckSettings(
+                ref this.client,
+                ref netObject,
+                ref this.localUsername,
+                ref this.localPassword,
+                ref this.authenticationEndpoint))
+            {
+                // return null in generic method terms.
+                return HttpStatusCode.Unauthorized;
+            }
+
+            if (!this.client.BaseUrl.ToString().Contains(netObject.BaseUrl))
+            {
+                this.client = new RestClient(netObject.BaseUrl);
+            }
+
+            IRestRequest request = new RestRequest(netObject.AddressUrl, Method.POST);
+            request.AddHeader("Authorization", "Bearer " + this.AccessToken);
+            request.AddFile(Path.GetFileName(filepath),filepath);
+
+            var response = this.client.Execute(request);
+
+            return response.StatusCode;
+
         }
 
         /// <summary>
@@ -371,24 +396,18 @@ namespace NetworkConnections
         /// </returns>
         private static bool Authenticate(ref NetObject nobj, ref IRestClient client)
         {
-            if (client == null || client.BaseUrl == null ||client.BaseUrl != new Uri(nobj.BaseUrl))
-            {
-                client = new RestClient(nobj.BaseUrl);
-            }
+            client = new RestClient(nobj.AuthUrl);
 
             IRestRequest request = new RestRequest(nobj.AuthEndpoint, Method.POST);
             request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
 
-            // Convert userpass to 64 base string.  i.e. username:password => 64 base string representation
-            var passBytes = Encoding.ASCII.GetBytes(string.Format("{0}:{1}", nobj.User, nobj.Password));
-            var string64 = Convert.ToBase64String(passBytes);
-
             // Add the 64 base string representation to the header
-            request.AddHeader("Authorization", string.Format("Basic {0}", string64));
+            request.AddHeader("Authorization", string.Format("Basic {0}",nobj.ApiKey));
 
             request.AddParameter("grant_type", "password");
             request.AddParameter("username", nobj.User);
             request.AddParameter("password", nobj.Password);
+            
 
             IRestResponse<AccessToken> response = client.Execute<AccessToken>(request);
 
@@ -428,14 +447,16 @@ namespace NetworkConnections
         /// </returns>
         private bool CheckSettings(ref IRestClient restClient, ref NetObject netObject, ref string user, ref string pass, ref string authEndpoint)
         {
-            if (restClient == null || restClient.BaseUrl == null || restClient.BaseUrl != new Uri(netObject.BaseUrl))
+            if (restClient == null || !restClient.BaseUrl.Equals(new Uri(netObject.BaseUrl)))
             {
                 restClient = new RestClient(netObject.BaseUrl);
                 this.client = restClient;
                 user = netObject.User;
                 pass = netObject.Password;
                 authEndpoint = netObject.AuthEndpoint;
-                return this.AuthenticateNetworkObject(ref netObject);
+                var authResult = this.AuthenticateNetworkObject(ref netObject);
+                this.client = new RestClient(netObject.BaseUrl);
+                return authResult;
             }
 
             // Check to make sure the username andpasword hasn't changed.
