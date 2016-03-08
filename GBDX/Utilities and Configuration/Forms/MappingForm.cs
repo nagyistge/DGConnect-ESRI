@@ -27,6 +27,12 @@ namespace Gbdx.Utilities_and_Configuration.Forms
 
         private void ok_button_Click(object sender, EventArgs e)
         {
+            this.Close();
+        }
+
+        private void cancel_button_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }
