@@ -327,7 +327,6 @@ namespace NetworkConnections
             var response = this.client.Execute(request);
 
             return response.StatusCode;
-
         }
 
         /// <summary>

@@ -1,22 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.IO;
 
 
 namespace Gbdx
 {
+    using System.Net;
     using System.Windows.Forms;
 
     using Encryption;
 
-    using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.DataSourcesFile;
     using ESRI.ArcGIS.Geodatabase;
     using ESRI.ArcGIS.Geometry;
 
     using Gbdx.Utilities_and_Configuration.Forms;
 
+    using GbdxSettings;
     using GbdxSettings.Properties;
 
     using GbdxTools;
@@ -41,6 +40,7 @@ namespace Gbdx
         {
             try
             {
+                // Open file dialog but only allow the user to see shapefiles
                 var openFileDialog = new OpenFileDialog() { Multiselect = false, Filter = "Shape Files (*.shp)|*.shp" };
 
                 if (openFileDialog.ShowDialog() == DialogResult.OK)
@@ -52,6 +52,7 @@ namespace Gbdx
 
                     MappingForm mapForm = new MappingForm();
 
+                    // Show the dialog to allow the user to name the vector items they are uploading
                     if (mapForm.ShowDialog() == DialogResult.OK)
                     {
                         string mappingProps = "mapping.properties";
@@ -63,11 +64,11 @@ namespace Gbdx
                         // If the spatial projection doesn't match tell the user what's up and stop processing from there
                         if (!string.Equals("EPSG:4326", spatialReference))
                         {
-                            MessageBox.Show(GbdxSettings.GbdxResources.wrongSpatialReference);
+                            MessageBox.Show(GbdxResources.wrongSpatialReference);
                             return;
                         }
 
-                        // Write the mapping.properties file.
+                        // Create the mapping.properties file.
                         if (!File.Exists(mappingProps))
                         {
                             using (var sw = File.CreateText(mappingProps))
@@ -90,6 +91,8 @@ namespace Gbdx
                                 sw.Close();
                             }
                         }
+
+                        // Create zip and zip up all necessary files.
                         using (var zip = new ZipFile())
                         {
                             AddFile(zip, openFileDialog.FileName);
@@ -101,8 +104,21 @@ namespace Gbdx
                             zip.AddFile(mappingProps);
                             zip.Save(newZip);
                         }
-
+                        
+                        // clean up the mapping props file that was zipped up.
                         File.Delete(mappingProps);
+
+                        var zipInfo = new FileInfo(newZip);
+                        
+                        // After file has been zipped up check to see if 100 MB limit was breached
+                        // Send message box informing the user
+                        if (zipInfo.Length / 1024 / 1024 > 100)
+                        {
+                            File.Delete(newZip);
+                            MessageBox.Show(GbdxResources.sizeToBig100);
+                            return;
+                        }
+
 
                         NetObject netobj = new NetObject()
                                                {
@@ -117,16 +133,28 @@ namespace Gbdx
                                                    ApiKey = Settings.Default.apiKey,
                                                };
 
+                        // Get the encrypted password and decrypt it.
                         string decryptedPassword;
                         var success = Aes.Instance.Decrypt128(Settings.Default.password, out decryptedPassword);
                         if (!success)
                         {
-                            MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
+                            MessageBox.Show(GbdxResources.InvalidUserPass);
                             return;
                         }
+                        // set the password on the network object.
                         netobj.Password = decryptedPassword;
 
-                        this.comms.UploadFile(netobj, newZip);
+                        // upload the file
+                        var status = this.comms.UploadFile(netobj, newZip);
+
+                        // Check the status code to see if there was an error
+                        if (status != HttpStatusCode.Accepted)
+                        {
+                            MessageBox.Show(GbdxResources.Source_ErrorMessage);
+                        }
+
+                        // The zip file was uploaded so now delete it.
+                        File.Delete(newZip);
                     }
                 }
             }
@@ -135,6 +163,12 @@ namespace Gbdx
             }
         }
 
+        /// <summary>
+        /// Add File to zip file.
+        /// </summary>
+        /// <param name="zip">Zipfile where the file will be addded too</param>
+        /// <param name="path">Path to the file to be zipped up</param>
+        /// <returns></returns>
         private static bool AddFile(ZipFile zip, string path)
         {
             if (File.Exists(path))

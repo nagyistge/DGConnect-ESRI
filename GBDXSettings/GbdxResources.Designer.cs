@@ -282,6 +282,15 @@ namespace GbdxSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Operation cancelled.  \nThe file size is greater than 100 MB..
+        /// </summary>
+        public static string sizeToBig100 {
+            get {
+                return ResourceManager.GetString("sizeToBig100", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred. Please try again..
         /// </summary>
         public static string Source_ErrorMessage {

@@ -209,4 +209,7 @@ Only letters and the '.' are allowed.</value>
   <data name="wrongSpatialReference" xml:space="preserve">
     <value>Spatial Projection needs to be WGS 1984.</value>
   </data>
+  <data name="sizeToBig100" xml:space="preserve">
+    <value>Operation cancelled.  \nThe file size is greater than 100 MB.</value>
+  </data>
 </root>
