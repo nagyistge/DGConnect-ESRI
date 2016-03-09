@@ -377,6 +377,7 @@ namespace NetworkConnections
             finally
             {
                 stream.Position = originalPosition;
+                stream.Close();
             }
         }
 

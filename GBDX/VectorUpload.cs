@@ -38,6 +38,7 @@ namespace Gbdx
 
         protected override void OnClick()
         {
+            FileInfo zipInfo = null;
             try
             {
                 // Open file dialog but only allow the user to see shapefiles
@@ -104,20 +105,21 @@ namespace Gbdx
                             zip.AddFile(mappingProps);
                             zip.Save(newZip);
                         }
-                        
+
                         // clean up the mapping props file that was zipped up.
                         File.Delete(mappingProps);
 
-                        var zipInfo = new FileInfo(newZip);
-                        
+                        zipInfo = new FileInfo(newZip);
                         // After file has been zipped up check to see if 100 MB limit was breached
                         // Send message box informing the user
                         if (zipInfo.Length / 1024 / 1024 > 100)
                         {
-                            File.Delete(newZip);
+                            zipInfo.Delete();
                             MessageBox.Show(GbdxResources.sizeToBig100);
                             return;
                         }
+
+
 
 
                         NetObject netobj = new NetObject()
@@ -147,19 +149,26 @@ namespace Gbdx
                         // upload the file
                         var status = this.comms.UploadFile(netobj, newZip);
 
+
+
                         // Check the status code to see if there was an error
                         if (status != HttpStatusCode.Accepted)
                         {
                             MessageBox.Show(GbdxResources.Source_ErrorMessage);
                         }
-
-                        // The zip file was uploaded so now delete it.
-                        File.Delete(newZip);
                     }
                 }
             }
             catch (Exception error)
             {
+                Console.WriteLine(error);
+            }
+            finally
+            {
+                if (zipInfo != null)
+                {
+                    zipInfo.Delete();
+                }
             }
         }
 
