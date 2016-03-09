@@ -1073,9 +1073,8 @@ namespace Gbdx.Aggregations
       
         lblPbarStatus.Content = "Done";
 
-        System.Windows.Forms.Application.DoEvents();
-        ///now I need to create a feature class and feature layer from this object
-        ///
+          System.Windows.Forms.Application.DoEvents();
+          // now I need to create a feature class and feature layer from this object
       }
       catch (Exception ex) {
         MessageBox.Show("An error occured calculating change\n"+ex.Message.ToString());
@@ -1121,8 +1120,7 @@ namespace Gbdx.Aggregations
     }
 
     private void Button_Click_1(object sender, RoutedEventArgs e) {
-      MessageBox.Show("MLTC stands for \"More Like This[ese] Cell[s].\"\nThis tool shows a similarity heatmap based on a selection. Similar in nature to a \" More Like This \" function. If many cells are selected then there will either be an output layer for each selected cell, or the average will be calculated.\n"+
-      "If an average is selected, then a graph of similarities between each feature will br printed out.\nMake a selection\nchoose the layer with the selection\nclick generate button", "About");
+      MessageBox.Show(GbdxResources.mltcAbout, "About");
     }
 
 
