@@ -24,6 +24,7 @@ namespace Gbdx
 
     using NetworkConnections;
 
+    using Logger = Logging.Logger;
     using Path = System.IO.Path;
 
     public class VectorUpload : ESRI.ArcGIS.Desktop.AddIns.Button
@@ -31,9 +32,12 @@ namespace Gbdx
 
         private readonly IGbdxComms comms;
 
+        private Logger logger;
+
         public VectorUpload()
         {
             this.comms = new GbdxComms(Jarvis.LogFile, false);
+            this.logger = new Logger(Jarvis.LogFile, false);
         }
 
         protected override void OnClick()
@@ -161,7 +165,7 @@ namespace Gbdx
             }
             catch (Exception error)
             {
-                Console.WriteLine(error);
+                this.logger.Error(error);
             }
             finally
             {
