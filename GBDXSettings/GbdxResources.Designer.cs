@@ -144,7 +144,7 @@ namespace GbdxSettings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to URL is incorrect..
+        ///   Looks up a localized string similar to Url or api key is incorrect..
         /// </summary>
         public static string InvalidUrl {
             get {

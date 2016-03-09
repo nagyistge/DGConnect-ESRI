@@ -146,7 +146,7 @@
     <value>Invalid date/time choosen.  Please choose again.</value>
   </data>
   <data name="InvalidUrl" xml:space="preserve">
-    <value>URL is incorrect.</value>
+    <value>Url or api key is incorrect.</value>
   </data>
   <data name="InvalidUsername" xml:space="preserve">
     <value>Not a valid username.

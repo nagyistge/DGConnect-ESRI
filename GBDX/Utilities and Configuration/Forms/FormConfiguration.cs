@@ -253,7 +253,7 @@ namespace Gbdx
             MessageBox.Show(GbdxSettings.GbdxResources.InvalidUrl);
             this.urlTextBox.BackColor = Color.Tomato;
             this.authTextBox.BackColor = Color.Tomato;
-            this.apiKeyRichTextBox.BackColor = Color.White;
+            this.apiKeyRichTextBox.BackColor = Color.Tomato;
             this.PasswordTextBox.BackColor = Color.White;
             this.UserNameTextBox.BackColor = Color.White;
         }
