@@ -205,6 +205,7 @@ namespace Gbdx.Vector_Index.Forms
             ArcMap.Events.CloseDocument += this.ResetVectorIndex;
             this.currentApplicationState = this.applicationStateGenerator.Next();
 
+            this.aoiTypeComboBox.SelectedIndex = 0;
             this.ActiveControl = this.treeView1;
             this.comms = new GbdxComms(Jarvis.LogFile, ConsoleLogging);
         }
