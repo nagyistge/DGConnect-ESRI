@@ -328,41 +328,51 @@ namespace Gbdx.Vector_Index.Forms
                 return;
             }
 
+            // Draw Rectangle option
+            if(this.aoiTypeComboBox.SelectedIndex ==0)
+            {
             // Reset this variable to allow the user to differentiate between normal and query search.
             this.usingQuerySource = false;
             this.treeView1.CheckBoxes = true;
 
-            if (ArcMap.Application.CurrentTool.Name != "DigitalGlobe_Inc_sma_VectorIndex")
+                if (ArcMap.Application.CurrentTool.Name != "DigitalGlobe_Inc_sma_VectorIndex")
+                {
+                    // Unsubscribe from any previous events.  Prevents awesome mode
+                    VectorIndexRelay.Instance.PolygonHasBeenSet -= this.InstancePolygonHasBeenSet;
+
+                    // Subscribe to the event
+                    VectorIndexRelay.Instance.PolygonHasBeenSet += this.InstancePolygonHasBeenSet;
+
+                    // Clear any current drawn images
+                    if (this.boundingBoxGraphicElement != null)
+                    {
+                        ArcUtility.DeleteElementFromGraphicContainer(
+                            ArcMap.Document.ActivatedView,
+                            this.boundingBoxGraphicElement);
+                        this.boundingBoxGraphicElement = null;
+                    }
+
+                    // Clear the treeview
+                    this.treeView1.Nodes.Clear();
+                    this.textBoxSearch.Clear();
+
+                    this.currentApplicationState = this.applicationStateGenerator.Next();
+                    var commandBars = ArcMap.Application.Document.CommandBars;
+                    var commandId = new UIDClass { Value = "DigitalGlobe_Inc_sma_VectorIndex" };
+
+                    var commandItem = commandBars.Find(commandId, false, false);
+                    if (commandItem != null)
+                    {
+                        this.originallySelectedItem = ArcMap.Application.CurrentTool;
+                        ArcMap.Application.CurrentTool = commandItem;
+                    }
+                }
+            }
+
+            // Use selected AOI 
+            else if (this.aoiTypeComboBox.SelectedIndex == 1)
             {
-                // Unsubscribe from any previous events.  Prevents awesome mode
-                VectorIndexRelay.Instance.PolygonHasBeenSet -= this.InstancePolygonHasBeenSet;
-
-                // Subscribe to the event
-                VectorIndexRelay.Instance.PolygonHasBeenSet += this.InstancePolygonHasBeenSet;
-
-                // Clear any current drawn images
-                if (this.boundingBoxGraphicElement != null)
-                {
-                    ArcUtility.DeleteElementFromGraphicContainer(
-                        ArcMap.Document.ActivatedView,
-                        this.boundingBoxGraphicElement);
-                    this.boundingBoxGraphicElement = null;
-                }
-
-                // Clear the treeview
-                this.treeView1.Nodes.Clear();
-                this.textBoxSearch.Clear();
-
-                this.currentApplicationState = this.applicationStateGenerator.Next();
-                var commandBars = ArcMap.Application.Document.CommandBars;
-                var commandId = new UIDClass { Value = "DigitalGlobe_Inc_sma_VectorIndex" };
-
-                var commandItem = commandBars.Find(commandId, false, false);
-                if (commandItem != null)
-                {
-                    this.originallySelectedItem = ArcMap.Application.CurrentTool;
-                    ArcMap.Application.CurrentTool = commandItem;
-                }
+                
             }
         }
 
