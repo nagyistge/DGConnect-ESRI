@@ -372,31 +372,51 @@ namespace Gbdx.Vector_Index.Forms
             // Use selected AOI 
             else if (this.aoiTypeComboBox.SelectedIndex == 1)
             {
-                List<string> list = new List<string>();
                 IMap Pmap = ArcMap.Document.FocusMap;
                 IEnumFeature pEnumFeat = (IEnumFeature)Pmap.FeatureSelection;
-                IFields fields;
                 pEnumFeat.Reset();
-                IEnumFeatureSetup enumFeatSetup = (IEnumFeatureSetup)pEnumFeat;
-                enumFeatSetup.AllFields = true;
+
                 try
                 {
                     IFeature pfeat = pEnumFeat.Next();
-
+                    string polygons = string.Empty;
                     while (pfeat != null)
                     {
-                        fields = pfeat.Fields;
-                        int x = fields.FindField("ID_K");
-                        list.Add(pfeat.get_Value(x).ToString());
+                        IPolygon geo = (IPolygon) pfeat.ShapeCopy;
+                        bool addComma = polygons == string.Empty ? false : true;
+                        polygons = CreateGeoJson(geo);
 
                         pfeat = pEnumFeat.Next();
+                        if (pfeat != null)
+                        {
+                            polygons += ", ";
+                        }
                     }
                 }
                 catch (Exception error)
                 {
-                    Console.WriteLine(error.Message);
+                    this.logWriter.Error(error);
                 }
             }
+        }
+
+        private static string CreateGeoJson(IPolygon poly)
+        {
+            string output = string.Empty;
+            IPointCollection pointColl = (IPointCollection) poly;
+            output = "{\"type\":\"Polygon\", \"coordinates\": [ [";
+            for (var i = 0; i <= pointColl.PointCount - 1; i++)
+            {
+                output += string.Format("[{0},{1}]", pointColl.Point[i].X, pointColl.Point[i].Y);
+
+                if (i == pointColl.PointCount - 1)
+                {
+                    output += ", ";
+                }
+            }
+            output += "] ] }";
+
+            return output;
         }
 
         /// <summary>
