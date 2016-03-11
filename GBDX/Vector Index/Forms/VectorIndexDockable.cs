@@ -372,7 +372,30 @@ namespace Gbdx.Vector_Index.Forms
             // Use selected AOI 
             else if (this.aoiTypeComboBox.SelectedIndex == 1)
             {
-                
+                List<string> list = new List<string>();
+                IMap Pmap = ArcMap.Document.FocusMap;
+                IEnumFeature pEnumFeat = (IEnumFeature)Pmap.FeatureSelection;
+                IFields fields;
+                pEnumFeat.Reset();
+                IEnumFeatureSetup enumFeatSetup = (IEnumFeatureSetup)pEnumFeat;
+                enumFeatSetup.AllFields = true;
+                try
+                {
+                    IFeature pfeat = pEnumFeat.Next();
+
+                    while (pfeat != null)
+                    {
+                        fields = pfeat.Fields;
+                        int x = fields.FindField("ID_K");
+                        list.Add(pfeat.get_Value(x).ToString());
+
+                        pfeat = pEnumFeat.Next();
+                    }
+                }
+                catch (Exception error)
+                {
+                    Console.WriteLine(error.Message);
+                }
             }
         }
 
