@@ -216,4 +216,10 @@ Only letters and the '.' are allowed.</value>
     <value>MLTC stands for \"More Like This[ese] Cell[s].\"\nThis tool shows a similarity heatmap based on a selection. Similar in nature to a \" More Like This \" function. If many cells are selected then there will either be an output layer for each selected cell, or the average will be calculated.\n"+
       "If an average is selected, then a graph of similarities between each feature will be printed out.\nMake a selection\nchoose the layer with the selection\nclick generate button</value>
   </data>
+  <data name="dataUploadWarning" xml:space="preserve">
+    <value>Please be aware that all uploaded data is available to the public.\nPrivate data should NOT be uploaded.</value>
+  </data>
+  <data name="warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
 </root>

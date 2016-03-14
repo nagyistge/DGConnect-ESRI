@@ -61,6 +61,15 @@ namespace GbdxSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please be aware that all uploaded data is available to the public.\nPrivate data should NOT be uploaded..
+        /// </summary>
+        public static string dataUploadWarning {
+            get {
+                return ResourceManager.GetString("dataUploadWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
         public static string Delete {
@@ -342,6 +351,15 @@ namespace GbdxSettings {
         public static string VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_ {
             get {
                 return ResourceManager.GetString("VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning.
+        /// </summary>
+        public static string warning {
+            get {
+                return ResourceManager.GetString("warning", resourceCulture);
             }
         }
         
