@@ -364,6 +364,15 @@ namespace GbdxSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Go to https://gbdx.geobigdata.io/account/login/ - Login &gt; User Settings &gt; API Key.
+        /// </summary>
+        public static string whereToGetApiKey {
+            get {
+                return ResourceManager.GetString("whereToGetApiKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Spatial Projection needs to be WGS 1984..
         /// </summary>
         public static string wrongSpatialReference {

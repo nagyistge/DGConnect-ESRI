@@ -222,4 +222,7 @@ Only letters and the '.' are allowed.</value>
   <data name="warning" xml:space="preserve">
     <value>Warning</value>
   </data>
+  <data name="whereToGetApiKey" xml:space="preserve">
+    <value>Go to https://gbdx.geobigdata.io/account/login/ - Login &gt; User Settings &gt; API Key</value>
+  </data>
 </root>
