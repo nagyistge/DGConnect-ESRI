@@ -34,5 +34,10 @@ namespace Gbdx.Utilities_and_Configuration.Forms
         {
             this.Close();
         }
+
+        private void itemNameTextBox_TextChanged(object sender, EventArgs e)
+        {
+            this.countLabel.Text = this.itemNameTextBox.Text.Length + "/30";
+        }
     }
 }

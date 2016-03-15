@@ -107,7 +107,7 @@ namespace Gbdx
             this.comms = new GbdxComms();
         }
 
-        void ApiKeyRichTextBoxTextChanged(object sender, EventArgs e)
+        private void ApiKeyRichTextBoxTextChanged(object sender, EventArgs e)
         {
             this.apiKeyRichTextBox.Text = this.apiKeyRichTextBox.Text.Replace(GbdxResources.whereToGetApiKey,"");
             this.apiKeyRichTextBox.ForeColor = Color.Black;
@@ -121,21 +121,12 @@ namespace Gbdx
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        void ApiKeyRichTextBoxLinkClicked(object sender, LinkClickedEventArgs e)
+        private void ApiKeyRichTextBoxLinkClicked(object sender, LinkClickedEventArgs e)
         {
             System.Diagnostics.Process.Start(e.LinkText);
         }
 
-        void ApiKeyRichTextBoxGotFocus(object sender, EventArgs e)
-        {
-            //if (this.apiKeyRichTextBox.Text.Equals(GbdxResources.whereToGetApiKey))
-            //{
-            //    this.apiKeyRichTextBox.Clear();
-            //    this.apiKeyRichTextBox.ForeColor = Color.Black;
-            //}
-        }
-
-        void ApiKeyRichTextBoxLostFocus(object sender, EventArgs e)
+        private void ApiKeyRichTextBoxLostFocus(object sender, EventArgs e)
         {
             if (string.IsNullOrEmpty(this.apiKeyRichTextBox.Text))
             {
