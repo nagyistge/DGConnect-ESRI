@@ -61,6 +61,16 @@ namespace GbdxSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please be aware that all uploaded data is available to the public.  
+        ///Private data should NOT be uploaded..
+        /// </summary>
+        public static string dataUploadWarning {
+            get {
+                return ResourceManager.GetString("dataUploadWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
         public static string Delete {
@@ -292,7 +302,8 @@ namespace GbdxSettings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Operation cancelled.  \nThe file size is greater than 100 MB..
+        ///   Looks up a localized string similar to Operation cancelled.  
+        ///The file size is greater than 100 MB..
         /// </summary>
         public static string sizeToBig100 {
             get {
@@ -342,6 +353,24 @@ namespace GbdxSettings {
         public static string VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_ {
             get {
                 return ResourceManager.GetString("VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning.
+        /// </summary>
+        public static string warning {
+            get {
+                return ResourceManager.GetString("warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go to https://gbdx.geobigdata.io/account/login/ - Login &gt; User Settings &gt; API Key.
+        /// </summary>
+        public static string whereToGetApiKey {
+            get {
+                return ResourceManager.GetString("whereToGetApiKey", resourceCulture);
             }
         }
         

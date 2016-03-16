@@ -42,6 +42,17 @@ namespace Gbdx
 
         protected override void OnClick()
         {
+            var result =
+                MessageBox.Show(
+                    GbdxResources.dataUploadWarning,
+                    GbdxResources.warning,
+                    MessageBoxButtons.OKCancel);
+
+            if (result != DialogResult.OK)
+            {
+                return;
+            }
+
             FileInfo zipInfo = null;
             try
             {
