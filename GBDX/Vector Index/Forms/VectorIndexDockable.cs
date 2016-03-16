@@ -409,7 +409,7 @@ namespace Gbdx.Vector_Index.Forms
             {
                 output += string.Format("[{0},{1}]", pointColl.Point[i].X, pointColl.Point[i].Y);
 
-                if (i == pointColl.PointCount - 1)
+                if (i != pointColl.PointCount - 1)
                 {
                     output += ", ";
                 }
