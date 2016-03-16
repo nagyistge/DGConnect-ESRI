@@ -92,11 +92,7 @@
             this.textBoxSearch.ForeColor = System.Drawing.Color.DarkGray;
             this.textBoxSearch.Location = new System.Drawing.Point(3, 3);
             this.textBoxSearch.Name = "textBoxSearch";
-<<<<<<< HEAD
             this.textBoxSearch.Size = new System.Drawing.Size(294, 22);
-=======
-            this.textBoxSearch.Size = new System.Drawing.Size(277, 26);
->>>>>>> vector-upload
             this.textBoxSearch.TabIndex = 3;
             this.textBoxSearch.Text = "Enter search terms and select area";
             // 
@@ -118,7 +114,7 @@
             this.aoiTypeComboBox.Items.AddRange(new object[] {
             "Draw Rectangle",
             "Use Selected Polygon(s)"});
-            this.aoiTypeComboBox.Location = new System.Drawing.Point(155, 536);
+            this.aoiTypeComboBox.Location = new System.Drawing.Point(155, 535);
             this.aoiTypeComboBox.Name = "aoiTypeComboBox";
             this.aoiTypeComboBox.Size = new System.Drawing.Size(142, 24);
             this.aoiTypeComboBox.TabIndex = 4;
