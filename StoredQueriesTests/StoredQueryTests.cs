@@ -22,7 +22,6 @@ namespace StoredQueries.Tests
                 CookieJar = new CookieContainer(),
                 AuthEndpoint = "https://jboss-dev.geoeyeanalytics.ec2:8443/monocle-3/j_spring_cas_security_check",
                 TicketEndpoint = "https://insightcloud.digitalglobe.com/cas/v1/tickets",
-                TimeoutSetting = 8000,
                 User = "sys.service",
                 Password = "sys.service",
             };

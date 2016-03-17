@@ -606,7 +606,6 @@ namespace Gbdx.Vector_Index.Forms
                                                         Uri.EscapeDataString(work.SourceNode.Source.Name));
                 
             }
-            work.NetworkObject.TimeoutSetting = 60000;
 
             if (node.Source != null)
             {
@@ -1011,8 +1010,6 @@ namespace Gbdx.Vector_Index.Forms
             var gbdxComms = (IGbdxComms)parms[1];
             work.NetworkObject.Result = string.Empty;
 
-            // set the timeout to 8 seconds.
-            work.NetworkObject.TimeoutSetting = 60000;
             var netobj = work.NetworkObject;
 
             if (netobj.UsingPolygonAoi)
@@ -1100,9 +1097,6 @@ namespace Gbdx.Vector_Index.Forms
                 {
                     // modifed to work with rest sharp
                     work.NetworkObject.AddressUrl = VectorIndexHelper.CreateStagedDataRequestUrl(string.Empty);
-
-                    // Timeout set to 1 minute.
-                    work.NetworkObject.TimeoutSetting = 60000;
 
                     // Make a locally copy of the network object.
                     var networkObj = work.NetworkObject;
@@ -1838,7 +1832,6 @@ namespace Gbdx.Vector_Index.Forms
                 // Modified to work with Restsharp
                 work.NetworkObject.BaseUrl = work.BaseUrl;
                 work.NetworkObject.AddressUrl = "/insight-vector/api/shape/sources";
-                work.NetworkObject.TimeoutSetting = 60000;
             }
             else
             {
@@ -1848,7 +1841,6 @@ namespace Gbdx.Vector_Index.Forms
                 work.NetworkObject.BaseUrl = work.BaseUrl;
 
                 work.NetworkObject.AddressUrl = "/insight-vector/api/shape/sources";
-                work.NetworkObject.TimeoutSetting = 60000;
             }
 
             this.treeView1.CheckBoxes = false;
@@ -1936,7 +1928,6 @@ namespace Gbdx.Vector_Index.Forms
                 // Modified to work with Restsharp
                 work.NetworkObject.BaseUrl = work.BaseUrl;
                 work.NetworkObject.AddressUrl = VectorIndexHelper.CreateUrl(work.BoundBox, string.Empty);
-                work.NetworkObject.TimeoutSetting = 60000;
             }
             else
             {
@@ -1946,7 +1937,6 @@ namespace Gbdx.Vector_Index.Forms
                 work.NetworkObject.BaseUrl = work.BaseUrl;
                 work.NetworkObject.AddressUrl =
                     VectorIndexHelper.CreateQueryUrl(work.BoundBox, string.Empty, this.textBoxSearch.Text);
-                work.NetworkObject.TimeoutSetting = 60000;
             }
 
             this.treeView1.CheckBoxes = false;

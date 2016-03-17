@@ -108,11 +108,6 @@ namespace NetworkConnections
         public Exception Error { get; set; }
 
         /// <summary>
-        /// Gets or sets the timeout setting.
-        /// </summary>
-        public int TimeoutSetting { get; set; }
-
-        /// <summary>
         /// Gets or sets the page id.
         /// </summary>
         public string PageId { get; set; }
