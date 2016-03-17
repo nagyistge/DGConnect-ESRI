@@ -77,52 +77,6 @@ namespace GbdxSettings.Properties {
             }
         }
         
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string sma_time {
-            get {
-                return ((string)(this["sma_time"]));
-            }
-            set {
-                this["sma_time"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.DateTime sma_date_from {
-            get {
-                return ((global::System.DateTime)(this["sma_date_from"]));
-            }
-            set {
-                this["sma_date_from"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.DateTime sma_date_to {
-            get {
-                return ((global::System.DateTime)(this["sma_date_to"]));
-            }
-            set {
-                this["sma_date_to"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string sma_query_limit {
-            get {
-                return ((string)(this["sma_query_limit"]));
-            }
-            set {
-                this["sma_query_limit"] = value;
-            }
-        }
-        
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("https://vector.geobigdata.io")]

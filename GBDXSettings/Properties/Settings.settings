@@ -17,18 +17,6 @@
     <Setting Name="StagingUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">/insight-vector</Value>
     </Setting>
-    <Setting Name="sma_time" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="sma_date_from" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="sma_date_to" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
-    <Setting Name="sma_query_limit" Type="System.String" Scope="User">
-      <Value Profile="(Default)" />
-    </Setting>
     <Setting Name="DefaultBaseUrl" Type="System.String" Scope="Application">
       <Value Profile="(Default)">https://vector.geobigdata.io</Value>
     </Setting>
