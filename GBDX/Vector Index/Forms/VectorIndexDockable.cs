@@ -108,12 +108,7 @@ namespace Gbdx.Vector_Index.Forms
         /// Originally selected esri item.  Once the Vector index tool has drawn it's bounding box this tool will be re-selected.
         /// </summary>
         private ICommandItem originallySelectedItem;
-
-        /// <summary>
-        /// Cookie Container that will contain the authorized cookie
-        /// </summary>
-        private CookieContainer cookieContainer;
-
+        
         /// <summary>
         /// Main network object that will be copied to threads as needed.
         /// </summary>
@@ -470,13 +465,6 @@ namespace Gbdx.Vector_Index.Forms
                                  User = gbdxUsername
                              };
 
-            if (this.cookieContainer == null)
-            {
-                this.cookieContainer = new CookieContainer();
-            }
-            
-            netObj.CookieJar = this.cookieContainer;
-
             netObj.AuthUrl = Settings.Default.AuthBase;
             netObj.ApiKey = Settings.Default.apiKey;
 
@@ -718,9 +706,7 @@ namespace Gbdx.Vector_Index.Forms
             //var netO = new NetObject
             //               {
             //                   AuthEndpoint = this.networkObject.AuthEndpoint,
-            //                   CookieJar = this.networkObject.CookieJar,
             //                   Password = this.networkObject.Password,
-            //                   TicketEndpoint = this.networkObject.TicketEndpoint,
             //                   Timeouts = 0,
             //                   User = this.networkObject.User
             //               };

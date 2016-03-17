@@ -66,12 +66,7 @@ namespace NetworkConnections
         /// Gets or sets the address url.
         /// </summary>
         public string AddressUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the cookie jar.
-        /// </summary>
-        public CookieContainer CookieJar { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the user.
         /// </summary>
@@ -81,12 +76,7 @@ namespace NetworkConnections
         /// Gets or sets the password.
         /// </summary>
         public string Password { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ticket endpoint.
-        /// </summary>
-        public string TicketEndpoint { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the auth endpoint.
         /// </summary>
@@ -96,12 +86,7 @@ namespace NetworkConnections
         /// Gets or sets the result.
         /// </summary>
         public string Result { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timeouts.
-        /// </summary>
-        public int Timeouts { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the error.
         /// </summary>

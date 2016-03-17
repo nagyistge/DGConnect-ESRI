@@ -56,12 +56,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessToken.cs" />
-    <Compile Include="CasAuthenticator.cs" />
-    <Compile Include="ICas.cs" />
     <Compile Include="IGbdxComms.cs" />
     <Compile Include="GbdxComms.cs" />
     <Compile Include="NetObject.cs" />
-    <Compile Include="NetworkResponse.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
