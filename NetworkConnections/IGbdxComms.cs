@@ -70,6 +70,8 @@ namespace NetworkConnections
         /// </returns>
         NetObject PushRequest(NetObject netObject, string bodyPostData);
 
+        NetObject PushRequest(NetObject netObject);
+
         /// <summary>
         /// The delete request.
         /// </summary>

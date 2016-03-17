@@ -36,6 +36,16 @@ namespace NetworkConnections
         {
             this.ErrorOccurred = false;
         }
+
+        /// <summary>
+        /// The geojson representation of the polygon being sent to vector services.
+        /// </summary>
+        public string PolygonAoi { get; set; }
+
+        /// <summary>
+        /// Flag used to determine if a polygon Aoi is being used.
+        /// </summary>
+        public bool UsingPolygonAoi { get; set; }
         
         /// <summary>
         /// Gets or sets the authorization token. 
@@ -86,11 +96,6 @@ namespace NetworkConnections
         /// Gets or sets the result.
         /// </summary>
         public string Result { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether use DEV authentication.
-        /// </summary>
-        public bool UseDevAuthentication { get; set; }
 
         /// <summary>
         /// Gets or sets the timeouts.

@@ -420,5 +420,11 @@ namespace NetworkConnections
             logger.Error(response.Content);
             return obj;
         }
+
+
+        public NetObject PushRequest(NetObject netObject)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

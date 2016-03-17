@@ -27,6 +27,7 @@ namespace NetworkConnections
     using System.IO;
     using System.Linq;
     using System.Net;
+    using System.Net.Security;
     using System.Text;
     using System.Web.SessionState;
 
@@ -189,6 +190,55 @@ namespace NetworkConnections
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 var postData = Encoding.ASCII.GetBytes(bodyPostData);
                 request.AddParameter("application/octet-stream", postData, ParameterType.RequestBody);
+
+                var response = this.client.Execute(request);
+                netObject.Result = response.Content;
+                netObject = this.CheckForErrors(response, netObject);
+            }
+            catch (Exception error)
+            {
+                logger.Error(error);
+                netObject.ErrorOccurred = true;
+            }
+
+            return netObject;
+        }
+
+        /// <summary>
+        /// Request that uses the Push method.
+        /// </summary>
+        /// <param name="netObject">
+        /// The net object.
+        /// </param>
+        /// <param name="bodyPostData">
+        /// The body post data.
+        /// </param>
+        /// <returns>
+        /// The <see cref="NetObject"/>.
+        /// </returns>
+        public NetObject PushRequest(NetObject netObject)
+        {
+            try
+            {
+                // DEV ONLY localhost crap
+                ServicePointManager.ServerCertificateValidationCallback =
+                new RemoteCertificateValidationCallback(delegate { return true; });
+
+                if (
+                    !this.CheckSettings(
+                        ref this.client,
+                        ref netObject,
+                        ref this.localUsername,
+                        ref this.localPassword,
+                        ref this.authenticationEndpoint))
+                {
+                    return netObject;
+                }
+
+                var request = new RestRequest(netObject.AddressUrl, Method.POST);
+                request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
+                request.AddHeader("Content-Type", "application/json");
+                request.AddParameter("application/json", netObject.PolygonAoi, ParameterType.RequestBody);
 
                 var response = this.client.Execute(request);
                 netObject.Result = response.Content;

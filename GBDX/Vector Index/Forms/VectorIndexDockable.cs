@@ -379,18 +379,10 @@ namespace Gbdx.Vector_Index.Forms
                 try
                 {
                     IFeature pfeat = pEnumFeat.Next();
-                    string polygons = string.Empty;
-                    while (pfeat != null)
+                    if (pfeat != null)
                     {
-                        IPolygon geo = (IPolygon) pfeat.ShapeCopy;
-                        bool addComma = polygons == string.Empty ? false : true;
-                        polygons = CreateGeoJson(geo);
-
-                        pfeat = pEnumFeat.Next();
-                        if (pfeat != null)
-                        {
-                            polygons += ", ";
-                        }
+                        IPolygon geo = (IPolygon)pfeat.ShapeCopy;
+                        this.PolygonAoi(geo);
                     }
                 }
                 catch (Exception error)
@@ -591,19 +583,29 @@ namespace Gbdx.Vector_Index.Forms
             // differntiate between using the query source and the regular sources
             // modified to work with RestSharp
             work.NetworkObject.BaseUrl = work.BaseUrl;
-            work.NetworkObject.AddressUrl = this.usingQuerySource
-                                                ?
-                                                      VectorIndexHelper.CreateQueryUrl(
-                                                          work.BoundBox,
-                                                          string.Empty,
-                                                          this.textBoxSearch.Text,
-                                                          work.SourceNode.Source.Name)
-                                                :
-                                                      VectorIndexHelper.CreateUrl(
-                                                          work.BoundBox,
-                                                          string.Empty,
-                                                          Uri.EscapeDataString(work.SourceNode.Source.Name));
 
+            if (this.aoiTypeComboBox.SelectedIndex == 1)
+            {
+                work.NetworkObject.AddressUrl = string.Format(
+                    "/insight-vector/api/shape/{0}/geometries",
+                    work.SourceNode.Source.Name);
+            }
+            else
+            {
+                work.NetworkObject.AddressUrl = this.usingQuerySource
+                                                    ?
+                                                    VectorIndexHelper.CreateQueryUrl(
+                                                        work.BoundBox,
+                                                        string.Empty,
+                                                        this.textBoxSearch.Text,
+                                                        work.SourceNode.Source.Name)
+                                                    :
+                                                    VectorIndexHelper.CreateUrl(
+                                                        work.BoundBox,
+                                                        string.Empty,
+                                                        Uri.EscapeDataString(work.SourceNode.Source.Name));
+                
+            }
             work.NetworkObject.TimeoutSetting = 60000;
 
             if (node.Source != null)
@@ -682,13 +684,26 @@ namespace Gbdx.Vector_Index.Forms
             // Create the url for the vector types.
             // Modified to work with RestSharp.
             work.NetworkObject.BaseUrl = work.BaseUrl;
-            work.NetworkObject.AddressUrl =
-                    VectorIndexHelper.CreateUrl(
-                        work.BoundBox,
-                        string.Empty,
-                        Uri.EscapeDataString(work.SourceNode.Source.Name),
-                        Uri.EscapeDataString(work.GeometryNode.GeometryType.Name));
+
+            if (this.aoiTypeComboBox.SelectedIndex == 1)
+            {
+                work.NetworkObject.AddressUrl = string.Format(
+                    "/insight-vector/api/shape/{0}/{1}/types",
+                    work.SourceNode.Source.Name,
+                    work.GeometryNode.GeometryType.Name);
+            }
+            else
+
+            {
+                work.NetworkObject.AddressUrl = VectorIndexHelper.CreateUrl(
+                    work.BoundBox,
+                    string.Empty,
+                    Uri.EscapeDataString(work.SourceNode.Source.Name),
+                    Uri.EscapeDataString(work.GeometryNode.GeometryType.Name));
+
+            }
             var parms = new object[] { work, this.comms };
+            
             ThreadPool.QueueUserWorkItem(this.GetVectorTypes, parms);
         }
 
@@ -701,23 +716,22 @@ namespace Gbdx.Vector_Index.Forms
         private void ProcessTypeNodeClick(TreeNode typeNode)
         {
             typeNode.Text = typeNode.Text.Replace(GbdxSettings.GbdxResources.Source_ErrorMessage, string.Empty);
-            var netO = new NetObject
-                           {
-                               AuthEndpoint = this.networkObject.AuthEndpoint,
-                               CookieJar = this.networkObject.CookieJar,
-                               Password = this.networkObject.Password,
-                               TicketEndpoint = this.networkObject.TicketEndpoint,
-                               Timeouts = 0,
-                               UseDevAuthentication = this.networkObject.UseDevAuthentication,
-                               User = this.networkObject.User
-                           };
+            //var netO = new NetObject
+            //               {
+            //                   AuthEndpoint = this.networkObject.AuthEndpoint,
+            //                   CookieJar = this.networkObject.CookieJar,
+            //                   Password = this.networkObject.Password,
+            //                   TicketEndpoint = this.networkObject.TicketEndpoint,
+            //                   Timeouts = 0,
+            //                   User = this.networkObject.User
+            //               };
             var work = new WorkerObject
                            {
                                BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
                                BoundBox = this.bBox,
                                SourceNode = (VectorIndexSourceNode)typeNode.Parent.Parent,
                                GeometryNode = (VectorIndexGeometryNode)typeNode.Parent,
-                               NetworkObject = netO,
+                               NetworkObject = this.networkObject,
                                TypeNode = (VectorIndexTypeNode)typeNode,
                                QuerySource = false,
                                ApplicationState = this.currentApplicationState,
@@ -725,15 +739,25 @@ namespace Gbdx.Vector_Index.Forms
                            };
 
             // modified to work with restsharp
-            var url = VectorIndexHelper.CreateStagingIdUrl(
-                work.BoundBox,
-                string.Empty,
-                Uri.EscapeDataString(work.SourceNode.Source.Name),
-                Uri.EscapeDataString(work.GeometryNode.GeometryType.Name),
-                Uri.EscapeDataString(work.TypeNode.Type.Name),
-                1,
-                100);
-
+            string url;
+            if (this.aoiTypeComboBox.SelectedIndex == 1)
+            {
+                url = string.Format("/insight-vector/api/shape/{0}/{1}/{2}/paging",Uri.EscapeDataString(work.SourceNode.Source.Name),
+                    Uri.EscapeDataString(work.GeometryNode.GeometryType.Name),
+                    Uri.EscapeDataString(work.TypeNode.Type.Name));
+            }
+            else
+            {
+                url = VectorIndexHelper.CreateStagingIdUrl(
+                    work.BoundBox,
+                    string.Empty,
+                    Uri.EscapeDataString(work.SourceNode.Source.Name),
+                    Uri.EscapeDataString(work.GeometryNode.GeometryType.Name),
+                    Uri.EscapeDataString(work.TypeNode.Type.Name),
+                    1,
+                    100);
+                
+            }
             // Create url to get the Paging ID.
             work.OriginalPagingIdUrl = url;
             var para = new object[2];
@@ -884,7 +908,14 @@ namespace Gbdx.Vector_Index.Forms
 
             var netObj = work.NetworkObject;
 
-            netObj = gbdxComms.Request(netObj);
+            if (netObj.UsingPolygonAoi)
+            {
+                netObj = gbdxComms.PushRequest(netObj);
+            }
+            else
+            {
+                netObj = gbdxComms.Request(netObj);
+            }
 
             work.NetworkObject = netObj;
             work.ResponseObject = VectorIndexHelper.GetSourceType(netObj.Result);
@@ -926,9 +957,19 @@ namespace Gbdx.Vector_Index.Forms
             work.NetworkObject.Result = string.Empty;
             var netobj = work.NetworkObject;
 
-            netobj = gbdxCloudComms.Request(netobj);
+            if (netobj.UsingPolygonAoi)
+            {
+                netobj = gbdxCloudComms.PushRequest(netobj);
+            }
+            else
+            {
+                netobj = gbdxCloudComms.Request(netobj);
+            }
 
             work.NetworkObject = netobj;
+
+            
+
             work.ResponseObject = VectorIndexHelper.GetSourceType(netobj.Result);
             if (work.ResponseObject == null)
             {
@@ -974,7 +1015,15 @@ namespace Gbdx.Vector_Index.Forms
             work.NetworkObject.TimeoutSetting = 60000;
             var netobj = work.NetworkObject;
 
-            netobj = gbdxComms.Request(netobj);
+            if (netobj.UsingPolygonAoi)
+            {
+                netobj = gbdxComms.PushRequest(netobj);
+            }
+            else
+            {
+                netobj = gbdxComms.Request(netobj);
+            }
+
             work.ResponseObject = VectorIndexHelper.GetSourceType(netobj.Result);
             if (work.ResponseObject == null)
             {
@@ -1021,8 +1070,14 @@ namespace Gbdx.Vector_Index.Forms
             // Set the result and page id back empty string. only needed when this function gets called again.  
             netobj.Result = string.Empty;
             netobj.PageId = string.Empty;
-            
-            netobj = gbdxComms.Request(netobj);
+            if (netobj.UsingPolygonAoi)
+            {
+                netobj = gbdxComms.PushRequest(netobj);
+            }
+            else
+            {
+                netobj = gbdxComms.Request(netobj);
+            }
 
             if (netobj == null || netobj.ErrorOccurred)
             {
@@ -1741,6 +1796,72 @@ namespace Gbdx.Vector_Index.Forms
 
         #endregion
 
+        private void PolygonAoi(IPolygon aoi)
+        {
+            if (this.networkObject == null)
+            {
+                this.networkObject = this.SetupNetObject(
+                    Settings.Default.username,
+                    Settings.Default.password);
+            }
+
+            this.networkObject.AuthEndpoint = GbdxHelper.GetAuthenticationEndpoint(Settings.Default);
+            this.networkObject.AddressUrl = null;
+            this.networkObject.Error = null;
+            this.networkObject.ErrorOccurred = false;
+            this.networkObject.PageId = string.Empty;
+            this.networkObject.ApiKey = Settings.Default.apiKey;
+            this.networkObject.AuthUrl = Settings.Default.AuthBase;
+            this.networkObject.UsingPolygonAoi = true;
+            this.networkObject.PolygonAoi = CreateGeoJson(aoi);
+
+            // There was a problem in creating the network object so dont proceed.
+            if (this.networkObject == null)
+            {
+                return;
+            }
+
+            // Setup worker object 
+            var work = new WorkerObject
+            {
+                BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
+                Logger = this.logWriter
+            };
+
+            var newNetObj = this.networkObject;
+            work.NetworkObject = newNetObj;
+
+            if (this.textBoxSearch.Text.Equals(GbdxSettings.GbdxResources.EnterSearchTerms) || this.textBoxSearch.Text == string.Empty)
+            {
+                this.usingQuerySource = false;
+
+                // Modified to work with Restsharp
+                work.NetworkObject.BaseUrl = work.BaseUrl;
+                work.NetworkObject.AddressUrl = "/insight-vector/api/shape/sources";
+                work.NetworkObject.TimeoutSetting = 60000;
+            }
+            else
+            {
+                this.usingQuerySource = true;
+
+                // Modifed to work with restsharp
+                work.NetworkObject.BaseUrl = work.BaseUrl;
+
+                work.NetworkObject.AddressUrl = "/insight-vector/api/shape/sources";
+                work.NetworkObject.TimeoutSetting = 60000;
+            }
+
+            this.treeView1.CheckBoxes = false;
+            var searchingNode = new VectorIndexSourceNode { Text = GbdxSettings.GbdxResources.SearchingText };
+            this.treeView1.Nodes.Add(searchingNode);
+
+            work.ApplicationState = this.currentApplicationState;
+
+            // Offload network communications for getting initial source list to the threadpool for processing.
+            ThreadPool.QueueUserWorkItem(
+                this.LoadSources,
+                new object[] { work, this.comms });
+        }
         /// <summary>
         /// Once the envelope of the bounding box has been established start the UVI tree population process.
         /// </summary>
