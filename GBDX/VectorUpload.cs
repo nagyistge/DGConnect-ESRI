@@ -140,7 +140,7 @@ namespace Gbdx
                         NetObject netobj = new NetObject()
                                                {
                                                    BaseUrl = Settings.Default.baseUrl,
-                                                   AddressUrl = "/insight-vector/api/vector/vector-upload",
+                                                   AddressUrl = "/insight-vector/api/upload/shapefile",
                                                    AuthUrl =
                                                        string.IsNullOrEmpty(Settings.Default.AuthBase)
                                                            ? Settings.Default.DefaultAuthBase
