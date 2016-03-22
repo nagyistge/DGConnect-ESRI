@@ -1573,6 +1573,7 @@ namespace Gbdx.Vector_Index.Forms
                                       Text = GbdxSettings.GbdxResources.Source_ErrorMessage,
                                       ResponseObject = work.ResponseObject
                                   };
+                this.treeView1.Nodes.Clear();
                 this.treeView1.Nodes.Add(newItem);
                 this.treeView1.CheckBoxes = false;
 
@@ -1826,10 +1827,11 @@ namespace Gbdx.Vector_Index.Forms
                 // Modifed to work with restsharp
                 work.NetworkObject.BaseUrl = work.BaseUrl;
 
-                work.NetworkObject.AddressUrl = "/insight-vector/api/shape/sources";
+                work.NetworkObject.AddressUrl = "/insight-vector/api/shape/query/geometries?q=" + this.textBoxSearch.Text;
             }
 
             this.treeView1.CheckBoxes = false;
+            this.treeView1.Nodes.Clear();
             var searchingNode = new VectorIndexSourceNode { Text = GbdxSettings.GbdxResources.SearchingText };
             this.treeView1.Nodes.Add(searchingNode);
 
