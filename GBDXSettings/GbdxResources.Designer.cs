@@ -61,6 +61,16 @@ namespace GbdxSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please be aware that all uploaded data is available to the public.  
+        ///Private data should NOT be uploaded..
+        /// </summary>
+        public static string dataUploadWarning {
+            get {
+                return ResourceManager.GetString("dataUploadWarning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Delete.
         /// </summary>
         public static string Delete {
@@ -144,7 +154,7 @@ namespace GbdxSettings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to URL is incorrect..
+        ///   Looks up a localized string similar to Url or api key is incorrect..
         /// </summary>
         public static string InvalidUrl {
             get {
@@ -168,6 +178,16 @@ namespace GbdxSettings {
         public static string InvalidUserPass {
             get {
                 return ResourceManager.GetString("InvalidUserPass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MLTC stands for \&quot;More Like This[ese] Cell[s].\&quot;\nThis tool shows a similarity heatmap based on a selection. Similar in nature to a \&quot; More Like This \&quot; function. If many cells are selected then there will either be an output layer for each selected cell, or the average will be calculated.\n&quot;+
+        ///      &quot;If an average is selected, then a graph of similarities between each feature will be printed out.\nMake a selection\nchoose the layer with the selection\nclick generate button.
+        /// </summary>
+        public static string mltcAbout {
+            get {
+                return ResourceManager.GetString("mltcAbout", resourceCulture);
             }
         }
         
@@ -282,6 +302,16 @@ namespace GbdxSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Operation cancelled.  
+        ///The file size is greater than 100 MB..
+        /// </summary>
+        public static string sizeToBig100 {
+            get {
+                return ResourceManager.GetString("sizeToBig100", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred. Please try again..
         /// </summary>
         public static string Source_ErrorMessage {
@@ -323,6 +353,24 @@ namespace GbdxSettings {
         public static string VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_ {
             get {
                 return ResourceManager.GetString("VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Warning.
+        /// </summary>
+        public static string warning {
+            get {
+                return ResourceManager.GetString("warning", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go to https://gbdx.geobigdata.io/account/login/ - Login &gt; User Settings &gt; API Key.
+        /// </summary>
+        public static string whereToGetApiKey {
+            get {
+                return ResourceManager.GetString("whereToGetApiKey", resourceCulture);
             }
         }
         

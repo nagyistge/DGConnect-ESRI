@@ -88,7 +88,7 @@
             this.textBoxSearch.ForeColor = System.Drawing.Color.DarkGray;
             this.textBoxSearch.Location = new System.Drawing.Point(3, 3);
             this.textBoxSearch.Name = "textBoxSearch";
-            this.textBoxSearch.Size = new System.Drawing.Size(277, 22);
+            this.textBoxSearch.Size = new System.Drawing.Size(277, 26);
             this.textBoxSearch.TabIndex = 3;
             this.textBoxSearch.Text = "Enter search terms and select area";
             // 

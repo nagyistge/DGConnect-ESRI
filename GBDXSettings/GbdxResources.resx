@@ -146,7 +146,7 @@
     <value>Invalid date/time choosen.  Please choose again.</value>
   </data>
   <data name="InvalidUrl" xml:space="preserve">
-    <value>URL is incorrect.</value>
+    <value>Url or api key is incorrect.</value>
   </data>
   <data name="InvalidUsername" xml:space="preserve">
     <value>Not a valid username.
@@ -208,5 +208,23 @@ Only letters and the '.' are allowed.</value>
   </data>
   <data name="wrongSpatialReference" xml:space="preserve">
     <value>Spatial Projection needs to be WGS 1984.</value>
+  </data>
+  <data name="sizeToBig100" xml:space="preserve">
+    <value>Operation cancelled.  
+The file size is greater than 100 MB.</value>
+  </data>
+  <data name="mltcAbout" xml:space="preserve">
+    <value>MLTC stands for \"More Like This[ese] Cell[s].\"\nThis tool shows a similarity heatmap based on a selection. Similar in nature to a \" More Like This \" function. If many cells are selected then there will either be an output layer for each selected cell, or the average will be calculated.\n"+
+      "If an average is selected, then a graph of similarities between each feature will be printed out.\nMake a selection\nchoose the layer with the selection\nclick generate button</value>
+  </data>
+  <data name="dataUploadWarning" xml:space="preserve">
+    <value>Please be aware that all uploaded data is available to the public.  
+Private data should NOT be uploaded.</value>
+  </data>
+  <data name="warning" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="whereToGetApiKey" xml:space="preserve">
+    <value>Go to https://gbdx.geobigdata.io/account/login/ - Login &gt; User Settings &gt; API Key</value>
   </data>
 </root>

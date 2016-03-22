@@ -28,6 +28,9 @@ namespace Gbdx
 
     using Encryption;
 
+    using GbdxSettings;
+    using GbdxSettings.Properties;
+
     using NetworkConnections;
 
     /// <summary>
@@ -38,7 +41,7 @@ namespace Gbdx
         /// <summary>
         /// value indicating that the class was instantiated as part of a unit test
         /// </summary>
-        private bool isUnitTest = false;
+        private bool isUnitTest;
 
         /// <summary>
         /// Class that implements the IGbdxComms interface.
@@ -52,42 +55,87 @@ namespace Gbdx
         {
             this.InitializeComponent();
 
+            // Events for when the text box gets and loses focus
+            this.apiKeyRichTextBox.LostFocus += this.ApiKeyRichTextBoxLostFocus;
+            this.apiKeyRichTextBox.TextChanged += this.ApiKeyRichTextBoxTextChanged;
+            this.apiKeyRichTextBox.LinkClicked += this.ApiKeyRichTextBoxLinkClicked;
+
             // If the setting is not set default to my documents otherwise load the setting
-            if (string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.geoDatabase))
+            if (string.IsNullOrEmpty(Settings.Default.geoDatabase))
             {
-                GbdxSettings.Properties.Settings.Default.geoDatabase = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                Settings.Default.geoDatabase = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
                 this.fileGdbDirectoryTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
             }
             else
             {
-                this.fileGdbDirectoryTextBox.Text = GbdxSettings.Properties.Settings.Default.geoDatabase;
+                this.fileGdbDirectoryTextBox.Text = Settings.Default.geoDatabase;
             }
 
 
-            if (string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.AuthBase))
+            if (string.IsNullOrEmpty(Settings.Default.AuthBase))
             {
-                this.authTextBox.Text = GbdxSettings.Properties.Settings.Default.DefaultAuthBase;
+                this.authTextBox.Text = Settings.Default.DefaultAuthBase;
             }
             else
             {
-                this.authTextBox.Text = GbdxSettings.Properties.Settings.Default.AuthBase;
+                this.authTextBox.Text = Settings.Default.AuthBase;
             }
 
-            this.apiKeyRichTextBox.Text = GbdxSettings.Properties.Settings.Default.apiKey;
+            if (string.IsNullOrEmpty(Settings.Default.apiKey))
+            {
+                // setup api key textbox text and initial color
+                this.apiKeyRichTextBox.Text = GbdxResources.whereToGetApiKey;
+                this.apiKeyRichTextBox.ForeColor = Color.DarkGray;
+            }
+            else
+            {
+                this.apiKeyRichTextBox.Text = Settings.Default.apiKey;
+            }
 
-            this.UserNameTextBox.Text = GbdxSettings.Properties.Settings.Default["username"].ToString();
+            this.UserNameTextBox.Text = Settings.Default["username"].ToString();
 
             var tempPassword = string.Empty;
 
-            if (Aes.Instance.Decrypt128(GbdxSettings.Properties.Settings.Default["password"].ToString(), out tempPassword))
+            if (Aes.Instance.Decrypt128(Settings.Default["password"].ToString(), out tempPassword))
             {
                 this.PasswordTextBox.Text = tempPassword;
             }
             
             // Set the base url text box.
-            this.urlTextBox.Text = string.IsNullOrEmpty(GbdxSettings.Properties.Settings.Default.baseUrl) ? GbdxSettings.Properties.Settings.Default.DefaultBaseUrl : GbdxSettings.Properties.Settings.Default.baseUrl;
+            this.urlTextBox.Text = string.IsNullOrEmpty(Settings.Default.baseUrl) ? Settings.Default.DefaultBaseUrl : Settings.Default.baseUrl;
 
             this.comms = new GbdxComms();
+        }
+
+        private void ApiKeyRichTextBoxTextChanged(object sender, EventArgs e)
+        {
+            this.apiKeyRichTextBox.Text = this.apiKeyRichTextBox.Text.Replace(GbdxResources.whereToGetApiKey,"");
+            this.apiKeyRichTextBox.ForeColor = Color.Black;
+            this.apiKeyRichTextBox.TextChanged -= this.ApiKeyRichTextBoxTextChanged;
+            this.apiKeyRichTextBox.Focus();
+            this.apiKeyRichTextBox.SelectionStart = this.apiKeyRichTextBox.Text.Length;
+        }
+
+        /// <summary>
+        /// Event handler for when the link in the 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ApiKeyRichTextBoxLinkClicked(object sender, LinkClickedEventArgs e)
+        {
+            System.Diagnostics.Process.Start(e.LinkText);
+        }
+
+        private void ApiKeyRichTextBoxLostFocus(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(this.apiKeyRichTextBox.Text))
+            {
+                this.apiKeyRichTextBox.TextChanged -= this.ApiKeyRichTextBoxTextChanged;
+                this.apiKeyRichTextBox.Text = GbdxResources.whereToGetApiKey;
+                this.apiKeyRichTextBox.ForeColor = Color.DarkGray;
+                this.apiKeyRichTextBox.TextChanged += this.ApiKeyRichTextBoxTextChanged;
+                
+            }
         }
 
         /// <summary>
@@ -185,24 +233,24 @@ namespace Gbdx
         /// </param>
         private void ButtonOkClick(object sender, EventArgs e)
         {
-            GbdxSettings.Properties.Settings.Default["username"] = this.UserNameTextBox.Text;
-            GbdxSettings.Properties.Settings.Default.geoDatabase = this.fileGdbDirectoryTextBox.Text;
-            GbdxSettings.Properties.Settings.Default.baseUrl = this.urlTextBox.Text;
-            GbdxSettings.Properties.Settings.Default.AuthBase = this.authTextBox.Text;
-            GbdxSettings.Properties.Settings.Default.apiKey = this.apiKeyRichTextBox.Text;
+            Settings.Default["username"] = this.UserNameTextBox.Text;
+            Settings.Default.geoDatabase = this.fileGdbDirectoryTextBox.Text;
+            Settings.Default.baseUrl = this.urlTextBox.Text;
+            Settings.Default.AuthBase = this.authTextBox.Text;
+            Settings.Default.apiKey = this.apiKeyRichTextBox.Text;
 
             string temp;
             if (Aes.Instance.Encrypt128(this.PasswordTextBox.Text, out temp))
             {
-                GbdxSettings.Properties.Settings.Default["password"] = temp;
+                Settings.Default["password"] = temp;
             }
             else
             {
-                MessageBox.Show(GbdxSettings.GbdxResources.ErrorSavingPassword);
+                MessageBox.Show(GbdxResources.ErrorSavingPassword);
                 return;
             }
 
-            GbdxSettings.Properties.Settings.Default.Save();
+            Settings.Default.Save();
             this.Close();
         }
 
@@ -219,7 +267,7 @@ namespace Gbdx
         {
             var netObj = new NetObject
                              {
-                                 AuthEndpoint = GbdxSettings.Properties.Settings.Default.authenticationServer,
+                                 AuthEndpoint = Settings.Default.authenticationServer,
                                  BaseUrl = this.urlTextBox.Text,
                                  User = this.UserNameTextBox.Text,
                                  AuthUrl =  this.authTextBox.Text,
@@ -237,23 +285,23 @@ namespace Gbdx
                 this.urlTextBox.BackColor = Color.GreenYellow;
                 this.authTextBox.BackColor = Color.GreenYellow;
                 this.apiKeyRichTextBox.BackColor = Color.GreenYellow;
-                MessageBox.Show(GbdxSettings.GbdxResources.SuccessfulConnection);
+                MessageBox.Show(GbdxResources.SuccessfulConnection);
                 return;
             }
 
             if (netObj.ResponseStatusCode == HttpStatusCode.Unauthorized)
             {
-                MessageBox.Show(GbdxSettings.GbdxResources.InvalidUserPass);
+                MessageBox.Show(GbdxResources.InvalidUserPass);
                 this.PasswordTextBox.BackColor = Color.Tomato;
                 this.UserNameTextBox.BackColor = Color.Tomato;
                 this.apiKeyRichTextBox.BackColor = Color.Tomato;
                 return;
             }
 
-            MessageBox.Show(GbdxSettings.GbdxResources.InvalidUrl);
+            MessageBox.Show(GbdxResources.InvalidUrl);
             this.urlTextBox.BackColor = Color.Tomato;
             this.authTextBox.BackColor = Color.Tomato;
-            this.apiKeyRichTextBox.BackColor = Color.White;
+            this.apiKeyRichTextBox.BackColor = Color.Tomato;
             this.PasswordTextBox.BackColor = Color.White;
             this.UserNameTextBox.BackColor = Color.White;
         }
