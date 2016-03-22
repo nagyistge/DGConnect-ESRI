@@ -199,7 +199,7 @@ namespace Gbdx.Aggregations
           return "terms:ingest_source";
 
         case "What is the twitter sentiment in the region?":
-          return "avg:attributes_sentiment_positive_dbl";
+          return "avg:attributes.sentiment_positive_dbl";
 
         case "What type of data is available in the region?":
           return "terms:item_type";
