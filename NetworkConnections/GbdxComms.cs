@@ -264,6 +264,10 @@ namespace NetworkConnections
         /// </returns>
         public NetObject Request(NetObject netObject)
         {
+            // DEV ONLY localhost crap
+            ServicePointManager.ServerCertificateValidationCallback =
+            new RemoteCertificateValidationCallback(delegate { return true; });
+
             try
             {
                 // Check the settings if valid processing will continue;

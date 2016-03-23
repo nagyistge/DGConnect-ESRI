@@ -29,7 +29,6 @@ namespace Gbdx.Vector_Index.Forms
     using System.Diagnostics;
     using System.Drawing;
     using System.IO;
-    using System.Net;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Web;
@@ -390,6 +389,11 @@ namespace Gbdx.Vector_Index.Forms
         private static string CreateGeoJson(IPolygon poly)
         {
             string output = string.Empty;
+
+            IPolygon2 poly2 = (IPolygon2)poly;
+
+            var ringCount = poly2.ExteriorRingCount;
+
             IPointCollection pointColl = (IPointCollection) poly;
             output = "{\"type\":\"Polygon\", \"coordinates\": [ [";
             for (var i = 0; i <= pointColl.PointCount - 1; i++)
@@ -574,9 +578,16 @@ namespace Gbdx.Vector_Index.Forms
 
             if (this.aoiTypeComboBox.SelectedIndex == 1)
             {
-                work.NetworkObject.AddressUrl = string.Format(
-                    "/insight-vector/api/shape/{0}/geometries",
-                    work.SourceNode.Source.Name);
+                if(this.usingQuerySource)
+                {
+                    work.NetworkObject.AddressUrl = string.Format("/insight-vector/api/shape/query/{0}/types?q={1}",work.SourceNode.Source.Name,this.textBoxSearch.Text);
+                }
+                else
+                {
+                    work.NetworkObject.AddressUrl = string.Format(
+                        "/insight-vector/api/shape/{0}/geometries",
+                        work.SourceNode.Source.Name);
+                }
             }
             else
             {
@@ -628,14 +639,24 @@ namespace Gbdx.Vector_Index.Forms
             var item = ((VectorIndexGeometryNode)itemNode).GeometryType.Name;
 
             // Modifed to work with restsharp
-            work.OriginalPagingIdUrl =
-                    VectorIndexHelper.CreateQueryUrl(
-                        work.BoundBox,
-                        string.Empty,
-                        Uri.EscapeDataString(this.textBoxSearch.Text),
-                        Uri.EscapeDataString(geometry),
-                        Uri.EscapeDataString(item));
+            if (this.networkObject.UsingPolygonAoi)
+            {
+                work.OriginalPagingIdUrl = string.Format(
+                    "/insight-vector/api/shape/query/{0}/{1}/paging?q={2}",
+                    Uri.EscapeDataString(geometry),
+                    Uri.EscapeDataString(item),
+                    Uri.EscapeDataString(this.textBoxSearch.Text));
+            }
+            else
+            {
+                work.OriginalPagingIdUrl = VectorIndexHelper.CreateQueryUrl(
+                    work.BoundBox,
+                    string.Empty,
+                    Uri.EscapeDataString(this.textBoxSearch.Text),
+                    Uri.EscapeDataString(geometry),
+                    Uri.EscapeDataString(item));
 
+            }
             var para = new object[2];
             para[0] = work;
             para[1] = this.comms;
@@ -703,13 +724,7 @@ namespace Gbdx.Vector_Index.Forms
         private void ProcessTypeNodeClick(TreeNode typeNode)
         {
             typeNode.Text = typeNode.Text.Replace(GbdxSettings.GbdxResources.Source_ErrorMessage, string.Empty);
-            //var netO = new NetObject
-            //               {
-            //                   AuthEndpoint = this.networkObject.AuthEndpoint,
-            //                   Password = this.networkObject.Password,
-            //                   Timeouts = 0,
-            //                   User = this.networkObject.User
-            //               };
+
             var work = new WorkerObject
                            {
                                BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
