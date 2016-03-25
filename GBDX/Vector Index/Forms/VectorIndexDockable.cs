@@ -29,6 +29,7 @@ namespace Gbdx.Vector_Index.Forms
     using System.Diagnostics;
     using System.Drawing;
     using System.IO;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Web;
@@ -388,27 +389,74 @@ namespace Gbdx.Vector_Index.Forms
 
         private static string CreateGeoJson(IPolygon poly)
         {
-            string output = string.Empty;
+            StringBuilder output = new StringBuilder("{\"type\":\"MultiPolygon\", \"coordinates\": [");
+            
+            IPolygon4 poly4 = (IPolygon4)poly;
 
-            IPolygon2 poly2 = (IPolygon2)poly;
+            IGeometryBag exteriorRingGeometryBag = poly4.ExteriorRingBag;
+            IGeometryCollection exteriorRingGeometryCollection = exteriorRingGeometryBag as IGeometryCollection;
 
-            var ringCount = poly2.ExteriorRingCount;
-
-            IPointCollection pointColl = (IPointCollection) poly;
-            output = "{\"type\":\"Polygon\", \"coordinates\": [ [";
-            for (var i = 0; i <= pointColl.PointCount - 1; i++)
+            for (int i = 0; i < exteriorRingGeometryCollection.GeometryCount; i++)
             {
-                output += string.Format("[{0},{1}]", pointColl.Point[i].X, pointColl.Point[i].Y);
-
-                if (i != pointColl.PointCount - 1)
+                if (i != 0)
                 {
-                    output += ", ";
+                    output.Append(",");
+                }
+                output.Append("[[");
+                IGeometry exteriorRingGeometry = exteriorRingGeometryCollection.get_Geometry(i);
+                IPointCollection exteriorRingPointCollection = exteriorRingGeometry as IPointCollection;
+
+                for (int j = 0; j < exteriorRingPointCollection.PointCount; j++)
+                {
+                    if (j != 0)
+                    {
+                        output.Append(", ");
+                    }
+                    IPoint point = exteriorRingPointCollection.get_Point(j);
+                    output.Append(PointToString(point));
+                }
+
+                IGeometryBag interiorRingGeometryBag = poly4.get_InteriorRingBag(exteriorRingGeometry as IRing);
+                IGeometryCollection interiorRingGeometryCollection = interiorRingGeometryBag as IGeometryCollection;
+
+                // if there are holes in the polygon lets add them
+                if (interiorRingGeometryCollection.GeometryCount > 0)
+                {
+                    output.Append("]],");
+                }
+                else
+                {
+                    output.Append("]]");
+                }
+
+                for (int k = 0; k < interiorRingGeometryCollection.GeometryCount; k++)
+                {
+                    output.Append("[[");
+
+                    IGeometry interiorRingGeometry = interiorRingGeometryCollection.get_Geometry(k);
+                    IPointCollection interiorRingPointCollection = interiorRingGeometry as IPointCollection;
+
+                    for (int m = 0; m < interiorRingPointCollection.PointCount; m++)
+                    {
+                        if (m == 0)
+                        {
+                            output.Append(", ");
+                        }
+                        IPoint interiorPoint = interiorRingPointCollection.get_Point(m);
+                        //Trace.WriteLine("Point[" + m + "] = " + PointToString());
+                        output.Append(PointToString(interiorPoint));
+                    }
+                    output.Append("]]");
                 }
             }
-            output += "] ] }";
-
-            return output;
+            output.Append("]}");
+            return output.ToString();
         }
+
+        private static string PointToString(IPoint point)
+        {
+            return "["+point.X + ", " + point.Y + "]";
+        }  
 
         /// <summary>
         /// Event handler for when the clear button is clicked.
