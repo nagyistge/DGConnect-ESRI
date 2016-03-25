@@ -220,10 +220,6 @@ namespace NetworkConnections
         {
             try
             {
-                // DEV ONLY localhost crap
-                ServicePointManager.ServerCertificateValidationCallback =
-                new RemoteCertificateValidationCallback(delegate { return true; });
-
                 if (
                     !this.CheckSettings(
                         ref this.client,
@@ -264,10 +260,6 @@ namespace NetworkConnections
         /// </returns>
         public NetObject Request(NetObject netObject)
         {
-            // DEV ONLY localhost crap
-            ServicePointManager.ServerCertificateValidationCallback =
-            new RemoteCertificateValidationCallback(delegate { return true; });
-
             try
             {
                 // Check the settings if valid processing will continue;
