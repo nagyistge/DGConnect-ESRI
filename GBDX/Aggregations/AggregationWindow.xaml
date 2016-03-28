@@ -108,8 +108,8 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
             <Label Content="Add a Query Filter" HorizontalAlignment="Left" Margin="10,211.12,0,0" VerticalAlignment="Top" Height="25.96" Width="106.123"/>
             <Label Content="Aggregation result analyses" HorizontalAlignment="Left" Margin="19.022,350.802,0,0" VerticalAlignment="Top" Height="27.003"/>
             <Label Name="lblPbarStatus" Content="Status" HorizontalAlignment="Left" Margin="10,190.681,0,0" Grid.Row="1" VerticalAlignment="Top" Width="238.093"/>
-            <ComboBox Name="selectionTypeComboBox" HorizontalAlignment="Left" Height="22.119" Margin="110.272,297.243,0,0" VerticalAlignment="Top" Width="148.947" SelectedIndex="1
-                      ">
+            <ComboBox Name="selectionTypeComboBox" HorizontalAlignment="Left" Height="22.119" Margin="110.272,297.243,0,0" VerticalAlignment="Top" Width="148.947" SelectedIndex="0
+                      " SelectionChanged="selectionTypeComboBox_SelectionChanged">
                 <ComboBoxItem>Draw Rectangle</ComboBoxItem>
                 <ComboBoxItem>Use Selected Polygons</ComboBoxItem>
             </ComboBox>
