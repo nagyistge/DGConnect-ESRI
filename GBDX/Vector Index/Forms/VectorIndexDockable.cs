@@ -367,96 +367,15 @@ namespace Gbdx.Vector_Index.Forms
             // Use selected AOI 
             else if (this.aoiTypeComboBox.SelectedIndex == 1)
             {
-                IMap Pmap = ArcMap.Document.FocusMap;
-                IEnumFeature pEnumFeat = (IEnumFeature)Pmap.FeatureSelection;
-                pEnumFeat.Reset();
-
-                try
-                {
-                    IFeature pfeat = pEnumFeat.Next();
-                    if (pfeat != null)
-                    {
-                        IPolygon geo = (IPolygon)pfeat.ShapeCopy;
-                        this.PolygonAoi(geo);
-                    }
-                }
-                catch (Exception error)
-                {
-                    this.logWriter.Error(error);
-                }
+                this.PolygonAoi();
             }
         }
 
-        private static string CreateGeoJson(IPolygon poly)
+        private static string GetGeoJson()
         {
-            StringBuilder output = new StringBuilder("{\"type\":\"MultiPolygon\", \"coordinates\": [");
-            
-            IPolygon4 poly4 = (IPolygon4)poly;
-
-            IGeometryBag exteriorRingGeometryBag = poly4.ExteriorRingBag;
-            IGeometryCollection exteriorRingGeometryCollection = exteriorRingGeometryBag as IGeometryCollection;
-
-            for (int i = 0; i < exteriorRingGeometryCollection.GeometryCount; i++)
-            {
-                if (i != 0)
-                {
-                    output.Append(",");
-                }
-                output.Append("[[");
-                IGeometry exteriorRingGeometry = exteriorRingGeometryCollection.get_Geometry(i);
-                IPointCollection exteriorRingPointCollection = exteriorRingGeometry as IPointCollection;
-
-                for (int j = 0; j < exteriorRingPointCollection.PointCount; j++)
-                {
-                    if (j != 0)
-                    {
-                        output.Append(", ");
-                    }
-                    IPoint point = exteriorRingPointCollection.get_Point(j);
-                    output.Append(PointToString(point));
-                }
-
-                IGeometryBag interiorRingGeometryBag = poly4.get_InteriorRingBag(exteriorRingGeometry as IRing);
-                IGeometryCollection interiorRingGeometryCollection = interiorRingGeometryBag as IGeometryCollection;
-
-                // if there are holes in the polygon lets add them
-                if (interiorRingGeometryCollection.GeometryCount > 0)
-                {
-                    output.Append("]],");
-                }
-                else
-                {
-                    output.Append("]]");
-                }
-
-                for (int k = 0; k < interiorRingGeometryCollection.GeometryCount; k++)
-                {
-                    output.Append("[[");
-
-                    IGeometry interiorRingGeometry = interiorRingGeometryCollection.get_Geometry(k);
-                    IPointCollection interiorRingPointCollection = interiorRingGeometry as IPointCollection;
-
-                    for (int m = 0; m < interiorRingPointCollection.PointCount; m++)
-                    {
-                        if (m == 0)
-                        {
-                            output.Append(", ");
-                        }
-                        IPoint interiorPoint = interiorRingPointCollection.get_Point(m);
-                        //Trace.WriteLine("Point[" + m + "] = " + PointToString());
-                        output.Append(PointToString(interiorPoint));
-                    }
-                    output.Append("]]");
-                }
-            }
-            output.Append("]}");
-            return output.ToString();
+            var polys = Jarvis.GetPolygons(ArcMap.Document.FocusMap);
+            return Jarvis.ConvertPolygonsToGeoJson(polys);
         }
-
-        private static string PointToString(IPoint point)
-        {
-            return "["+point.X + ", " + point.Y + "]";
-        }  
 
         /// <summary>
         /// Event handler for when the clear button is clicked.
@@ -1840,7 +1759,7 @@ namespace Gbdx.Vector_Index.Forms
 
         #endregion
 
-        private void PolygonAoi(IPolygon aoi)
+        private void PolygonAoi()
         {
             if (this.networkObject == null)
             {
@@ -1857,7 +1776,7 @@ namespace Gbdx.Vector_Index.Forms
             this.networkObject.ApiKey = Settings.Default.apiKey;
             this.networkObject.AuthUrl = Settings.Default.AuthBase;
             this.networkObject.UsingPolygonAoi = true;
-            this.networkObject.PolygonAoi = CreateGeoJson(aoi);
+            this.networkObject.PolygonAoi = GetGeoJson();
 
             // There was a problem in creating the network object so dont proceed.
             if (this.networkObject == null)
