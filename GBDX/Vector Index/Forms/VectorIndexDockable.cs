@@ -542,7 +542,7 @@ namespace Gbdx.Vector_Index.Forms
             // modified to work with RestSharp
             work.NetworkObject.BaseUrl = work.BaseUrl;
 
-            if (this.aoiTypeComboBox.SelectedIndex == 1)
+            if (this.networkObject.UsingPolygonAoi)
             {
                 if(this.usingQuerySource)
                 {
@@ -659,7 +659,7 @@ namespace Gbdx.Vector_Index.Forms
             // Modified to work with RestSharp.
             work.NetworkObject.BaseUrl = work.BaseUrl;
 
-            if (this.aoiTypeComboBox.SelectedIndex == 1)
+            if (this.networkObject.UsingPolygonAoi)
             {
                 work.NetworkObject.AddressUrl = string.Format(
                     "/insight-vector/api/shape/{0}/{1}/types",
@@ -706,7 +706,7 @@ namespace Gbdx.Vector_Index.Forms
 
             // modified to work with restsharp
             string url;
-            if (this.aoiTypeComboBox.SelectedIndex == 1)
+            if (this.networkObject.UsingPolygonAoi)
             {
                 url = string.Format("/insight-vector/api/shape/{0}/{1}/{2}/paging",Uri.EscapeDataString(work.SourceNode.Source.Name),
                     Uri.EscapeDataString(work.GeometryNode.GeometryType.Name),
