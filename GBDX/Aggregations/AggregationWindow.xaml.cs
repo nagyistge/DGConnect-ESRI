@@ -123,6 +123,11 @@ namespace Gbdx.Aggregations
         private string SearchItem { get; set; }
 
         /// <summary>
+        /// Element of the existing bounding box
+        /// </summary>
+        private IElement BoundingBoxElmement { get; set; }
+
+        /// <summary>
         /// Gets or sets the previously selected arcmap selected tool.
         /// </summary>
         private ICommandItem PreviouslySelectedItem { get; set; }
@@ -345,7 +350,7 @@ namespace Gbdx.Aggregations
                     DispatcherPriority.Normal,
                     (MethodInvoker)delegate
                         {
-                            AddLayerToArcMap(featureClassName);
+                            this.AddLayerToArcMap(featureClassName);
                             this.goButton.IsEnabled = true;
                         });
             }
@@ -380,9 +385,9 @@ namespace Gbdx.Aggregations
                 argument);
             request.AddParameter("aggs", agg,ParameterType.QueryString);
 
-            if (tbFilter != null && tbFilter.Text != null && tbFilter.Text != "")
+            if (this.tbFilter != null && this.tbFilter.Text != null && this.tbFilter.Text != "")
             {
-                request.AddParameter("query", tbFilter.Text, ParameterType.QueryString);
+                request.AddParameter("query", this.tbFilter.Text, ParameterType.QueryString);
             }
 
             // If the user setup a custom date range then use that otherwise assume no date range has been specified.
@@ -609,6 +614,13 @@ namespace Gbdx.Aggregations
         /// </param>
         private void SelectAreaButtonClick(object sender, RoutedEventArgs e)
         {
+
+            if (this.BoundingBoxElmement != null)
+            {
+                ArcUtility.DeleteElementFromGraphicContainer(ArcMap.Document.ActivatedView, this.BoundingBoxElmement);
+                this.BoundingBoxElmement = null;
+            }
+
             // if there was already a listener established close it.
             AggregationRelay.Instance.AoiHasBeenDrawn -= this.InstanceOnAoiHasBeenDrawn;
             AggregationRelay.Instance.AoiHasBeenDrawn += this.InstanceOnAoiHasBeenDrawn;
@@ -636,8 +648,11 @@ namespace Gbdx.Aggregations
         /// </param>
         private void InstanceOnAoiHasBeenDrawn(IPolygon poly, IElement elm)
         {
+
             // stop listening
             AggregationRelay.Instance.AoiHasBeenDrawn -= this.InstanceOnAoiHasBeenDrawn;
+
+            this.BoundingBoxElmement = elm;
 
             // All done so return the selected tool to the same one the user had previously.
             ArcMap.Application.CurrentTool = this.PreviouslySelectedItem;
@@ -722,16 +737,16 @@ namespace Gbdx.Aggregations
         //do not call this via a delegate from another thread
         private void UpdatePBar(int val)
         {
-            pbarChangeDet.Value = val;
+            this.pbarChangeDet.Value = val;
             System.Windows.Forms.Application.DoEvents();
         }
 
         //do not call this via a delegate from another thread
         private void SetPBarProperties(int max, int min, int val)
         {
-            pbarChangeDet.Minimum = min;
-            pbarChangeDet.Maximum = max;
-            pbarChangeDet.Value = val;
+            this.pbarChangeDet.Minimum = min;
+            this.pbarChangeDet.Maximum = max;
+            this.pbarChangeDet.Value = val;
             System.Windows.Forms.Application.DoEvents();
         }
 
@@ -743,28 +758,28 @@ namespace Gbdx.Aggregations
 
         private void buttAnalyzeAgg_Click(object sender, RoutedEventArgs e)
         {
-            ESRI.ArcGIS.ArcMapUI.IContentsView cView = GetContentsViewFromArcMap(ArcMap.Application, 0);
-            ESRI.ArcGIS.Carto.IActiveView aView = GetActiveViewFromArcMap(ArcMap.Application);
-            List<ESRI.ArcGIS.Carto.IFeatureLayer> layers = GetFeatureLayersFromToc(aView);
+            ESRI.ArcGIS.ArcMapUI.IContentsView cView = this.GetContentsViewFromArcMap(ArcMap.Application, 0);
+            IActiveView aView = this.GetActiveViewFromArcMap(ArcMap.Application);
+            List<IFeatureLayer> layers = this.GetFeatureLayersFromToc(aView);
 
-            if (!cbAggLayerA.Items.IsEmpty)
+            if (!this.cbAggLayerA.Items.IsEmpty)
             {
-                cbAggLayerA.Items.Clear();
-                cbAggLayerB.Items.Clear();
+                this.cbAggLayerA.Items.Clear();
+                this.cbAggLayerB.Items.Clear();
             }
 
-            if (!cbAggLayerA.Items.IsEmpty)
+            if (!this.cbAggLayerA.Items.IsEmpty)
             {
-                for (int i = 0; i < cbAggLayerA.Items.Count; i++)
+                for (int i = 0; i < this.cbAggLayerA.Items.Count; i++)
                 {
-                    cbAggLayerA.Items.RemoveAt(i);
+                    this.cbAggLayerA.Items.RemoveAt(i);
                 }
             }
-            if (!cbAggLayerB.Items.IsEmpty)
+            if (!this.cbAggLayerB.Items.IsEmpty)
             {
-                for (int i = 0; i < cbAggLayerB.Items.Count; i++)
+                for (int i = 0; i < this.cbAggLayerB.Items.Count; i++)
                 {
-                    cbAggLayerB.Items.RemoveAt(i);
+                    this.cbAggLayerB.Items.RemoveAt(i);
                 }
             }
 
@@ -773,11 +788,11 @@ namespace Gbdx.Aggregations
                 // MessageBox.Show(layer.Name + " -- " + layer.DataSourceType);
                 if (layer.Name.ToLower().Contains("aggregation"))
                 {
-                    cbAggLayerA.Items.Add(layer.Name);
-                    cbAggLayerB.Items.Add(layer.Name);
+                    this.cbAggLayerA.Items.Add(layer.Name);
+                    this.cbAggLayerB.Items.Add(layer.Name);
                 }
             }
-            if (cbAggLayerA.Items.Count < 1)
+            if (this.cbAggLayerA.Items.Count < 1)
             {
                 MessageBox.Show("No aggregation layers available");
             }
@@ -817,14 +832,14 @@ namespace Gbdx.Aggregations
                 PivotTableEntry entry = new PivotTableEntry();
                 //do something with each feature(ie update geometry or attribute)
                 //  Console.WriteLine("The {0} field contains a value of {1}", nameOfField, feature.get_Value(fieldIndexValue));
-                pbarChangeDet.Value++;
+                this.pbarChangeDet.Value++;
                 sai.Invoke(x);
                 x++;
                 for (int i = 0; i < feature.Fields.FieldCount; i++)
                 {
-                    if (pbarChangeDet.Value == pbarChangeDet.Maximum)
+                    if (this.pbarChangeDet.Value == this.pbarChangeDet.Maximum)
                     {
-                        pbarChangeDet.Maximum = pbarChangeDet.Maximum + 10;
+                        this.pbarChangeDet.Maximum = this.pbarChangeDet.Maximum + 10;
                     }
 
                     string f = feature.Fields.get_Field(i).Name;
@@ -856,7 +871,7 @@ namespace Gbdx.Aggregations
                 feature = featureCursor.NextFeature();
             }
 
-            sai.Invoke(Convert.ToInt32(pbarChangeDet.Maximum));
+            sai.Invoke(Convert.ToInt32(this.pbarChangeDet.Maximum));
             //add to the cache
             if (!PivotTableCache.Cache.ContainsKey(layer.Name))
             {
@@ -893,14 +908,14 @@ namespace Gbdx.Aggregations
                 PivotTableEntry entry = new PivotTableEntry();
                 //do something with each feature(ie update geometry or attribute)
                 //  Console.WriteLine("The {0} field contains a value of {1}", nameOfField, feature.get_Value(fieldIndexValue));
-                pbarChangeDet.Value++;
+                this.pbarChangeDet.Value++;
                 sai.Invoke(x);
                 x++;
                 for (int i = 0; i < feature.Fields.FieldCount; i++)
                 {
-                    if (pbarChangeDet.Value == pbarChangeDet.Maximum)
+                    if (this.pbarChangeDet.Value == this.pbarChangeDet.Maximum)
                     {
-                        pbarChangeDet.Maximum = pbarChangeDet.Maximum + 10;
+                        this.pbarChangeDet.Maximum = this.pbarChangeDet.Maximum + 10;
                     }
 
                     string fname = feature.Fields.get_Field(i).Name;
@@ -930,7 +945,7 @@ namespace Gbdx.Aggregations
                 }
                 pt.Add(entry);
             }
-            sai.Invoke(Convert.ToInt32(pbarChangeDet.Maximum));
+            sai.Invoke(Convert.ToInt32(this.pbarChangeDet.Maximum));
             return pt;
         }
 
@@ -943,8 +958,8 @@ namespace Gbdx.Aggregations
         /// 
         ///<remarks></remarks>
         public ESRI.ArcGIS.ArcMapUI.IContentsView GetContentsViewFromArcMap(
-            ESRI.ArcGIS.Framework.IApplication application,
-            System.Int32 index)
+            IApplication application,
+            Int32 index)
         {
             if (application == null || index < 0 || index > 1)
             {
@@ -966,7 +981,7 @@ namespace Gbdx.Aggregations
         ///<returns>An IActiveView interface.</returns>
         ///   
         ///<remarks></remarks>
-        public ESRI.ArcGIS.Carto.IActiveView GetActiveViewFromArcMap(ESRI.ArcGIS.Framework.IApplication application)
+        public IActiveView GetActiveViewFromArcMap(IApplication application)
         {
             if (application == null)
             {
@@ -974,33 +989,33 @@ namespace Gbdx.Aggregations
             }
             ESRI.ArcGIS.ArcMapUI.IMxDocument mxDocument = application.Document as ESRI.ArcGIS.ArcMapUI.IMxDocument;
                 // Dynamic Cast
-            ESRI.ArcGIS.Carto.IActiveView activeView = mxDocument.ActiveView;
+            IActiveView activeView = mxDocument.ActiveView;
 
             return activeView;
         }
 
-        public List<ESRI.ArcGIS.Carto.IFeatureLayer> GetFeatureLayersFromToc(ESRI.ArcGIS.Carto.IActiveView activeView)
+        public List<IFeatureLayer> GetFeatureLayersFromToc(IActiveView activeView)
         {
-            List<ESRI.ArcGIS.Carto.IFeatureLayer> outlist = new List<IFeatureLayer>();
+            List<IFeatureLayer> outlist = new List<IFeatureLayer>();
 
             if (activeView == null)
             {
                 return null;
             }
-            ESRI.ArcGIS.Carto.IMap map = activeView.FocusMap;
+            IMap map = activeView.FocusMap;
 
             for (int i = 0; i < map.LayerCount; i++)
             {
                 if (activeView.FocusMap.get_Layer(i) is IFeatureLayer)
                 {
-                    outlist.Add((ESRI.ArcGIS.Carto.IFeatureLayer)activeView.FocusMap.get_Layer(i));
+                    outlist.Add((IFeatureLayer)activeView.FocusMap.get_Layer(i));
                 }
             }
 
             return outlist;
         }
 
-        public ESRI.ArcGIS.Carto.IFeatureLayer getLayerByName(List<ESRI.ArcGIS.Carto.IFeatureLayer> layers, String name)
+        public IFeatureLayer getLayerByName(List<IFeatureLayer> layers, String name)
         {
             foreach (IFeatureLayer layer in layers)
             {
@@ -1013,7 +1028,7 @@ namespace Gbdx.Aggregations
         }
 
         public List<IFeature> getSelectedFeatureFromLayerByName(
-            List<ESRI.ArcGIS.Carto.IFeatureLayer> layers,
+            List<IFeatureLayer> layers,
             String nameOfLayer)
         {
             IFeatureLayer l = null;
@@ -1025,7 +1040,7 @@ namespace Gbdx.Aggregations
                     break;
                 }
             }
-            return GetSelectedFeatures(l);
+            return this.GetSelectedFeatures(l);
         }
 
         public List<IFeature> GetSelectedFeatures(IFeatureLayer featureLayer)
@@ -1053,13 +1068,13 @@ namespace Gbdx.Aggregations
         {
             try
             {
-                if (cbFocusLayer.Text == null || cbFocusLayer.Text == "")
+                if (this.cbFocusLayer.Text == null || this.cbFocusLayer.Text == "")
                 {
                     MessageBox.Show("You must select a layer");
                     return;
                 }
-                List<IFeatureLayer> layers = GetFeatureLayersFromToc(GetActiveViewFromArcMap(ArcMap.Application));
-                IFeatureLayer layerWithSelection = getLayerByName(layers, cbFocusLayer.Text);
+                List<IFeatureLayer> layers = this.GetFeatureLayersFromToc(this.GetActiveViewFromArcMap(ArcMap.Application));
+                IFeatureLayer layerWithSelection = this.getLayerByName(layers, this.cbFocusLayer.Text);
                 if (layerWithSelection == null)
                 {
                     MessageBox.Show("Layer does not exist");
@@ -1070,7 +1085,7 @@ namespace Gbdx.Aggregations
                 this.pbarChangeDet.Value = 0;
                 System.Windows.Forms.Application.DoEvents();
 
-                List<IFeature> outPut = getSelectedFeatureFromLayerByName(layers, cbFocusLayer.Text);
+                List<IFeature> outPut = this.getSelectedFeatureFromLayerByName(layers, this.cbFocusLayer.Text);
                 List<String> cols = new List<string>();
                 Dictionary<string, string> outputCols = new Dictionary<string, string>();
                 if (outPut.Count == 0)
@@ -1119,8 +1134,8 @@ namespace Gbdx.Aggregations
                         DialogResult resGraph = MessageBox.Show("Continue?", "Graph", MessageBoxButtons.YesNoCancel);
                         if (resGraph == DialogResult.No || resGraph == DialogResult.Cancel)
                         {
-                            UpdatePBar(0);
-                            UpdateStatusLabel("Status");
+                            this.UpdatePBar(0);
+                            this.UpdateStatusLabel("Status");
                             return;
                         }
                         signature = analyzer.GenerateAverageVector(signature);
@@ -1142,16 +1157,16 @@ namespace Gbdx.Aggregations
                     }
                     IWorkspace ws = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
 
-                    String fcName = "mlt_" + entry.RowKey + "_" + System.DateTime.Now.Millisecond;
+                    String fcName = "mlt_" + entry.RowKey + "_" + DateTime.Now.Millisecond;
                     var featureClass = Jarvis.CreateStandaloneFeatureClass(ws, fcName, outputCols, false, 0);
                     IFeatureCursor insertCur = featureClass.Insert(true);
                     this.UpdateStatusLabel("Loading Feature Class");
                     System.Windows.Forms.Application.DoEvents();
 
-                    InsertPivoTableRowsToFeatureClass(featureClass, res, outputCols);
+                    this.InsertPivoTableRowsToFeatureClass(featureClass, res, outputCols);
                     this.AddLayerToArcMap(fcName);
 
-                    lblPbarStatus.Content = "Done";
+                    this.lblPbarStatus.Content = "Done";
                     this.pbarChangeDet.Value = 0;
                     System.Windows.Forms.Application.DoEvents();
                 }
@@ -1172,19 +1187,19 @@ namespace Gbdx.Aggregations
                 {
                     MessageBox.Show("no layers available");
                 }
-                List<IFeatureLayer> layers = GetFeatureLayersFromToc(GetActiveViewFromArcMap(ArcMap.Application));
+                List<IFeatureLayer> layers = this.GetFeatureLayersFromToc(this.GetActiveViewFromArcMap(ArcMap.Application));
                 //  getSelectedFeatureFromLayerByName(layers, "somename");
-                IFeatureLayer flayerA = getLayerByName(layers, layerA);
-                IFeatureLayer flayerB = getLayerByName(layers, layerB);
+                IFeatureLayer flayerA = this.getLayerByName(layers, layerA);
+                IFeatureLayer flayerB = this.getLayerByName(layers, layerB);
                 this.pbarChangeDet.Value = 0;
 
                 this.UpdateStatusLabel("formatting and Caching Layer A");
                 System.Windows.Forms.Application.DoEvents();
                 List<String> ignoreCols = new List<String>() { "OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area" };
-                PivotTable ptA = FeatureLayerToPivotTable(flayerA, "Name", ignoreCols);
+                PivotTable ptA = this.FeatureLayerToPivotTable(flayerA, "Name", ignoreCols);
                 this.UpdateStatusLabel("formatting and Caching Layer B");
                 System.Windows.Forms.Application.DoEvents();
-                PivotTable ptB = FeatureLayerToPivotTable(flayerB, "Name", ignoreCols);
+                PivotTable ptB = this.FeatureLayerToPivotTable(flayerB, "Name", ignoreCols);
                 this.UpdateStatusLabel("Generating Change Detection layer");
                 System.Windows.Forms.Application.DoEvents();
                 Dictionary<String, String> uniqueFieldNames = new Dictionary<String, String>();
@@ -1205,17 +1220,17 @@ namespace Gbdx.Aggregations
                     break;
                 }
                 IWorkspace ws = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
-                String fcName = "change_" + layerA + "_" + layerB + "_" + System.DateTime.Now.Millisecond;
+                String fcName = "change_" + layerA + "_" + layerB + "_" + DateTime.Now.Millisecond;
                 var featureClass = Jarvis.CreateStandaloneFeatureClass(ws, fcName, uniqueFieldNames, false, 0);
                 IFeatureCursor insertCur = featureClass.Insert(true);
                 this.UpdateStatusLabel("Loading Feature Class");
                 System.Windows.Forms.Application.DoEvents();
 
-                InsertPivoTableRowsToFeatureClass(featureClass, res, uniqueFieldNames);
+                this.InsertPivoTableRowsToFeatureClass(featureClass, res, uniqueFieldNames);
                 this.AddLayerToArcMap(fcName);
                 this.pbarChangeDet.Value = 0;
 
-                lblPbarStatus.Content = "Done";
+                this.lblPbarStatus.Content = "Done";
 
                 System.Windows.Forms.Application.DoEvents();
                 // now I need to create a feature class and feature layer from this object
@@ -1236,20 +1251,20 @@ namespace Gbdx.Aggregations
 
         private void butPopFocLyrCb_Click(object sender, RoutedEventArgs e)
         {
-            ESRI.ArcGIS.ArcMapUI.IContentsView cView = GetContentsViewFromArcMap(ArcMap.Application, 0);
-            ESRI.ArcGIS.Carto.IActiveView aView = GetActiveViewFromArcMap(ArcMap.Application);
-            List<ESRI.ArcGIS.Carto.IFeatureLayer> layers = GetFeatureLayersFromToc(aView);
+            ESRI.ArcGIS.ArcMapUI.IContentsView cView = this.GetContentsViewFromArcMap(ArcMap.Application, 0);
+            IActiveView aView = this.GetActiveViewFromArcMap(ArcMap.Application);
+            List<IFeatureLayer> layers = this.GetFeatureLayersFromToc(aView);
 
-            if (!cbFocusLayer.Items.IsEmpty)
+            if (!this.cbFocusLayer.Items.IsEmpty)
             {
-                cbFocusLayer.Items.Clear();
+                this.cbFocusLayer.Items.Clear();
             }
 
-            if (!cbFocusLayer.Items.IsEmpty)
+            if (!this.cbFocusLayer.Items.IsEmpty)
             {
-                for (int i = 0; i < cbAggLayerA.Items.Count; i++)
+                for (int i = 0; i < this.cbAggLayerA.Items.Count; i++)
                 {
-                    cbFocusLayer.Items.RemoveAt(i);
+                    this.cbFocusLayer.Items.RemoveAt(i);
                 }
             }
 
@@ -1258,11 +1273,11 @@ namespace Gbdx.Aggregations
                 // MessageBox.Show(layer.Name + " -- " + layer.DataSourceType);
                 if (layer.Name.ToLower().Contains("aggregation"))
                 {
-                    cbFocusLayer.Items.Add(layer.Name);
+                    this.cbFocusLayer.Items.Add(layer.Name);
                 }
             }
 
-            if (cbFocusLayer.Items.Count < 1)
+            if (this.cbFocusLayer.Items.Count < 1)
             {
                 MessageBox.Show("No aggregation layers available");
             }
