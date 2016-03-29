@@ -227,4 +227,8 @@ Private data should NOT be uploaded.</value>
   <data name="whereToGetApiKey" xml:space="preserve">
     <value>Go to https://gbdx.geobigdata.io/account/login/ - Login &gt; User Settings &gt; API Key</value>
   </data>
+  <data name="noFeaturesSelected" xml:space="preserve">
+    <value>No features were selected.
+Please select features and try again.</value>
+  </data>
 </root>

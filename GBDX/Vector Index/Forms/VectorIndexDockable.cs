@@ -371,9 +371,8 @@ namespace Gbdx.Vector_Index.Forms
             }
         }
 
-        private static string GetGeoJson()
+        private static string GetGeoJson(List<IPolygon> polys )
         {
-            var polys = Jarvis.GetPolygons(ArcMap.Document.FocusMap);
             return Jarvis.ConvertPolygonsToGeoJson(polys);
         }
 
@@ -1766,6 +1765,15 @@ namespace Gbdx.Vector_Index.Forms
                     Settings.Default.username,
                     Settings.Default.password);
             }
+            var polys = Jarvis.GetPolygons(ArcMap.Document.FocusMap);
+
+            // check to see if features were selected
+            if (polys.Count == 0)
+            {
+                MessageBox.Show(GbdxSettings.GbdxResources.noFeaturesSelected);
+                return;
+            }
+
 
             this.networkObject.AuthEndpoint = GbdxHelper.GetAuthenticationEndpoint(Settings.Default);
             this.networkObject.AddressUrl = null;
@@ -1775,7 +1783,7 @@ namespace Gbdx.Vector_Index.Forms
             this.networkObject.ApiKey = Settings.Default.apiKey;
             this.networkObject.AuthUrl = Settings.Default.AuthBase;
             this.networkObject.UsingPolygonAoi = true;
-            this.networkObject.PolygonAoi = GetGeoJson();
+            this.networkObject.PolygonAoi = GetGeoJson(polys);
 
             // There was a problem in creating the network object so dont proceed.
             if (this.networkObject == null)
@@ -2049,22 +2057,29 @@ namespace Gbdx.Vector_Index.Forms
             this.treeView1.CheckBoxes = true;
             this.usingQuerySource = false;
 
-            // if the boundingbox graphic element hasn't been pressed then
-            // lets assume that we use the curren't active views extent as the envelope.
-            if (this.boundingBoxGraphicElement == null)
+            if (this.aoiTypeComboBox.SelectedIndex == 0)
             {
-                var poly = VectorIndexHelper.DisplayRectangle(
-                    ArcMap.Document.ActiveView,
-                    out this.boundingBoxGraphicElement);
+                // if the boundingbox graphic element hasn't been pressed then
+                // lets assume that we use the curren't active views extent as the envelope.
+                if (this.boundingBoxGraphicElement == null)
+                {
+                    var poly = VectorIndexHelper.DisplayRectangle(
+                        ArcMap.Document.ActiveView,
+                        out this.boundingBoxGraphicElement);
 
-                // Kick off vector index functionality
-                this.VectorIndex(poly);
-                return;
+                    // Kick off vector index functionality
+                    this.VectorIndex(poly);
+                    return;
+                }
+
+                // We already have a bounding box drawn so lets re-use that without redrawing the aoi.
+                var tempPolygon = (IPolygon)this.boundingBoxGraphicElement.Geometry;
+                this.VectorIndex(tempPolygon);
             }
-
-            // We already have a bounding box drawn so lets re-use that without redrawing the aoi.
-            var tempPolygon = (IPolygon)this.boundingBoxGraphicElement.Geometry;
-            this.VectorIndex(tempPolygon);
+            else
+            {
+                this.PolygonAoi();
+            }
         }
 
         /// <summary>
