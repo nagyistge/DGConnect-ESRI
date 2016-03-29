@@ -367,6 +367,15 @@ namespace Gbdx.Vector_Index.Forms
             // Use selected AOI 
             else if (this.aoiTypeComboBox.SelectedIndex == 1)
             {
+                // Clear any current drawn images
+                if (this.boundingBoxGraphicElement != null)
+                {
+                    ArcUtility.DeleteElementFromGraphicContainer(
+                        ArcMap.Document.ActivatedView,
+                        this.boundingBoxGraphicElement);
+                    this.boundingBoxGraphicElement = null;
+                }
+
                 this.PolygonAoi();
             }
         }
@@ -2078,6 +2087,15 @@ namespace Gbdx.Vector_Index.Forms
             }
             else
             {
+                // Clear any current drawn images
+                if (this.boundingBoxGraphicElement != null)
+                {
+                    ArcUtility.DeleteElementFromGraphicContainer(
+                        ArcMap.Document.ActivatedView,
+                        this.boundingBoxGraphicElement);
+                    this.boundingBoxGraphicElement = null;
+                }
+
                 this.PolygonAoi();
             }
         }
