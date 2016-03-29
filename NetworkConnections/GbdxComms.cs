@@ -235,7 +235,6 @@ namespace NetworkConnections
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 request.AddHeader("Content-Type", "application/json");
                 request.AddParameter("application/json", netObject.PolygonAoi, ParameterType.RequestBody);
-
                 var response = this.client.Execute(request);
                 netObject.Result = response.Content;
                 netObject = this.CheckForErrors(response, netObject);

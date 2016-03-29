@@ -315,7 +315,7 @@
 
             for (int i = 0; i < polygons.Count; i++)
             {
-                if (i > 0)
+                if (i != 0)
                 {
                     output.Append(",");
                 }
@@ -390,6 +390,11 @@
 
             for (int i = 0; i < interiorRingGeometryCollection.GeometryCount; i++)
             {
+                if (i != 0)
+                {
+                    output.Append(", ");
+                }
+
                 output.Append("[[");
                 var interiorRingGeometry = interiorRingGeometryCollection.Geometry[i];
                 output.Append(ConvertPointCollectionToGeoJson(interiorRingGeometry));
