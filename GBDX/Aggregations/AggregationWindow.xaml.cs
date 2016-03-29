@@ -241,10 +241,6 @@ namespace Gbdx.Aggregations
         /// </param>
         private void GoButtonClick(object sender, RoutedEventArgs e)
         {
-            ServicePointManager
-    .ServerCertificateValidationCallback +=
-    (sender2, cert, chain, sslPolicyErrors) => true;
-
             if (this.AoiPolygon == null && this.selectionTypeComboBox.SelectedIndex == 0)
             {
                 MessageBox.Show(GbdxResources.invalidBoundingBox);
