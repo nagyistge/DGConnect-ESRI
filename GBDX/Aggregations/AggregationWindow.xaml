@@ -117,6 +117,5 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
             <Label Content="Label" HorizontalAlignment="Left" Height="3.602" Margin="116.139,342.2,0,0" VerticalAlignment="Top" Width="7.461"/>
         </Grid>
         <Grid HorizontalAlignment="Left" Height="0" Margin="119.8,61.2,0,-57.349" VerticalAlignment="Top" Width="3.2" Grid.Column="2" Grid.Row="2"/>
-        <ComboBox Grid.Column="2" HorizontalAlignment="Left" Margin="462.459,338,-351.355,-0.001" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </UserControl>
