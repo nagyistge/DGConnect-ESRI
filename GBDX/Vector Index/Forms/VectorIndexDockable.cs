@@ -1021,7 +1021,6 @@ namespace Gbdx.Vector_Index.Forms
         private void GetVectorData(object source)
         {
             var param = (object[])source;
-
             var work = (WorkerObject)param[0];
             var gbdxComms = (GbdxComms)param[1];
 
@@ -1035,6 +1034,7 @@ namespace Gbdx.Vector_Index.Forms
             // Set the result and page id back empty string. only needed when this function gets called again.  
             netobj.Result = string.Empty;
             netobj.PageId = string.Empty;
+
             if (netobj.UsingPolygonAoi)
             {
                 netobj = gbdxComms.PushRequest(netobj);
@@ -1124,7 +1124,6 @@ namespace Gbdx.Vector_Index.Forms
                     }
 
                     // Check to see if the last page has been received otherwise process it.
-                    //if (string.Equals(pagedResult.ToString(), "{}", StringComparison.OrdinalIgnoreCase))
                     if(networkObj.PageItemCount == 0)
                     {
                         done = true;
@@ -1847,6 +1846,8 @@ namespace Gbdx.Vector_Index.Forms
             this.networkObject.PageId = string.Empty;
             this.networkObject.ApiKey = Settings.Default.apiKey;
             this.networkObject.AuthUrl = Settings.Default.AuthBase;
+            this.networkObject.UsingPolygonAoi = false;
+            this.networkObject.PolygonAoi = string.Empty;
 
             // There was a problem in creating the network object so dont proceed.
             if (this.networkObject == null)

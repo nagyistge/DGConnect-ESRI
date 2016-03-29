@@ -49,9 +49,9 @@
             this.tableLayoutPanel1.Controls.Add(this.clearButton, 1, 3);
             this.tableLayoutPanel1.Controls.Add(this.treeView1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.textBoxSearch, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.selectAreaButton, 0, 3);
             this.tableLayoutPanel1.Controls.Add(this.aoiTypeComboBox, 1, 2);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.selectAreaButton, 0, 3);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
             this.tableLayoutPanel1.RowCount = 4;
@@ -114,7 +114,7 @@
             this.aoiTypeComboBox.Items.AddRange(new object[] {
             "Draw Rectangle",
             "Use Selected Polygon(s)"});
-            this.aoiTypeComboBox.Location = new System.Drawing.Point(155, 535);
+            this.aoiTypeComboBox.Location = new System.Drawing.Point(155, 536);
             this.aoiTypeComboBox.Name = "aoiTypeComboBox";
             this.aoiTypeComboBox.Size = new System.Drawing.Size(142, 24);
             this.aoiTypeComboBox.TabIndex = 4;
