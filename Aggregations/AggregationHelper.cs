@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
 
     public class AggregationHelper
     {
@@ -47,7 +48,7 @@
                 }
 
                 // Check to see if the aggregation name contains geohash
-                if (aggs[index].name.Contains("geohash"))
+                if (aggs[index].name.Contains("GeoHash"))
                 {
                     // if it does then set isGeoHas true to signal that all terms under this
                     // aggregation are geohashes to be added as keys to the main dictionary.
@@ -167,7 +168,7 @@
 
         private static string CheckName(string name)
         {
-            if (GbdxTools.Jarvis.invalidStartingChars.Contains(name[0]))
+            if (GbdxTools.Jarvis.invalidStartingChars.Contains(name[0])||string.Equals(name,"GeoHash", StringComparison.OrdinalIgnoreCase))
             {
                 name = "t_" + name;
             }

@@ -85,7 +85,7 @@
 
             var tmpField = new FieldClass();
             IFieldEdit tmpFieldEdit = (IFieldEdit)tmpField;
-            tmpFieldEdit.Name_2 = "Name";
+            tmpFieldEdit.Name_2 = "GeoHash";
             tmpFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
             tmpFieldEdit.Length_2 = 20;
             fieldsEdit.AddField(tmpField);

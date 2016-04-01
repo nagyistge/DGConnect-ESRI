@@ -456,20 +456,34 @@ namespace Gbdx.Aggregations
             Dictionary<string, Dictionary<string, double>> resultDictionary,
             Dictionary<string, string> uniqueFieldNames)
         {
-            // get the polygon of the geohash
-            var poly = this.GetGeoHashPoly(key);
-            var buffer = featureClass.CreateFeatureBuffer();
-
-            // Setup the features geometry.
-            buffer.Shape = (IGeometry)poly;
-            buffer.Value[featureClass.FindField("Name")] = key;
-            foreach (var subKey in resultDictionary[key].Keys)
+            try
             {
-                buffer.Value[featureClass.FindField(uniqueFieldNames[subKey])] = resultDictionary[key][subKey];
-            }
+                // get the polygon of the geohash
+                var poly = this.GetGeoHashPoly(key);
+                var buffer = featureClass.CreateFeatureBuffer();
 
-            // Feature has been created so add to the feature class.
-            insertCur.InsertFeature(buffer);
+                // Setup the features geometry.
+                buffer.Shape = (IGeometry)poly;
+                buffer.Value[featureClass.FindField("GeoHash")] = key;
+                foreach (var subKey in resultDictionary[key].Keys)
+                {
+                    var field = uniqueFieldNames[subKey];
+                    var value = resultDictionary[key][subKey];
+                    var index = featureClass.FindField(field);
+
+                    if(index != -1)
+                    {
+                        buffer.Value[index] = value;
+                    }
+                }
+
+                // Feature has been created so add to the feature class.
+                insertCur.InsertFeature(buffer);
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
         }
 
         private void InsertPivoTableRowsToFeatureClass(
@@ -1094,7 +1108,7 @@ namespace Gbdx.Aggregations
                     return;
                 }
 
-                PivotTable signature = this.FeaturesToPivotTable(outPut, "Name", null);
+                PivotTable signature = this.FeaturesToPivotTable(outPut, "GeoHash", null);
                 List<String> ignoreCols = new List<String>() { "OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area" };
 
                 PivotTableAnalyzer analyzer = new PivotTableAnalyzer(
@@ -1103,7 +1117,7 @@ namespace Gbdx.Aggregations
                 this.UpdateStatusLabel("Preparing and caching AOI layer");
                 System.Windows.Forms.Application.DoEvents();
 
-                PivotTable aoiPivotTable = this.FeatureLayerToPivotTable(layerWithSelection, "Name", null);
+                PivotTable aoiPivotTable = this.FeatureLayerToPivotTable(layerWithSelection, "GeoHash", null);
 
                 this.UpdateStatusLabel("Processing Signature");
 
@@ -1196,10 +1210,10 @@ namespace Gbdx.Aggregations
                 this.UpdateStatusLabel("formatting and Caching Layer A");
                 System.Windows.Forms.Application.DoEvents();
                 List<String> ignoreCols = new List<String>() { "OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area" };
-                PivotTable ptA = this.FeatureLayerToPivotTable(flayerA, "Name", ignoreCols);
+                PivotTable ptA = this.FeatureLayerToPivotTable(flayerA, "GeoHash", ignoreCols);
                 this.UpdateStatusLabel("formatting and Caching Layer B");
                 System.Windows.Forms.Application.DoEvents();
-                PivotTable ptB = this.FeatureLayerToPivotTable(flayerB, "Name", ignoreCols);
+                PivotTable ptB = this.FeatureLayerToPivotTable(flayerB, "GeoHash", ignoreCols);
                 this.UpdateStatusLabel("Generating Change Detection layer");
                 System.Windows.Forms.Application.DoEvents();
                 Dictionary<String, String> uniqueFieldNames = new Dictionary<String, String>();
