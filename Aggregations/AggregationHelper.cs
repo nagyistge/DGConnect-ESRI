@@ -48,7 +48,7 @@
                 }
 
                 // Check to see if the aggregation name contains geohash
-                if (aggs[index].name.Contains("GeoHash"))
+                if (aggs[index].name.Contains("geohash"))
                 {
                     // if it does then set isGeoHas true to signal that all terms under this
                     // aggregation are geohashes to be added as keys to the main dictionary.
