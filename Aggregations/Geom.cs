@@ -4,7 +4,7 @@
 
     public class Geom
     {
-        public List<List<List<int>>> coordinates { get; set; }
+        public List<List<List<List<double>>>> coordinates { get; set; }
         public string type { get; set; }
     }
 }

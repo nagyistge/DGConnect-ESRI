@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
 
     public class AggregationHelper
     {
@@ -167,7 +168,7 @@
 
         private static string CheckName(string name)
         {
-            if (GbdxTools.Jarvis.invalidStartingChars.Contains(name[0]))
+            if (GbdxTools.Jarvis.invalidStartingChars.Contains(name[0])||string.Equals(name,"GeoHash", StringComparison.OrdinalIgnoreCase))
             {
                 name = "t_" + name;
             }

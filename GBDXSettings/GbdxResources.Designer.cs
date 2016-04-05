@@ -201,6 +201,16 @@ namespace GbdxSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to No features were selected.
+        ///Please select features and try again..
+        /// </summary>
+        public static string noFeaturesSelected {
+            get {
+                return ResourceManager.GetString("noFeaturesSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Problem with password.  Please check the username and password settings..
         /// </summary>
         public static string PasswordProblemCheckSettings {

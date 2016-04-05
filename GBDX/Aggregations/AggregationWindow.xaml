@@ -31,7 +31,7 @@
                 <ComboBoxItem Content="8"/>
             </ComboBox>
             <Label Content="Detail Granularity" HorizontalAlignment="Left" Margin="-0.115,70.869,0,0" VerticalAlignment="Top" Height="25.6" Width="102.4"/>
-            <Button x:Name="goButton" Content="Go" HorizontalAlignment="Left" Margin="157.815,314.171,0,0" VerticalAlignment="Top" Width="75" Click="GoButtonClick" Height="21.6" RenderTransformOrigin="0.5,0.5">
+            <Button x:Name="goButton" Content="Go" HorizontalAlignment="Left" Margin="181.816,326.438,0,0" VerticalAlignment="Top" Width="75" Click="GoButtonClick" Height="21.6" RenderTransformOrigin="0.5,0.5">
                 <Button.RenderTransform>
                     <TransformGroup>
                         <ScaleTransform/>
@@ -41,7 +41,7 @@
                     </TransformGroup>
                 </Button.RenderTransform>
             </Button>
-            <GroupBox HorizontalAlignment="Left" Height="234.924" Margin="9.886,115.878,0,0" VerticalAlignment="Top" Width="226.4">
+            <GroupBox HorizontalAlignment="Left" Height="98.391" Margin="10,112.729,0,0" VerticalAlignment="Top" Width="238.207">
                 <GroupBox.Header>
                     <CheckBox x:Name="specifyDateCheckbox" Click="SpecifyDateCheckboxChecked" Content="Specify Date Range"/>
                 </GroupBox.Header>
@@ -66,14 +66,14 @@
                 <ComboBoxItem Content="What is the twitter sentiment in the region?"/>
                 <ComboBoxItem Content="What type of data is available in the region?"/>
             </ComboBox>
-            <Button Name="selectAreaButton" Content="Select Area" HorizontalAlignment="Left" Margin="9.886,313.875,0,0" VerticalAlignment="Top" Width="75" Height="21.6" Click="SelectAreaButtonClick"/>
-            <TextBox Name="tbFilter" HorizontalAlignment="Left" Height="55.935" Margin="9.886,252.94,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="226.286" AcceptsReturn="True" 
+            <Button Name="selectAreaButton" Content="Select Area" HorizontalAlignment="Left" Margin="10,324.202,0,0" VerticalAlignment="Top" Width="75" Height="21.6" Click="SelectAreaButtonClick"/>
+            <TextBox Name="tbFilter" HorizontalAlignment="Left" Height="55.935" Margin="10,231.413,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="249.219" AcceptsReturn="True" 
 VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;value&gt; AND|OR ..."/>
 
             <ProgressBar x:Name="pbarChangeDet" HorizontalAlignment="Left" Height="17.938" Margin="10,167.743,0,0" VerticalAlignment="Top" Width="238.207" Grid.Row="1"/>
 
             <TabControl x:Name="tabAggAnalytics" HorizontalAlignment="Left" Height="187.54" Margin="10,382.805,0,0" VerticalAlignment="Top" Width="238.207" Grid.RowSpan="2">
-           
+
                 <TabItem Header="Change Detection">
                     <Grid Background="#FFE5E5E5" Margin="0,0,1.2,7.6">
                         <Grid.ColumnDefinitions>
@@ -105,9 +105,16 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
                     </Grid>
                 </TabItem>
             </TabControl>
-            <Label Content="Add a Query Filter" HorizontalAlignment="Left" Margin="10,228.187,0,0" VerticalAlignment="Top" Height="25.96" Width="106.123"/>
+            <Label Content="Add a Query Filter" HorizontalAlignment="Left" Margin="10,211.12,0,0" VerticalAlignment="Top" Height="25.96" Width="106.123"/>
             <Label Content="Aggregation result analyses" HorizontalAlignment="Left" Margin="19.022,350.802,0,0" VerticalAlignment="Top" Height="27.003"/>
             <Label Name="lblPbarStatus" Content="Status" HorizontalAlignment="Left" Margin="10,190.681,0,0" Grid.Row="1" VerticalAlignment="Top" Width="238.093"/>
+            <ComboBox Name="selectionTypeComboBox" HorizontalAlignment="Left" Height="22.119" Margin="110.272,297.243,0,0" VerticalAlignment="Top" Width="148.947" SelectedIndex="0
+                      " SelectionChanged="selectionTypeComboBox_SelectionChanged">
+                <ComboBoxItem>Draw Rectangle</ComboBoxItem>
+                <ComboBoxItem>Use Selected Polygons</ComboBoxItem>
+            </ComboBox>
+            <Label Content="Selection Type" HorizontalAlignment="Left" Margin="10,293.242,0,0" VerticalAlignment="Top"/>
+            <Label Content="Label" HorizontalAlignment="Left" Height="3.602" Margin="116.139,342.2,0,0" VerticalAlignment="Top" Width="7.461"/>
         </Grid>
         <Grid HorizontalAlignment="Left" Height="0" Margin="119.8,61.2,0,-57.349" VerticalAlignment="Top" Width="3.2" Grid.Column="2" Grid.Row="2"/>
     </Grid>

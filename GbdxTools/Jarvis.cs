@@ -5,8 +5,10 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
 
+    using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Geodatabase;
     using ESRI.ArcGIS.Geometry;
@@ -83,7 +85,7 @@
 
             var tmpField = new FieldClass();
             IFieldEdit tmpFieldEdit = (IFieldEdit)tmpField;
-            tmpFieldEdit.Name_2 = "Name";
+            tmpFieldEdit.Name_2 = "GeoHash";
             tmpFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
             tmpFieldEdit.Length_2 = 20;
             fieldsEdit.AddField(tmpField);
@@ -236,10 +238,7 @@
         /// <summary>
         /// The logger.
         /// </summary>
-        public static readonly Logger Logger =
-            new Logger(
-                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + "\\GBDX\\GBDX.log",
-                false);
+        public static readonly Logger Logger = new Logger(LogFile,false);
 
         /// <summary>
         /// Open the GBDX cloud workspace.  This defaults to the GBDX cloud file GDB.
@@ -272,6 +271,7 @@
 
             return workspace;
         }
+
         public static List<String> GetFieldList(IFeatureClass fc) {
           List<String> outlist = new List<String>();
           for (int i = 0; i < fc.Fields.FieldCount;i++ ) {
@@ -279,7 +279,134 @@
           }
           return outlist;
         }
-    
 
+        /// <summary>
+        /// Get all the selected Polygons from the map document
+        /// </summary>
+        /// <param name="focusMap">Map document with selected polygons</param>
+        /// <returns>List of IPolygons</returns>
+        public static List<IPolygon> GetPolygons(IMap focusMap)
+        {
+            List<IPolygon> polygons = new List<IPolygon>();
+
+            IEnumFeature pEnumFeat = (IEnumFeature)focusMap.FeatureSelection;
+            pEnumFeat.Reset();
+
+            try
+            {
+                IFeature pfeat;
+                while((pfeat = pEnumFeat.Next()) != null)
+                {
+                        IPolygon geo = (IPolygon)pfeat.ShapeCopy;
+                        polygons.Add(geo);
+                }
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
+
+            return polygons;
+        }
+
+        public static string ConvertPolygonsToGeoJson(List<IPolygon> polygons)
+        {
+            StringBuilder output = new StringBuilder("{\"type\":\"MultiPolygon\", \"coordinates\": [");
+
+            for (int i = 0; i < polygons.Count; i++)
+            {
+                if (i != 0)
+                {
+                    output.Append(",");
+                }
+
+                output.Append(ConvertToPolygonGeoJson(polygons[i]));
+            }
+
+            output.Append("]}");
+            return output.ToString();
+        }
+
+        private static string ConvertToPolygonGeoJson(IPolygon poly)
+        {
+            var output = new StringBuilder();
+            var poly4 = (IPolygon4)poly;
+            var exteriorRingGeometryBag = poly4.ExteriorRingBag;
+            var exteriorRingGeometryCollection = exteriorRingGeometryBag as IGeometryCollection;
+
+            if (exteriorRingGeometryCollection != null)
+            {
+                for (int i = 0; i < exteriorRingGeometryCollection.GeometryCount; i++)
+                {
+                    if (i != 0)
+                    {
+                        output.Append(",");
+                    }
+                    output.Append("[[");
+                    var exteriorRingGeometry = exteriorRingGeometryCollection.Geometry[i];
+
+                    output.Append(ConvertPointCollectionToGeoJson(exteriorRingGeometry));
+                    output.Append("]]");
+
+                    output.Append(ConvertInteriorRingsToGeoJson(poly4.InteriorRingBag[exteriorRingGeometry as IRing]));
+                }
+            }
+
+            return output.ToString();
+        }
+
+        private static string ConvertPointCollectionToGeoJson(IGeometry ringGeometry)
+        {
+            var pointCollect = ringGeometry as IPointCollection;
+            var builder = new StringBuilder();
+            if(pointCollect != null)
+            {
+                for (int i = 0; i < pointCollect.PointCount; i++)
+                {
+                    if (i != 0)
+                    {
+                        builder.Append(", ");
+                    }
+                    var point = pointCollect.Point[i];
+                    builder.Append(PointToString(point));
+                }
+            }
+            return builder.ToString();
+        }
+
+        private static string ConvertInteriorRingsToGeoJson(IGeometryBag interiorRingGeometryBag)
+        {
+            var output = new StringBuilder();
+            var interiorRingGeometryCollection = interiorRingGeometryBag as IGeometryCollection;
+
+            if (interiorRingGeometryCollection != null && interiorRingGeometryCollection.GeometryCount > 0)
+            {
+                output.Append(",");
+            }
+            else
+            {
+                return string.Empty;
+            }
+
+            for (int i = 0; i < interiorRingGeometryCollection.GeometryCount; i++)
+            {
+                if (i != 0)
+                {
+                    output.Append(", ");
+                }
+
+                output.Append("[[");
+                var interiorRingGeometry = interiorRingGeometryCollection.Geometry[i];
+                output.Append(ConvertPointCollectionToGeoJson(interiorRingGeometry));
+                output.Append("]]");
+            }
+
+            return output.ToString();
+        }
+
+        private static string PointToString(IPoint point)
+        {
+            return "[" + point.X + ", " + point.Y + "]";
+        }  
     }
 }

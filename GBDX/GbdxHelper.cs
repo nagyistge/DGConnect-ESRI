@@ -29,63 +29,6 @@ namespace Gbdx
     public static class GbdxHelper
     {
         /// <summary>
-        /// Some components still use the old CAS authentication system.  This function is to accommodate those components.
-        /// </summary>
-        /// <param name="userSettings">
-        /// The user settings.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        internal static string GetCasTicketEndpoint(GbdxSettings.Properties.Settings userSettings)
-        {
-            if (string.IsNullOrEmpty(userSettings.baseUrl))
-            {
-                return userSettings.DefaultBaseUrl + userSettings.casTicket;
-            }
-
-            return userSettings.baseUrl + userSettings.casTicket;
-        }
-
-        /// <summary>
-        /// Some components still use the old CAS authentication system.  This function is to accommodate those components.
-        /// </summary>
-        /// <param name="userSettings">
-        /// The user settings.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        internal static string GetCasAuthenticationEndpoint(GbdxSettings.Properties.Settings userSettings)
-        {
-            if (string.IsNullOrEmpty(userSettings.baseUrl))
-            {
-                return userSettings.DefaultBaseUrl + userSettings.casAuth;
-            }
-
-            return userSettings.baseUrl + userSettings.casAuth;
-        }
-
-        /// <summary>
-        /// Some components still use the old CAS authentication system.  This function is to accommodate those components.
-        /// </summary>
-        /// <param name="userSettings">
-        /// The user settings.
-        /// </param>
-        /// <returns>
-        /// The <see cref="string"/>.
-        /// </returns>
-        internal static string GetCasBaseEndpoint(GbdxSettings.Properties.Settings userSettings)
-        {
-            if (string.IsNullOrEmpty(userSettings.baseUrl))
-            {
-                return userSettings.DefaultBaseUrl + userSettings.casBase;
-            }
-
-            return userSettings.baseUrl + userSettings.casBase;
-        }
-
-        /// <summary>
         /// Manages which authentication endpoint gets returned based on user settings
         /// </summary>
         /// <param name="userSettings">user settings</param>

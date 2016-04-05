@@ -36,6 +36,16 @@ namespace NetworkConnections
         {
             this.ErrorOccurred = false;
         }
+
+        /// <summary>
+        /// The geojson representation of the polygon being sent to vector services.
+        /// </summary>
+        public string PolygonAoi { get; set; }
+
+        /// <summary>
+        /// Flag used to determine if a polygon Aoi is being used.
+        /// </summary>
+        public bool UsingPolygonAoi { get; set; }
         
         /// <summary>
         /// Gets or sets the authorization token. 
@@ -56,12 +66,7 @@ namespace NetworkConnections
         /// Gets or sets the address url.
         /// </summary>
         public string AddressUrl { get; set; }
-
-        /// <summary>
-        /// Gets or sets the cookie jar.
-        /// </summary>
-        public CookieContainer CookieJar { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the user.
         /// </summary>
@@ -71,12 +76,7 @@ namespace NetworkConnections
         /// Gets or sets the password.
         /// </summary>
         public string Password { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ticket endpoint.
-        /// </summary>
-        public string TicketEndpoint { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the auth endpoint.
         /// </summary>
@@ -86,26 +86,11 @@ namespace NetworkConnections
         /// Gets or sets the result.
         /// </summary>
         public string Result { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether use DEV authentication.
-        /// </summary>
-        public bool UseDevAuthentication { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timeouts.
-        /// </summary>
-        public int Timeouts { get; set; }
-
+        
         /// <summary>
         /// Gets or sets the error.
         /// </summary>
         public Exception Error { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timeout setting.
-        /// </summary>
-        public int TimeoutSetting { get; set; }
 
         /// <summary>
         /// Gets or sets the page id.

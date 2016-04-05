@@ -49,15 +49,6 @@ namespace GbdxSettings.Properties {
         
         [global::System.Configuration.ApplicationScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool orbit {
-            get {
-                return ((bool)(this["orbit"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("/auth/v1/oauth/token")]
         public string authenticationServer {
             get {
@@ -83,52 +74,6 @@ namespace GbdxSettings.Properties {
         public string StagingUrl {
             get {
                 return ((string)(this["StagingUrl"]));
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string sma_time {
-            get {
-                return ((string)(this["sma_time"]));
-            }
-            set {
-                this["sma_time"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.DateTime sma_date_from {
-            get {
-                return ((global::System.DateTime)(this["sma_date_from"]));
-            }
-            set {
-                this["sma_date_from"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.DateTime sma_date_to {
-            get {
-                return ((global::System.DateTime)(this["sma_date_to"]));
-            }
-            set {
-                this["sma_date_to"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string sma_query_limit {
-            get {
-                return ((string)(this["sma_query_limit"]));
-            }
-            set {
-                this["sma_query_limit"] = value;
             }
         }
         
@@ -159,33 +104,6 @@ namespace GbdxSettings.Properties {
         public string logfile {
             get {
                 return ((string)(this["logfile"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/cas/v1/tickets")]
-        public string casTicket {
-            get {
-                return ((string)(this["casTicket"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/monocle-3/j_spring_cas_security_check")]
-        public string casAuth {
-            get {
-                return ((string)(this["casAuth"]));
-            }
-        }
-        
-        [global::System.Configuration.ApplicationScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("/monocle-3")]
-        public string casBase {
-            get {
-                return ((string)(this["casBase"]));
             }
         }
         
