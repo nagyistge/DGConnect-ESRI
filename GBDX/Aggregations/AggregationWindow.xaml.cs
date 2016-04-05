@@ -318,50 +318,56 @@ namespace Gbdx.Aggregations
 
         private void HandleResponse(IRestResponse<MotherOfGodAggregations> response)
         {
-            if (response.Data != null)
+            try
             {
-                var workspace = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
-                var resultDictionary = new Dictionary<string, Dictionary<string, double>>();
-                var uniqueFieldNames = new Dictionary<string, string>();
+                if (response.Data != null)
+                {
+                    var workspace = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+                    var resultDictionary = new Dictionary<string, Dictionary<string, double>>();
+                    var uniqueFieldNames = new Dictionary<string, string>();
 
-                AggregationHelper.ProcessAggregations(
-                    response.Data.aggregations,
-                    0,
-                    ref resultDictionary,
-                    string.Empty,
-                    false,
-                    ref uniqueFieldNames);
+                    AggregationHelper.ProcessAggregations(
+                        response.Data.aggregations,
+                        0,
+                        ref resultDictionary,
+                        string.Empty,
+                        false,
+                        ref uniqueFieldNames);
 
-                // Create a unique name for the feature class based on name.
-                var featureClassName = "Aggregation" + DateTime.Now.ToString("ddMMMHHmmss");
+                    // Create a unique name for the feature class based on name.
+                    var featureClassName = "Aggregation" + DateTime.Now.ToString("ddMMMHHmmss");
 
-                // Function being called really says it all but ... lets CREATE A FEATURE CLASS
-                var featureClass = Jarvis.CreateStandaloneFeatureClass(
-                    workspace,
-                    featureClassName,
-                    uniqueFieldNames,
-                    false,
-                    0);
+                    // Function being called really says it all but ... lets CREATE A FEATURE CLASS
+                    var featureClass = Jarvis.CreateStandaloneFeatureClass(
+                        workspace,
+                        featureClassName,
+                        uniqueFieldNames,
+                        false,
+                        0);
 
-                this.WriteToFeatureClass(featureClass, resultDictionary, uniqueFieldNames, workspace);
+                    this.WriteToFeatureClass(featureClass, resultDictionary, uniqueFieldNames, workspace);
 
-                // Use the dispatcher to make sure the following calls occur on the MAIN thread.
-                this.Dispatcher.Invoke(
-                    DispatcherPriority.Normal,
-                    (MethodInvoker)delegate
-                        {
-                            this.AddLayerToArcMap(featureClassName);
-                            this.goButton.IsEnabled = true;
-                        });
+                    // Use the dispatcher to make sure the following calls occur on the MAIN thread.
+                    this.Dispatcher.Invoke(
+                        DispatcherPriority.Normal,
+                        (MethodInvoker)delegate
+                            {
+                                this.AddLayerToArcMap(featureClassName);
+                                this.goButton.IsEnabled = true;
+                            });
+                }
+                else
+                {
+                    var error = string.Format("\n{0}\n\n{1}", response.ResponseUri.AbsoluteUri, response.Content);
+                    throw new Exception(error);
+                }
             }
-            else
+            catch (Exception error)
             {
-                var error = string.Format("\n{0}\n\n{1}", response.ResponseUri.AbsoluteUri, response.Content);
-                this.logWriter.Error(error);
-
+                Jarvis.Logger.Error(error);
                 this.Dispatcher.Invoke(
-                    DispatcherPriority.Normal,
-                    (MethodInvoker)delegate { this.goButton.IsEnabled = true; });
+                        DispatcherPriority.Normal,
+                        (MethodInvoker)delegate { this.goButton.IsEnabled = true; });
 
                 MessageBox.Show(GbdxResources.Source_ErrorMessage);
             }
@@ -468,7 +474,7 @@ namespace Gbdx.Aggregations
                 buffer.Value[featureClass.FindField("GeoHash")] = key;
                 foreach (var subKey in resultDictionary[key].Keys)
                 {
-                    var field = uniqueFieldNames[subKey];
+                    var field = "DG_" + uniqueFieldNames[subKey];
                     var value = resultDictionary[key][subKey];
                     var index = featureClass.FindField(field);
 
