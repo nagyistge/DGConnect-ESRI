@@ -185,7 +185,7 @@ namespace NetworkConnections
                 {
                     return netObject;
                 }
-
+                logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
                 var request = new RestRequest(netObject.AddressUrl, Method.POST);
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 var postData = Encoding.ASCII.GetBytes(bodyPostData);
@@ -231,6 +231,7 @@ namespace NetworkConnections
                     return netObject;
                 }
 
+                logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
                 var request = new RestRequest(netObject.AddressUrl, Method.POST);
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 request.AddHeader("Content-Type", "application/json");
@@ -277,6 +278,7 @@ namespace NetworkConnections
                     this.client = new RestClient(netObject.BaseUrl);
                 }
 
+                logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
                 var request = new RestRequest(netObject.AddressUrl);
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 var response = this.client.Execute(request);
@@ -325,6 +327,7 @@ namespace NetworkConnections
                 this.client = new RestClient(netObject.BaseUrl);
             }
 
+            logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
             var request = new RestRequest(netObject.AddressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.AccessToken);
             request.AddParameter("application/json", jsonDataPayLoad, ParameterType.RequestBody);
@@ -363,7 +366,7 @@ namespace NetworkConnections
             {
                 this.client = new RestClient(netObject.BaseUrl);
             }
-
+            logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
             IRestRequest request = new RestRequest(netObject.AddressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.AccessToken);
             var postData = ReadToEnd(filepath);
@@ -511,8 +514,9 @@ namespace NetworkConnections
             request.AddParameter("grant_type", "password");
             request.AddParameter("username", nobj.User);
             request.AddParameter("password", nobj.Password);
-            
 
+            logger.Info(client.BaseUrl.OriginalString + nobj.AuthEndpoint);
+            logger.Info(client.BaseUrl.ToString().Remove(client.BaseUrl.ToString().Length - 1) + nobj.AuthEndpoint);
             IRestResponse<AccessToken> response = client.Execute<AccessToken>(request);
 
             // Set the status code.
