@@ -23,6 +23,7 @@ namespace GBD
 {
     using System;
     using System.Collections.Generic;
+    using System.Windows.Forms;
 
     using GbdxTools;
 
@@ -50,6 +51,10 @@ namespace GBD
                 List<GbdPolygon> polygons = new List<GbdPolygon>();
                 IPoint startingPoint = env.UpperLeft;
 
+                if (startingPoint.IsEmpty)
+                {
+                    return null;
+                }
                 while (startingPoint.Y != env.LowerLeft.Y)
                 {
                     var temp = ProcessRow(new List<GbdPolygon>(), startingPoint, env);

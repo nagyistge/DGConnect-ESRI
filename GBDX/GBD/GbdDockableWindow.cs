@@ -1408,7 +1408,13 @@ namespace Gbdx.Gbd
             this.localDatatable.Clear();
             
             var output = GbdJarvis.CreateAois(this.localPolygon.Envelope);
-            
+
+            if (output == null)
+            {
+                MessageBox.Show(GbdxResources.redrawBoundingBox);
+                return;
+            }
+
             // Login has been completed so lets proceed with the next set of network calls.
             this.GetGbdData(output);
         }
