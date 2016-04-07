@@ -285,6 +285,15 @@ namespace GbdxSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Please redraw bounding box by click and dragging..
+        /// </summary>
+        public static string redrawBoundingBox {
+            get {
+                return ResourceManager.GetString("redrawBoundingBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Searching.
         /// </summary>
         public static string SearchingText {
