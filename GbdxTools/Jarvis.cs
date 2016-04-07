@@ -145,7 +145,7 @@
 
                 var tempField = new FieldClass();
                 IFieldEdit tempFieldEdit = (IFieldEdit)tempField;
-                tempFieldEdit.Name_2 = "DG_"+uniqueNames[name];
+                tempFieldEdit.Name_2 = uniqueNames[name];
                 tempFieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
                 tempFieldEdit.Length_2 = 20;
                 tempFieldEdit.AliasName_2 = name;
