@@ -521,17 +521,26 @@ namespace Gbdx.Aggregations
 
                 // Setup the features geometry.
                 buffer.Shape = (IGeometry)poly;
+
                 foreach (String val in entry.Data.Keys)
                 {
                     if (uniqueFieldNames.ContainsKey(val))
                     {
-                        if (val.EndsWith("_str"))
+
+                        try
                         {
-                            buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Label;
+                            if (val.EndsWith("_str"))
+                            {
+                                buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Label;
+                            }
+                            else
+                            {
+                                buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Data[val];
+                            }
                         }
-                        else
+                        catch (Exception error)
                         {
-                            buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Data[val];
+                            Jarvis.Logger.Error(error);
                         }
                     }
                     // Feature has been created so add to the feature class.

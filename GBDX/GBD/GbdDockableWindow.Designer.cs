@@ -118,7 +118,7 @@
             "1.1",
             "1.2",
             "1.3 (Lowest Resolution)"});
-            this.panResolutionComboBox.Location = new System.Drawing.Point(139, 192);
+            this.panResolutionComboBox.Location = new System.Drawing.Point(139, 193);
             this.panResolutionComboBox.Name = "panResolutionComboBox";
             this.panResolutionComboBox.Size = new System.Drawing.Size(129, 24);
             this.panResolutionComboBox.TabIndex = 10;
