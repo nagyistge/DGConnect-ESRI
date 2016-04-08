@@ -1024,14 +1024,14 @@ namespace Gbdx.Gbd
                             writeRow = (bool)item.Cells[i].Value;
                             continue;
                         }
-
+                        DataGridViewCell value = item.Cells[i];
                         if (rowToBeWritten == string.Empty)
                         {
-                            rowToBeWritten += item.Cells[i].Value.ToString();
+                            rowToBeWritten += GetValue(value);
                         }
                         else
                         {
-                            rowToBeWritten += "," + item.Cells[i].Value;
+                            rowToBeWritten += "," + GetValue(value);
                         }
                     }
 
@@ -1050,6 +1050,12 @@ namespace Gbdx.Gbd
             {
                 this.logWriter.Error(error);
             }
+        }
+
+        private static string GetValue(DataGridViewCell value)
+        {
+            string output = string.Format("\"{0}\"", value.Value);
+            return output;
         }
 
         /// <summary>
