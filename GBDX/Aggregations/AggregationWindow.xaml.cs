@@ -312,7 +312,6 @@ namespace Gbdx.Aggregations
                 request.AddHeader("Content-Type", "application/json");
                 request.AddParameter("application/json", aoi, ParameterType.RequestBody);
             }
-
             this.Client.ExecuteAsync<MotherOfGodAggregations>(request, response => this.HandleResponse(response));
         }
 
@@ -320,6 +319,7 @@ namespace Gbdx.Aggregations
         {
             try
             {
+                Jarvis.Logger.Info(response.ResponseUri.ToString());
                 if (response.Data != null)
                 {
                     var workspace = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
@@ -1063,8 +1063,6 @@ namespace Gbdx.Aggregations
         {
             IFeatureSelection featureSelection = (IFeatureSelection)featureLayer;
             var selectionSet = featureSelection.SelectionSet;
-            IFeatureClass featureClass = featureLayer.FeatureClass;
-            string shapeField = featureClass.ShapeFieldName;
 
             ICursor cursor;
             selectionSet.Search(new QueryFilterClass(), false, out cursor);
@@ -1175,7 +1173,6 @@ namespace Gbdx.Aggregations
 
                     String fcName = "mlt_" + entry.RowKey + "_" + DateTime.Now.Millisecond;
                     var featureClass = Jarvis.CreateStandaloneFeatureClass(ws, fcName, outputCols, false, 0);
-                    IFeatureCursor insertCur = featureClass.Insert(true);
                     this.UpdateStatusLabel("Loading Feature Class");
                     System.Windows.Forms.Application.DoEvents();
 
