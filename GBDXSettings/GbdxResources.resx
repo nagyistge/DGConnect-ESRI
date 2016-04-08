@@ -236,6 +236,6 @@ Private data should NOT be uploaded.</value>
 Please select features and try again.</value>
   </data>
   <data name="redrawBoundingBox" xml:space="preserve">
-    <value>Please click Select Area and redraw bounding box by click and dragging.</value>
+    <value>Please click Select Area and redraw bounding box by clicking and dragging to create a polygon.</value>
   </data>
 </root>
