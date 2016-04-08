@@ -473,7 +473,7 @@ namespace Gbdx.Aggregations
                 buffer.Value[featureClass.FindField("GeoHash")] = key;
                 foreach (var subKey in resultDictionary[key].Keys)
                 {
-                    var field = "DG_" + uniqueFieldNames[subKey];
+                    var field = uniqueFieldNames[subKey];
                     var value = resultDictionary[key][subKey];
                     var index = featureClass.FindField(field);
 

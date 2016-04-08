@@ -174,7 +174,7 @@
             }
 
             name = GbdxTools.Jarvis.InvalidFieldCharacters.Replace(name, "_");
-            return name;
+            return "DG_"+ name;
         }
     }
 } 
