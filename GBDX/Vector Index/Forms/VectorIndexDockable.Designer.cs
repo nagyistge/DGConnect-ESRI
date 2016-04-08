@@ -35,6 +35,8 @@
             this.aoiTypeComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.selectAreaButton = new System.Windows.Forms.Button();
+
+            this.label2 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -46,26 +48,28 @@
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 148F));
-            this.tableLayoutPanel1.Controls.Add(this.clearButton, 1, 3);
-            this.tableLayoutPanel1.Controls.Add(this.treeView1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.textBoxSearch, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.aoiTypeComboBox, 1, 2);
-            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 2);
-            this.tableLayoutPanel1.Controls.Add(this.selectAreaButton, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.clearButton, 1, 4);
+            this.tableLayoutPanel1.Controls.Add(this.selectAreaButton, 0, 4);
+            this.tableLayoutPanel1.Controls.Add(this.label1, 0, 3);
+            this.tableLayoutPanel1.Controls.Add(this.aoiTypeComboBox, 1, 3);
+            this.tableLayoutPanel1.Controls.Add(this.treeView1, 1, 1);
+            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 1);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 4;
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 5.502846F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 94.49715F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(300, 597);
+            this.tableLayoutPanel1.RowCount = 5;
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 35F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(300, 613);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // clearButton
             // 
             this.clearButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.clearButton.Location = new System.Drawing.Point(207, 567);
+            this.clearButton.Location = new System.Drawing.Point(207, 582);
             this.clearButton.Name = "clearButton";
             this.clearButton.Size = new System.Drawing.Size(90, 27);
             this.clearButton.TabIndex = 2;
@@ -80,9 +84,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.treeView1.CheckBoxes = true;
             this.tableLayoutPanel1.SetColumnSpan(this.treeView1, 2);
-            this.treeView1.Location = new System.Drawing.Point(3, 32);
+            this.treeView1.Location = new System.Drawing.Point(3, 48);
             this.treeView1.Name = "treeView1";
-            this.treeView1.Size = new System.Drawing.Size(294, 497);
+            this.treeView1.Size = new System.Drawing.Size(294, 493);
             this.treeView1.TabIndex = 1;
             // 
             // textBoxSearch
@@ -103,7 +107,7 @@
             this.aoiTypeComboBox.Items.AddRange(new object[] {
             "Draw Rectangle",
             "Use Selected Polygon(s)"});
-            this.aoiTypeComboBox.Location = new System.Drawing.Point(155, 535);
+            this.aoiTypeComboBox.Location = new System.Drawing.Point(155, 549);
             this.aoiTypeComboBox.Name = "aoiTypeComboBox";
             this.aoiTypeComboBox.Size = new System.Drawing.Size(142, 24);
             this.aoiTypeComboBox.TabIndex = 4;
@@ -113,7 +117,7 @@
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(18, 539);
+            this.label1.Location = new System.Drawing.Point(18, 553);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(116, 17);
             this.label1.TabIndex = 5;
@@ -122,7 +126,7 @@
             // selectAreaButton
             // 
             this.selectAreaButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.selectAreaButton.Location = new System.Drawing.Point(3, 567);
+            this.selectAreaButton.Location = new System.Drawing.Point(3, 583);
             this.selectAreaButton.Name = "selectAreaButton";
             this.selectAreaButton.Size = new System.Drawing.Size(90, 26);
             this.selectAreaButton.TabIndex = 0;
@@ -130,11 +134,22 @@
             this.selectAreaButton.UseVisualStyleBackColor = true;
             this.selectAreaButton.Click += new System.EventHandler(this.SelectAreaButtonClick);
             // 
+            // label2
+            // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.label2.AutoSize = true;
+            this.label2.ForeColor = System.Drawing.SystemColors.ActiveBorder;
+            this.label2.Location = new System.Drawing.Point(3, 26);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(102, 17);
+            this.label2.TabIndex = 6;
+            this.label2.Text = "Case-Sensitive";
+            // 
             // VectorIndexDockable
             // 
             this.Controls.Add(this.tableLayoutPanel1);
             this.Name = "VectorIndexDockable";
-            this.Size = new System.Drawing.Size(306, 600);
+            this.Size = new System.Drawing.Size(306, 616);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.ResumeLayout(false);
@@ -150,6 +165,7 @@
         private System.Windows.Forms.TextBox textBoxSearch;
         private System.Windows.Forms.ComboBox aoiTypeComboBox;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
 
     }
 }
