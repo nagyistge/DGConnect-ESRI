@@ -182,12 +182,12 @@ namespace GbdxSettings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to MLTC stands for \&quot;More Like This[ese] Cell[s].\&quot;
-        ///This tool shows a similarity heatmap based on a selection. Similar in nature to a \&quot; More Like This \&quot; function. If many cells are selected then there will either be an output layer for each selected cell, or the average will be calculated.
-        ///&quot;+ &quot;If an average is selected, then a graph of similarities between each feature will be printed out.
-        ///Make a selection
-        ///choose the layer with the selection
-        ///click generate button.
+        ///   Looks up a localized string similar to MLTC stands for &quot;More Like This[ese] Cell[s].&quot;
+        ///This tool shows a similarity heatmap based on a selection. Similar in nature to a &quot;More Like This &quot; function. If many cells are selected then there will either be an output layer for each selected cell, or the average will be calculated.  If an average is selected, then a graph of similarities between each feature will be printed out.
+        ///
+        ///1) Make a selection
+        ///2) Choose the layer with the selection
+        ///3) Click generate button.
         /// </summary>
         public static string mltcAbout {
             get {

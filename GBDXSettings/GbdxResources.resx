@@ -214,12 +214,12 @@ Only letters and the '.' are allowed.</value>
 The file size is greater than 100 MB.</value>
   </data>
   <data name="mltcAbout" xml:space="preserve">
-    <value>MLTC stands for \"More Like This[ese] Cell[s].\"
-This tool shows a similarity heatmap based on a selection. Similar in nature to a \" More Like This \" function. If many cells are selected then there will either be an output layer for each selected cell, or the average will be calculated.
-"+ "If an average is selected, then a graph of similarities between each feature will be printed out.
-Make a selection
-choose the layer with the selection
-click generate button</value>
+    <value>MLTC stands for "More Like This[ese] Cell[s]."
+This tool shows a similarity heatmap based on a selection. Similar in nature to a "More Like This " function. If many cells are selected then there will either be an output layer for each selected cell, or the average will be calculated.  If an average is selected, then a graph of similarities between each feature will be printed out.
+
+1) Make a selection
+2) Choose the layer with the selection
+3) Click generate button</value>
   </data>
   <data name="dataUploadWarning" xml:space="preserve">
     <value>Please be aware that all uploaded data is available to the public.  
