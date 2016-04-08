@@ -393,7 +393,7 @@ namespace Gbdx.Aggregations
 
             if (this.tbFilter != null && this.tbFilter.Text != null && this.tbFilter.Text != "")
             {
-                request.AddParameter("query", this.tbFilter.Text, ParameterType.QueryString);
+                request.AddParameter("query", this.tbFilter.Text.Replace("\n","").Replace("\r",""), ParameterType.QueryString);
             }
 
             // If the user setup a custom date range then use that otherwise assume no date range has been specified.
