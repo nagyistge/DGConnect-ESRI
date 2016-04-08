@@ -289,7 +289,7 @@ namespace GbdxSettings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please click Select Area and redraw bounding box by click and dragging..
+        ///   Looks up a localized string similar to Please click Select Area and redraw bounding box by clicking and dragging to create a polygon..
         /// </summary>
         public static string redrawBoundingBox {
             get {
