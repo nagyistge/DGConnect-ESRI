@@ -604,7 +604,15 @@ namespace NetworkConnections
             }
 
             obj.ErrorOccurred = true;
-            logger.Error(response.Content);
+            if (string.IsNullOrEmpty(response.Content))
+            {
+                logger.Error(response.StatusCode.ToString());
+            }
+            else
+            {
+                logger.Error(response.Content);
+            }
+            
             return obj;
         }
     }
