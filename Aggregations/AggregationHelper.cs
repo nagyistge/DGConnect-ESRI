@@ -174,6 +174,11 @@
                         }
                     }
                 }
+                if (terms.Count == 0)
+                {
+                    return;
+                }
+
                 if (terms[index].aggregations != null)
                 {
                     // There are still more nested aggregations to search through so get to it.
