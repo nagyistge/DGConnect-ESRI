@@ -1054,7 +1054,7 @@ namespace Gbdx.Gbd
 
         private static string GetValue(DataGridViewCell value)
         {
-            string output = string.Format("\"{0}\"", value.Value);
+            string output = string.Format("=\"{0}\"", value.Value);
             return output;
         }
 
