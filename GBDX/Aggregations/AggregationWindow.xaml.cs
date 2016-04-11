@@ -334,6 +334,17 @@ namespace Gbdx.Aggregations
                         false,
                         ref uniqueFieldNames);
 
+                    if (resultDictionary.Count == 0 && uniqueFieldNames.Count == 0)
+                    {
+                        MessageBox.Show(GbdxResources.NoDataFound);
+                        this.Dispatcher.Invoke(
+                        DispatcherPriority.Normal,
+                        (MethodInvoker)delegate { this.goButton.IsEnabled = true; });
+
+                        return;
+
+                    }
+
                     // Create a unique name for the feature class based on name.
                     var featureClassName = "Aggregation" + DateTime.Now.ToString("ddMMMHHmmss");
 

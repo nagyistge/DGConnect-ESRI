@@ -179,7 +179,7 @@ Only letters and the '.' are allowed.</value>
   <data name="SuccessfulConnection" xml:space="preserve">
     <value>Successful Connection.</value>
   </data>
-  <data name="VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_" xml:space="preserve">
+  <data name="NoDataFound" xml:space="preserve">
     <value>No data found.</value>
   </data>
   <data name="Hide_Advanced_Options" xml:space="preserve">
