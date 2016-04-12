@@ -369,7 +369,7 @@ namespace Gbdx.Aggregations
                 }
                 else
                 {
-                    var error = string.Format("\n{0}\n\n{1}", response.ResponseUri.AbsoluteUri, response.Content);
+                    var error = string.Format("STATUS: {0}\n{1}\n\n{2}", response.StatusCode ,response.ResponseUri.AbsoluteUri, response.Content);
                     throw new Exception(error);
                 }
             }
