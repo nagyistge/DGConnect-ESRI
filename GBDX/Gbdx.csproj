@@ -38,10 +38,10 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG; </DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <RegisterForComInterop>false</RegisterForComInterop>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -181,6 +181,8 @@
     <Compile Include="Aggregations\PivotTableAnalyzer.cs" />
     <Compile Include="Aggregations\PivotTableCache.cs" />
     <Compile Include="Aggregations\PivotTableEntry.cs" />
+    <Compile Include="Answer Factory\AnswerFactoryCreateProject.cs" />
+    <Compile Include="Answer Factory\AnswerFactoryProjects.cs" />
     <Compile Include="Config.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Config.esriaddinx</DependentUpon>
@@ -241,7 +243,7 @@
     <Compile Include="Vector Index\VectorIndexRelay.cs" />
     <Compile Include="Vector Index\VectorIndexSourceNode.cs" />
     <Compile Include="Vector Index\VectorIndexTypeNode.cs" />
-    <Compile Include="VectorUpload.cs" />
+    <Compile Include="Answer Factory\VectorUpload.cs" />
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Config.esriaddinx">
@@ -368,6 +370,15 @@
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\VectorUpload.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\AnswerFactoryCreateProject.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\AnswerFactoryProjects.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\AnswerFactoryButton.png" />
   </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>
