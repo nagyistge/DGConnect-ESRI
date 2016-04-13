@@ -31,7 +31,7 @@
             <Button refID="DigitalGlobe_Inc_GbdButton" />
             <Button refID="DigitalGlobe_Inc_AggregationButton" />
             <Button refID="DigitalGlobe_Inc_Gbdx_VectorUpload" />
-            <Button refID="DigitalGlobe_Inc_Gbdx_AnswerFactoryButton"/>
+            <Button refID="DigitalGlobe_Inc_Gbdx_AnswerFactoryButton" />
             <Button refID="DigitalGlobe_Inc_sma_smaConfig" separator="true" />
             <Button refID="DigitalGlobe_Inc_GbdxAboutButton" />
           </Items>
@@ -47,8 +47,8 @@
         <DockableWindow id="DigitalGlobe_Inc_AggregationWindow" class="Gbdx.Aggregations.AggregationWindow+AddinImpl" caption="Aggregations" image="Images\AggregationWindow.png">
           <InitialPlacement height="264" width="267" state="unpinned" position="left" />
         </DockableWindow>
-        <DockableWindow id="DigitalGlobe_Inc_Gbdx_AnswerFactoryProjects" class="AnswerFactoryProjects+AddinImpl" caption="My Dockable Window" image="Images\AnswerFactoryProjects.png">
-          <InitialPlacement height="300" width="300" state="pinned" position="left" />
+        <DockableWindow id="DigitalGlobe_Inc_Gbdx_AnswerFactoryDockableWindow" class="Gbdx.Answer_Factory.AnswerFactoryDockableWindow+AddinImpl" caption="AnswerFactory" image="Images\AnswerFactoryDockableWindow.png">
+          <InitialPlacement height="300" width="300" state="pinned" position="right" />
         </DockableWindow>
       </DockableWindows>
     </ArcMap>

@@ -181,8 +181,13 @@
     <Compile Include="Aggregations\PivotTableAnalyzer.cs" />
     <Compile Include="Aggregations\PivotTableCache.cs" />
     <Compile Include="Aggregations\PivotTableEntry.cs" />
-    <Compile Include="Answer Factory\AnswerFactoryCreateProject.cs" />
-    <Compile Include="Answer Factory\AnswerFactoryProjects.cs" />
+    <Compile Include="Answer Factory\AnswerFactoryButton.cs" />
+    <Compile Include="Answer Factory\AnswerFactoryDockableWindow.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Answer Factory\AnswerFactoryDockableWindow.Designer.cs">
+      <DependentUpon>AnswerFactoryDockableWindow.cs</DependentUpon>
+    </Compile>
     <Compile Include="Config.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Config.esriaddinx</DependentUpon>
@@ -379,6 +384,9 @@
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\AnswerFactoryButton.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\AnswerFactoryDockableWindow.png" />
   </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>
