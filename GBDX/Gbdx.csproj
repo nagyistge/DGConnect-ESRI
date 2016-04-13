@@ -283,6 +283,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Answer Factory\AnswerFactoryDockableWindow.resx">
+      <DependentUpon>AnswerFactoryDockableWindow.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Gbd\GbdDockableWindow.resx">
       <DependentUpon>GbdDockableWindow.cs</DependentUpon>
     </EmbeddedResource>

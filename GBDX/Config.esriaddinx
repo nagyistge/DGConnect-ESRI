@@ -48,7 +48,7 @@
           <InitialPlacement height="264" width="267" state="unpinned" position="left" />
         </DockableWindow>
         <DockableWindow id="DigitalGlobe_Inc_Gbdx_AnswerFactoryDockableWindow" class="Gbdx.Answer_Factory.AnswerFactoryDockableWindow+AddinImpl" caption="AnswerFactory" image="Images\AnswerFactoryDockableWindow.png">
-          <InitialPlacement height="300" width="300" state="pinned" position="right" />
+          <InitialPlacement height="398" width="564" state="pinned" position="right" />
         </DockableWindow>
       </DockableWindows>
     </ArcMap>
