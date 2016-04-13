@@ -6,6 +6,8 @@ using System.IO;
 
 namespace Gbdx
 {
+    using ESRI.ArcGIS.esriSystem;
+
     public class AnswerFactoryCreateProject : ESRI.ArcGIS.Desktop.AddIns.Button
     {
         public AnswerFactoryCreateProject()
@@ -14,6 +16,10 @@ namespace Gbdx
 
         protected override void OnClick()
         {
+                UID theUid = new UIDClass();
+                theUid.Value = ThisAddIn.IDs.AnswerFactoryProjects;
+                var window = ArcMap.DockableWindowManager.GetDockableWindow(theUid);
+                window.Show(!window.IsVisible());
         }
 
         protected override void OnUpdate()
