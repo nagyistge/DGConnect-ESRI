@@ -65,6 +65,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\GbdxTools\GbdxTools.csproj">
+      <Project>{95B5413E-160A-4AFB-8B0A-B0DF1B1C093B}</Project>
+      <Name>GbdxTools</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{f64278bf-afd4-4304-815f-3e5130d8f9e8}</Project>
       <Name>Logging</Name>
