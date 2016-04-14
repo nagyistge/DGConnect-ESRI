@@ -1,0 +1,35 @@
+﻿namespace AnswerFactory
+{
+    using System.Collections.Generic;
+
+    public class Project
+    {
+        public string id { get; set; } 
+        public string owner { get; set; }
+        public string name { get; set; }
+        public string accountId { get; set; }
+        public List<IdahoImage> idahoImages { get; set; }
+        public List<string> aois { get; set; }
+        public List<RecipeConfig> recipeConfigs { get; set; } 
+        public List<string> bestIdahoIds { get; set; } 
+        public List<string> originalGeometries { get; set; } 
+        public List<NamedBuffer> namedBuffers { get; set; }
+
+        public override string ToString()
+        {
+            return
+                string.Format(
+                    "Project{id='{0}', owner='{1}', name='{2}', accountId='{3}', idahoImages={4}, originalGeometries={5}, namedBuffers={6}, aois={7}, recipeConfigs={8}, bestIdahoIds={9}}",
+                    this.id,
+                    this.owner,
+                    this.name,
+                    this.accountId,
+                    this.idahoImages,
+                    this.originalGeometries,
+                    this.namedBuffers,
+                    this.aois,
+                    this.recipeConfigs,
+                    this.bestIdahoIds);
+        }
+    }
+}
