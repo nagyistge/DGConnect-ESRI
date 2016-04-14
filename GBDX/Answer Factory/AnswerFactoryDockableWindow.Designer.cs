@@ -31,7 +31,6 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.selectShapefileButton = new System.Windows.Forms.Button();
             this.saveButton = new System.Windows.Forms.Button();
             this.addRecipeButton = new System.Windows.Forms.Button();
             this.computeButton = new System.Windows.Forms.Button();
@@ -88,7 +87,6 @@
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel2.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 79F));
-            this.tableLayoutPanel2.Controls.Add(this.selectShapefileButton, 0, 0);
             this.tableLayoutPanel2.Controls.Add(this.saveButton, 2, 4);
             this.tableLayoutPanel2.Controls.Add(this.addRecipeButton, 2, 3);
             this.tableLayoutPanel2.Controls.Add(this.computeButton, 2, 2);
@@ -109,16 +107,6 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(377, 247);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
-            // selectShapefileButton
-            // 
-            this.selectShapefileButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.selectShapefileButton.Location = new System.Drawing.Point(3, 9);
-            this.selectShapefileButton.Name = "selectShapefileButton";
-            this.selectShapefileButton.Size = new System.Drawing.Size(124, 30);
-            this.selectShapefileButton.TabIndex = 0;
-            this.selectShapefileButton.Text = "Select Shapefile";
-            this.selectShapefileButton.UseVisualStyleBackColor = true;
-            // 
             // saveButton
             // 
             this.saveButton.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -128,6 +116,7 @@
             this.saveButton.TabIndex = 1;
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
             // addRecipeButton
             // 
@@ -153,7 +142,7 @@
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(34, 65);
+            this.label1.Location = new System.Drawing.Point(30, 65);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(93, 17);
             this.label1.TabIndex = 4;
@@ -163,7 +152,7 @@
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(81, 114);
+            this.label2.Location = new System.Drawing.Point(77, 114);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(46, 17);
             this.label2.TabIndex = 5;
@@ -173,7 +162,7 @@
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(7, 164);
+            this.label3.Location = new System.Drawing.Point(3, 164);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(120, 17);
             this.label3.TabIndex = 6;
@@ -183,26 +172,26 @@
             // 
             this.projectNameTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel2.SetColumnSpan(this.projectNameTextbox, 2);
-            this.projectNameTextbox.Location = new System.Drawing.Point(133, 62);
+            this.projectNameTextbox.Location = new System.Drawing.Point(129, 62);
             this.projectNameTextbox.Name = "projectNameTextbox";
-            this.projectNameTextbox.Size = new System.Drawing.Size(241, 22);
+            this.projectNameTextbox.Size = new System.Drawing.Size(245, 22);
             this.projectNameTextbox.TabIndex = 7;
             // 
             // bufferTextbox
             // 
             this.bufferTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.bufferTextbox.Location = new System.Drawing.Point(133, 111);
+            this.bufferTextbox.Location = new System.Drawing.Point(129, 111);
             this.bufferTextbox.Name = "bufferTextbox";
-            this.bufferTextbox.Size = new System.Drawing.Size(162, 22);
+            this.bufferTextbox.Size = new System.Drawing.Size(166, 22);
             this.bufferTextbox.TabIndex = 8;
             // 
             // availableRecipesCombobox
             // 
             this.availableRecipesCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.availableRecipesCombobox.FormattingEnabled = true;
-            this.availableRecipesCombobox.Location = new System.Drawing.Point(133, 160);
+            this.availableRecipesCombobox.Location = new System.Drawing.Point(129, 160);
             this.availableRecipesCombobox.Name = "availableRecipesCombobox";
-            this.availableRecipesCombobox.Size = new System.Drawing.Size(162, 24);
+            this.availableRecipesCombobox.Size = new System.Drawing.Size(166, 24);
             this.availableRecipesCombobox.TabIndex = 9;
             // 
             // groupBox2
@@ -236,7 +225,6 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel2;
-        private System.Windows.Forms.Button selectShapefileButton;
         private System.Windows.Forms.Button saveButton;
         private System.Windows.Forms.Button addRecipeButton;
         private System.Windows.Forms.Button computeButton;

@@ -7,6 +7,7 @@ using System.Text;
 
 namespace Gbdx.Answer_Factory
 {
+    using System.Linq;
     using System.Net;
     using System.Windows.Controls;
     using System.Windows.Forms;
@@ -16,9 +17,14 @@ namespace Gbdx.Answer_Factory
     using GbdxSettings;
     using GbdxSettings.Properties;
     using System.Windows.Threading;
+
+    using ESRI.ArcGIS.Geometry;
+
     using GbdxTools;
 
     using NetworkConnections;
+
+    using Newtonsoft.Json;
 
     using RestSharp;
 
@@ -126,7 +132,42 @@ namespace Gbdx.Answer_Factory
                 this.client = new RestClient(Settings.Default.baseUrl);
             }
         }
-        
+
+        private string CreateProjectJson(List<IPolygon> polygons )
+        {
+            // get the geojson of the aois
+            var aoi = Jarvis.ConvertPolygonsToGeoJson(polygons);
+            var newProject = new Project();
+            newProject.aois.Add(aoi);
+            newProject.name = this.projectNameTextbox.Text;
+
+            if (this.availableRecipesCombobox.SelectedIndex != -1)
+            {
+                var recName =
+                    this.availableRecipesCombobox.Items[this.availableRecipesCombobox.SelectedIndex].ToString();
+                var recipe = this.GetRecipe(recName);
+
+                if (recipe != null)
+                {
+                    var recipeConfig = new RecipeConfig { recipeId = recipe.id, recipeName = recipe.name };
+                    newProject.recipeConfigs.Add(recipeConfig);
+                }
+            }
+
+            var projectJson = JsonConvert.SerializeObject(newProject);
+            return projectJson;
+        }
+
+        private Recipe GetRecipe(string name)
+        {
+            IEnumerable<Recipe> query = (from q in this.recipeList where q.name.Equals(name) select q);
+            
+            if (query.Count() == 1)
+            {
+                return query.Single();
+            }
+            return null;
+        }
 
         /// <summary>
         /// Host object of the dockable window
@@ -163,6 +204,37 @@ namespace Gbdx.Answer_Factory
                 base.Dispose(disposing);
             }
 
+        }
+
+        private void saveButton_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // check for a project name
+                if (string.IsNullOrEmpty(this.projectNameTextbox.Text))
+                {
+                    MessageBox.Show("Project Name Required.");
+                    return;
+                }
+
+                var polygons = Jarvis.GetPolygons(ArcMap.Document.FocusMap);
+
+                // check to make sure an aoi(s) have been selected.
+                if (polygons.Count == 0)
+                {
+                    MessageBox.Show("Please select polygon(s)");
+                    return;
+                }
+
+                var projectJson = this.CreateProjectJson(polygons);
+
+
+
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
         }
     }
 }

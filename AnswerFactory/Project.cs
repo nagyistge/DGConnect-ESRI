@@ -15,6 +15,20 @@
         public List<string> originalGeometries { get; set; } 
         public List<NamedBuffer> namedBuffers { get; set; }
 
+        public Project()
+        {
+            this.id = string.Empty;
+            this.owner = string.Empty;
+            this.name = string.Empty;
+            this.accountId = string.Empty;
+            this.idahoImages = new List<IdahoImage>();
+            this.aois = new List<string>();
+            this.recipeConfigs = new List<RecipeConfig>();
+            this.bestIdahoIds = new List<string>();
+            this.originalGeometries = new List<string>();
+            this.namedBuffers = new List<NamedBuffer>();
+        }
+
         public override string ToString()
         {
             return
