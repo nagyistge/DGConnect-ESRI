@@ -89,6 +89,7 @@ namespace Gbdx.Answer_Factory
                         {
                             this.token = resp.Data.access_token;
                             this.GetRecipes();
+                            this.GetExistingProjects();
                         }
                         else
                         {
@@ -154,7 +155,10 @@ namespace Gbdx.Answer_Factory
                 }
             }
 
-            var projectJson = JsonConvert.SerializeObject(newProject);
+            var projectJson = JsonConvert.SerializeObject(newProject).Replace("\\", "");
+
+            projectJson = projectJson.Replace("\"aois\":[\"{\"", "\"aois\":[{\"");
+            projectJson = projectJson.Replace("\"],\"recipeConfigs\"", "],\"recipeConfigs\"");
             return projectJson;
         }
 
@@ -167,6 +171,22 @@ namespace Gbdx.Answer_Factory
                 return query.Single();
             }
             return null;
+        }
+
+        private void GetExistingProjects()
+        {
+
+            var request = new RestRequest("/answer-factory-project-service/api/project", Method.GET);
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+
+            this.CheckBaseUrl();
+            this.client.ExecuteAsync<List<Project2>>(
+                request,
+                resp =>
+                    {
+                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                    });
         }
 
         /// <summary>
@@ -228,6 +248,16 @@ namespace Gbdx.Answer_Factory
 
                 var projectJson = this.CreateProjectJson(polygons);
 
+                var request = new RestRequest("/answer-factory-project-service/api/project", Method.POST);
+                request.AddHeader("Authorization", "Bearer " + this.token);
+                request.AddHeader("Content-Type", "application/json");
+                request.AddParameter("application/json", projectJson, ParameterType.RequestBody);
+                this.CheckBaseUrl();
+                this.client.ExecuteAsync(request,
+                    resp =>
+                        {
+                            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                        });
 
 
             }
