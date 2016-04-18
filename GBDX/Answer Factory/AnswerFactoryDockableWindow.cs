@@ -28,6 +28,7 @@ namespace Gbdx.Answer_Factory
 
     using RestSharp;
 
+    using ListViewItem = System.Windows.Forms.ListViewItem;
     using UserControl = System.Windows.Forms.UserControl;
 
     /// <summary>
@@ -40,7 +41,7 @@ namespace Gbdx.Answer_Factory
         private string token;
 
         List<Recipe> recipeList = new List<Recipe>();
-
+        List<Project2> existingProjects = new List<Project2>(); 
         private IRestClient client;
 
         public AnswerFactoryDockableWindow(object hook)
@@ -186,7 +187,63 @@ namespace Gbdx.Answer_Factory
                 resp =>
                     {
                         Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                        
+                        if (resp.Data != null && resp.StatusCode == HttpStatusCode.OK)
+                        {
+                            this.existingProjects = resp.Data;
+                            this.Invoke(
+                                (MethodInvoker)(() =>
+                                    {
+                                        this.UpdateUiWithExistingProjects();
+                                    }));
+                        }
+
                     });
+        }
+
+        private void GetResult(string id, string projectId)
+        {
+            this.CheckBaseUrl();
+
+            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(projectId))
+            {
+                MessageBox.Show("No id or project id");
+                return;
+            }
+            var request =
+                new RestRequest(
+                    string.Format("/answer-factory-recipe-service/api/result/{0}/{1}", id, projectId),
+                    Method.GET);
+
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+            this.client.ExecuteAsync<ResultItem>(
+                request,
+                resp =>
+                    {
+                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+                        if (resp.Data == null)
+                        {
+                            MessageBox.Show("recipe isn't ready");
+                        }
+                        else
+                        {
+                            Jarvis.Logger.Info(resp.Data.properties.query_string);
+                        }
+                    });
+        }
+
+        private void UpdateUiWithExistingProjects()
+        {
+            this.existingProjectsListView.Items.Clear();
+            foreach (var item in this.existingProjects)
+            {
+                string[] arr = new string[2];
+                arr[0] = item.name;
+                arr[1] = item.id;
+                this.existingProjectsListView.Items.Add(new ListViewItem(arr));
+            }
         }
 
         /// <summary>
@@ -259,12 +316,52 @@ namespace Gbdx.Answer_Factory
                             Jarvis.Logger.Info(resp.ResponseUri.ToString());
                         });
 
+                this.projectNameTextbox.Clear();
+                this.availableRecipesCombobox.SelectedIndex = -1;
 
             }
             catch (Exception error)
             {
                 Jarvis.Logger.Error(error);
             }
+        }
+
+        private void showResultsButton_Click(object sender, EventArgs e)
+        {
+            foreach (ListViewItem item in this.existingProjectsListView.SelectedItems)
+            {
+                var name = item.SubItems[0].Text;
+                var id = item.SubItems[1].Text;
+
+                //var query = from i in this.existingProjects where i.id == id select i;
+
+                foreach (var projItem in this.existingProjects)
+                {
+                    if (projItem.id == id)
+                    {
+                        if (projItem.recipeConfigs.Count >= 1)
+                        {
+                            this.GetResult(projItem.id, projItem.recipeConfigs[0].recipeId);
+                        }
+                        else
+                        {
+                            MessageBox.Show("No recipe was applied to the result");
+                        }
+                    }
+                }
+            }
+        }
+
+        private void resultRefrshButton_Click(object sender, EventArgs e)
+        {
+            this.GetExistingProjects();
+        }
+
+        private void resetButton_Click(object sender, EventArgs e)
+        {
+            this.projectNameTextbox.Clear();
+            this.bufferTextbox.Clear();
+            this.availableRecipesCombobox.SelectedIndex = -1;
         }
     }
 }

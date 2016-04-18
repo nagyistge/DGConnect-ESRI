@@ -50,6 +50,7 @@
     <Compile Include="Recipe.cs" />
     <Compile Include="RecipeConfig.cs" />
     <Compile Include="RecipeConfigParameter.cs" />
+    <Compile Include="ResultItem.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

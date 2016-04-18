@@ -41,9 +41,18 @@
             this.bufferTextbox = new System.Windows.Forms.TextBox();
             this.availableRecipesCombobox = new System.Windows.Forms.ComboBox();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
+            this.existingProjectsListView = new System.Windows.Forms.ListView();
+            this.showResultsButton = new System.Windows.Forms.Button();
+            this.nameHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.idHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.resultRefrshButton = new System.Windows.Forms.Button();
+            this.resetButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.tableLayoutPanel3.SuspendLayout();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -76,7 +85,7 @@
             this.groupBox1.Size = new System.Drawing.Size(389, 274);
             this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
-            this.groupBox1.Text = "Create";
+            this.groupBox1.Text = "Create Project";
             // 
             // tableLayoutPanel2
             // 
@@ -96,6 +105,7 @@
             this.tableLayoutPanel2.Controls.Add(this.projectNameTextbox, 1, 1);
             this.tableLayoutPanel2.Controls.Add(this.bufferTextbox, 1, 2);
             this.tableLayoutPanel2.Controls.Add(this.availableRecipesCombobox, 1, 3);
+            this.tableLayoutPanel2.Controls.Add(this.resetButton, 0, 4);
             this.tableLayoutPanel2.Location = new System.Drawing.Point(6, 21);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 5;
@@ -189,7 +199,7 @@
             // 
             this.availableRecipesCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.availableRecipesCombobox.FormattingEnabled = true;
-            this.availableRecipesCombobox.Location = new System.Drawing.Point(129, 160);
+            this.availableRecipesCombobox.Location = new System.Drawing.Point(129, 161);
             this.availableRecipesCombobox.Name = "availableRecipesCombobox";
             this.availableRecipesCombobox.Size = new System.Drawing.Size(166, 24);
             this.availableRecipesCombobox.TabIndex = 9;
@@ -200,12 +210,102 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.SetColumnSpan(this.groupBox2, 2);
+            this.groupBox2.Controls.Add(this.tableLayoutPanel3);
             this.groupBox2.Location = new System.Drawing.Point(3, 283);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(389, 275);
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
-            this.groupBox2.Text = "Open";
+            this.groupBox2.Text = "Open Projects";
+            // 
+            // tableLayoutPanel3
+            // 
+            this.tableLayoutPanel3.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel3.ColumnCount = 3;
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.99999F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.00001F));
+            this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
+            this.tableLayoutPanel3.Controls.Add(this.existingProjectsListView, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.showResultsButton, 2, 4);
+            this.tableLayoutPanel3.Controls.Add(this.resultRefrshButton, 0, 4);
+            this.tableLayoutPanel3.Location = new System.Drawing.Point(12, 21);
+            this.tableLayoutPanel3.Name = "tableLayoutPanel3";
+            this.tableLayoutPanel3.RowCount = 5;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 25F));
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle());
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(371, 248);
+            this.tableLayoutPanel3.TabIndex = 0;
+            // 
+            // existingProjectsListView
+            // 
+            this.existingProjectsListView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.existingProjectsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.nameHeader,
+            this.idHeader});
+            this.tableLayoutPanel3.SetColumnSpan(this.existingProjectsListView, 3);
+            this.existingProjectsListView.FullRowSelect = true;
+            this.existingProjectsListView.GridLines = true;
+            this.existingProjectsListView.Location = new System.Drawing.Point(3, 3);
+            this.existingProjectsListView.MultiSelect = false;
+            this.existingProjectsListView.Name = "existingProjectsListView";
+            this.tableLayoutPanel3.SetRowSpan(this.existingProjectsListView, 4);
+            this.existingProjectsListView.Size = new System.Drawing.Size(365, 202);
+            this.existingProjectsListView.TabIndex = 0;
+            this.existingProjectsListView.UseCompatibleStateImageBehavior = false;
+            this.existingProjectsListView.View = System.Windows.Forms.View.Details;
+            // 
+            // showResultsButton
+            // 
+            this.showResultsButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.showResultsButton.Location = new System.Drawing.Point(263, 211);
+            this.showResultsButton.Name = "showResultsButton";
+            this.showResultsButton.Size = new System.Drawing.Size(104, 33);
+            this.showResultsButton.TabIndex = 1;
+            this.showResultsButton.Text = "Show Results";
+            this.showResultsButton.UseVisualStyleBackColor = true;
+            this.showResultsButton.Click += new System.EventHandler(this.showResultsButton_Click);
+            // 
+            // nameHeader
+            // 
+            this.nameHeader.Text = "Name";
+            this.nameHeader.Width = 200;
+            // 
+            // idHeader
+            // 
+            this.idHeader.Text = "ID";
+            this.idHeader.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.idHeader.Width = 300;
+            // 
+            // resultRefrshButton
+            // 
+            this.resultRefrshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.resultRefrshButton.Location = new System.Drawing.Point(3, 211);
+            this.resultRefrshButton.Name = "resultRefrshButton";
+            this.resultRefrshButton.Size = new System.Drawing.Size(124, 34);
+            this.resultRefrshButton.TabIndex = 2;
+            this.resultRefrshButton.Text = "Refresh";
+            this.resultRefrshButton.UseVisualStyleBackColor = true;
+            this.resultRefrshButton.Click += new System.EventHandler(this.resultRefrshButton_Click);
+            // 
+            // resetButton
+            // 
+            this.resetButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.resetButton.Location = new System.Drawing.Point(25, 209);
+            this.resetButton.Name = "resetButton";
+            this.resetButton.Size = new System.Drawing.Size(75, 27);
+            this.resetButton.TabIndex = 10;
+            this.resetButton.Text = "Reset";
+            this.resetButton.UseVisualStyleBackColor = true;
+            this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
             // 
             // AnswerFactoryDockableWindow
             // 
@@ -216,6 +316,8 @@
             this.groupBox1.ResumeLayout(false);
             this.tableLayoutPanel2.ResumeLayout(false);
             this.tableLayoutPanel2.PerformLayout();
+            this.groupBox2.ResumeLayout(false);
+            this.tableLayoutPanel3.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -235,6 +337,13 @@
         private System.Windows.Forms.TextBox bufferTextbox;
         private System.Windows.Forms.ComboBox availableRecipesCombobox;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel3;
+        private System.Windows.Forms.ListView existingProjectsListView;
+        private System.Windows.Forms.Button showResultsButton;
+        private System.Windows.Forms.ColumnHeader nameHeader;
+        private System.Windows.Forms.ColumnHeader idHeader;
+        private System.Windows.Forms.Button resultRefrshButton;
+        private System.Windows.Forms.Button resetButton;
 
     }
 }
