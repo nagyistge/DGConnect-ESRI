@@ -462,6 +462,7 @@ namespace Gbdx.Aggregations
                 var poly = this.GetGeoHashPoly(key);
                 var buffer = featureClass.CreateFeatureBuffer();
 
+
                 // Setup the features geometry.
                 buffer.Shape = (IGeometry)poly;
                 buffer.Value[featureClass.FindField("GeoHash")] = key;
@@ -1354,10 +1355,10 @@ private void buttMultiAnalyzeDiff_Click(object sender, RoutedEventArgs e)
                                                           "SHAPE_Length",
                                                           "SHAPE_Area"
                                                       };
-                        PivotTable ptA = this.FeatureLayerToPivotTable(flayerA, "Name", ignoreCols);
+                        PivotTable ptA = this.FeatureLayerToPivotTable(flayerA, "GeoHash", ignoreCols);
                         this.UpdateStatusLabel("Preparing " + layerB);
                         System.Windows.Forms.Application.DoEvents();
-                        PivotTable ptB = this.FeatureLayerToPivotTable(flayerB, "Name", ignoreCols);
+                        PivotTable ptB = this.FeatureLayerToPivotTable(flayerB, "GeoHash", ignoreCols);
                         this.UpdateStatusLabel("Calculating change");
                         System.Windows.Forms.Application.DoEvents();
 
