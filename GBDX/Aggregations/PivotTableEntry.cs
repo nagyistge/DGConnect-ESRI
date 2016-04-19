@@ -26,6 +26,7 @@ namespace Gbdx.Aggregations {
       /// Anything you might need in relation to this row
       /// </summary>
       public Object Context { set; get; }
+      public string Label { set; get; }
     }
   
 

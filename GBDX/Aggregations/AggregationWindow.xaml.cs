@@ -471,7 +471,7 @@ namespace Gbdx.Aggregations
                     var value = resultDictionary[key][subKey];
                     var index = featureClass.FindField(field);
 
-                    if(index != -1)
+                    if (index != -1)
                     {
                         buffer.Value[index] = value;
                     }
@@ -497,6 +497,12 @@ namespace Gbdx.Aggregations
             this.pbarChangeDet.Maximum = ptable.Count;
             this.pbarChangeDet.Minimum = 0;
             this.pbarChangeDet.Value = 0;
+            List<String> fieldsInFC = new List<String>();
+            for (int y = 0; y < featureClass.Fields.FieldCount; y++)
+            {
+                fieldsInFC.Add(featureClass.Fields.Field[y].Name);
+            }
+
             int i = 0;
             foreach (PivotTableEntry entry in ptable)
             {
@@ -512,30 +518,22 @@ namespace Gbdx.Aggregations
                 {
                     if (uniqueFieldNames.ContainsKey(val))
                     {
-                        buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Data[val];
+                        if (val.EndsWith("_str"))
+                        {
+                            buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Label;
+                        }
+                        else
+                        {
+                            buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Data[val];
+                        }
                     }
+                    // Feature has been created so add to the feature class.
+                    insertCur.InsertFeature(buffer);
                 }
-                // Feature has been created so add to the feature class.
-                insertCur.InsertFeature(buffer);
+                insertCur.Flush();
             }
-            insertCur.Flush();
         }
 
-        /// <summary>
-        /// Write the feature class to disk
-        /// </summary>
-        /// <param name="featureClass">
-        /// The feature class.
-        /// </param>
-        /// <param name="resultDictionary">
-        /// The result dictionary.
-        /// </param>
-        /// <param name="uniqueFieldNames">
-        /// The unique field names.
-        /// </param>
-        /// <param name="workspace">
-        /// The workspace.
-        /// </param>
         private void WriteToFeatureClass(
             IFeatureClass featureClass,
             Dictionary<string, Dictionary<string, double>> resultDictionary,
@@ -779,22 +777,10 @@ namespace Gbdx.Aggregations
             if (!this.cbAggLayerA.Items.IsEmpty)
             {
                 this.cbAggLayerA.Items.Clear();
-                this.cbAggLayerB.Items.Clear();
-            }
-
-            if (!this.cbAggLayerA.Items.IsEmpty)
-            {
-                for (int i = 0; i < this.cbAggLayerA.Items.Count; i++)
-                {
-                    this.cbAggLayerA.Items.RemoveAt(i);
-                }
             }
             if (!this.cbAggLayerB.Items.IsEmpty)
             {
-                for (int i = 0; i < this.cbAggLayerB.Items.Count; i++)
-                {
-                    this.cbAggLayerB.Items.RemoveAt(i);
-                }
+                this.cbAggLayerB.Items.Clear();
             }
 
             foreach (IFeatureLayer layer in layers)
@@ -1195,6 +1181,7 @@ namespace Gbdx.Aggregations
         {
             try
             {
+                Boolean diffs = this.cbCalcDiffs.IsChecked.Value;
                 String layerA = (String)this.cbAggLayerA.SelectedValue;
                 String layerB = this.cbAggLayerB.Text;
                 if (layerA == null || layerB == null)
@@ -1211,17 +1198,17 @@ namespace Gbdx.Aggregations
                 System.Windows.Forms.Application.DoEvents();
                 List<String> ignoreCols = new List<String>() { "OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area" };
                 PivotTable ptA = this.FeatureLayerToPivotTable(flayerA, "GeoHash", ignoreCols);
-                this.UpdateStatusLabel("formatting and Caching Layer B");
+                this.UpdateStatusLabel("Preparing " + layerA);
                 System.Windows.Forms.Application.DoEvents();
                 PivotTable ptB = this.FeatureLayerToPivotTable(flayerB, "GeoHash", ignoreCols);
-                this.UpdateStatusLabel("Generating Change Detection layer");
+                this.UpdateStatusLabel("Preparing " + layerB);
                 System.Windows.Forms.Application.DoEvents();
                 Dictionary<String, String> uniqueFieldNames = new Dictionary<String, String>();
 
                 PivotTableAnalyzer analyzer = new PivotTableAnalyzer(
                     new SendAnInt(this.UpdatePBar),
                     new UpdateAggWindowPbar(this.SetPBarProperties));
-                PivotTable res = analyzer.DetectChange(ptA, ptB);
+                PivotTable res = analyzer.DetectChange(ptA, ptB, layerA + "," + layerB, diffs);
                 foreach (PivotTableEntry entry in res)
                 {
                     foreach (String name in entry.Data.Keys)
@@ -1237,7 +1224,7 @@ namespace Gbdx.Aggregations
                 String fcName = "change_" + layerA + "_" + layerB + "_" + DateTime.Now.Millisecond;
                 var featureClass = Jarvis.CreateStandaloneFeatureClass(ws, fcName, uniqueFieldNames, false, 0);
                 IFeatureCursor insertCur = featureClass.Insert(true);
-                this.UpdateStatusLabel("Loading Feature Class");
+                this.UpdateStatusLabel("Loading Output Feature Class");
                 System.Windows.Forms.Application.DoEvents();
 
                 this.InsertPivoTableRowsToFeatureClass(featureClass, res, uniqueFieldNames);
@@ -1312,6 +1299,183 @@ namespace Gbdx.Aggregations
             {
                 this.selectAreaButton.IsEnabled = false;
             }
+        }
+
+private void buttMultiAnalyzeDiff_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                List<String> layerNames = new List<String>();
+                List<String> allFieldNames = new List<String>();
+                foreach (String s in this.lbChangeLayers.SelectedItems)
+                {
+                    if (!layerNames.Contains(s))
+                    {
+                        layerNames.Add(s);
+                    }
+                }
+                if (this.lbChangeLayers.SelectedItems.Count < 2)
+                {
+                    MessageBox.Show("Please select at least two layers");
+                    return;
+                }
+                Dictionary<String, String> colsMappingForMsgBox = new Dictionary<string, string>();
+                Dictionary<String, String> uniqueFieldNames = new Dictionary<String, String>();
+                PivotTable multiResult = new PivotTable();
+                PivotTableAnalyzer analyzer = new PivotTableAnalyzer(
+                    new SendAnInt(this.UpdatePBar),
+                    new UpdateAggWindowPbar(this.SetPBarProperties));
+
+                for (int i = 0; i < layerNames.Count; i++)
+                {
+                    for (int x = i + 1; x < layerNames.Count; x++)
+                    {
+                        String layerA = layerNames[i];
+                        String layerB = layerNames[x];
+                        colsMappingForMsgBox.Add("L" + i + "_" + x + "L", layerA + " --> " + layerB);
+
+                        if (layerA == null || layerB == null)
+                        {
+                            MessageBox.Show("no layers available");
+                        }
+
+                        List<IFeatureLayer> layers = this.GetFeatureLayersFromToc(this.GetActiveViewFromArcMap(ArcMap.Application));
+                        //  getSelectedFeatureFromLayerByName(layers, "somename");
+                        IFeatureLayer flayerA = this.getLayerByName(layers, layerA);
+                        IFeatureLayer flayerB = this.getLayerByName(layers, layerB);
+                        this.pbarChangeDet.Value = 0;
+
+                        this.UpdateStatusLabel("Preparing " + layerA);
+                        System.Windows.Forms.Application.DoEvents();
+                        List<String> ignoreCols = new List<String>()
+                                                      {
+                                                          "OBJECTID",
+                                                          "SHAPE",
+                                                          "SHAPE_Length",
+                                                          "SHAPE_Area"
+                                                      };
+                        PivotTable ptA = this.FeatureLayerToPivotTable(flayerA, "Name", ignoreCols);
+                        this.UpdateStatusLabel("Preparing " + layerB);
+                        System.Windows.Forms.Application.DoEvents();
+                        PivotTable ptB = this.FeatureLayerToPivotTable(flayerB, "Name", ignoreCols);
+                        this.UpdateStatusLabel("Calculating change");
+                        System.Windows.Forms.Application.DoEvents();
+
+                        PivotTable res = analyzer.DetectChange(ptA, ptB, "L" + i + "_" + x + "L", false);
+
+                        foreach (PivotTableEntry entry in res)
+                        {
+                            if (!entry.Data.ContainsKey("layerAIndex"))
+                            {
+                                entry.Data.Add("layerAIndex", i);
+                            }
+                            if (!entry.Data.ContainsKey("layerBIndex"))
+                            {
+                                entry.Data.Add("layerBIndex", i);
+                            }
+
+                            entry.Label = ("L" + i + "_" + x + "L");
+
+                            foreach (String name in entry.Data.Keys)
+                            {
+                                if (!allFieldNames.Contains(name))
+                                {
+                                    allFieldNames.Add(name);
+                                }
+
+                                if (!uniqueFieldNames.ContainsKey(name))
+                                {
+                                    uniqueFieldNames.Add(name, name);
+                                }
+                            }
+                            break;
+                        }
+                        multiResult.AddRange(res);
+                    }
+                }
+                PivotTable flat = analyzer.flattenAndSimplify(multiResult, "percent_change");
+                uniqueFieldNames = new Dictionary<string, string>();
+                foreach (PivotTableEntry pte in flat)
+                {
+                    List<Double> vals = new List<Double>();
+                    foreach (String field in pte.Data.Keys)
+                    {
+                        vals.Add(pte.Data[field]);
+                    }
+                    pte.Data.Add("stdev_", analyzer.stdev(vals));
+                    pte.Data.Add("avg_", analyzer.avg(vals));
+                    pte.Data.Add("min_", analyzer.min(vals));
+                    pte.Data.Add("max_", analyzer.max(vals));
+
+                    foreach (String field in pte.Data.Keys)
+                    {
+                        if (!uniqueFieldNames.ContainsKey(field))
+                        {
+                            uniqueFieldNames.Add(field, field);
+                        }
+                    }
+                }
+                IWorkspace ws = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+                String fcName = "multi_change_" + DateTime.Now.Millisecond;
+                //  uniqueFieldNames.Add("context_str", "context_str");
+                var featureClass = Jarvis.CreateStandaloneFeatureClass(ws, fcName, uniqueFieldNames, false, 0);
+
+                IFeatureCursor insertCur = featureClass.Insert(true);
+                this.UpdateStatusLabel("Loading Output Feature Class");
+                System.Windows.Forms.Application.DoEvents();
+
+                this.InsertPivoTableRowsToFeatureClass(featureClass, flat, uniqueFieldNames);
+                this.AddLayerToArcMap(fcName);
+                this.pbarChangeDet.Value = 0;
+
+                this.lblPbarStatus.Content = "Done";
+                String message = "FYI:\n";
+                foreach (String colName in colsMappingForMsgBox.Keys)
+                {
+                    message += "Column " + colName + " represents change for " + colsMappingForMsgBox[colName] + "\n";
+                }
+                message += "\n*This is required because of field length limitations";
+                MessageBox.Show(message);
+
+                System.Windows.Forms.Application.DoEvents();
+                // now I need to create a feature class and feature layer from this object
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("An error occured calculating change" + ex.Message.ToString());
+            }
+        }
+
+        private void buttAnalyzeAggM_Click(object sender, RoutedEventArgs e)
+        {
+            ESRI.ArcGIS.ArcMapUI.IContentsView cView = this.GetContentsViewFromArcMap(ArcMap.Application, 0);
+            IActiveView aView = this.GetActiveViewFromArcMap(ArcMap.Application);
+            List<IFeatureLayer> layers = this.GetFeatureLayersFromToc(aView);
+
+            if (!this.lbChangeLayers.Items.IsEmpty)
+            {
+                this.lbChangeLayers.Items.Clear();
+            }
+            foreach (IFeatureLayer layer in layers)
+            {
+                // MessageBox.Show(layer.Name + " -- " + layer.DataSourceType);
+                if (layer.Name.ToLower().Contains("aggregation"))
+                {
+                    this.lbChangeLayers.Items.Add(layer.Name);
+                }
+            }
+            if (this.lbChangeLayers.Items.Count < 1)
+            {
+                MessageBox.Show("No aggregation layers available");
+            }
+        }
+
+        private void butChangeInfoMulti_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show(
+                "This tool calculates the change between two or more aggregation layers over the same area that represent different time slices. Geohash size must be consistent in order to obtain valid results from this algorithm."
+                + " The algorithm performs a sparse cosine similarity based on all field values for each row, and produces a pivot table of pairwise cell by cell comparisons. For percent diff on a field by field basis, use the Pairwise Change Detection tool.",
+                "info");
         }
     }
 }

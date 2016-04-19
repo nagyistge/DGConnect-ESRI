@@ -32,9 +32,9 @@
             this.clearButton = new System.Windows.Forms.Button();
             this.treeView1 = new System.Windows.Forms.TreeView();
             this.textBoxSearch = new System.Windows.Forms.TextBox();
-            this.selectAreaButton = new System.Windows.Forms.Button();
             this.aoiTypeComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
+            this.selectAreaButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -96,17 +96,6 @@
             this.textBoxSearch.TabIndex = 3;
             this.textBoxSearch.Text = "Enter search terms and select area";
             // 
-            // selectAreaButton
-            // 
-            this.selectAreaButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.selectAreaButton.Location = new System.Drawing.Point(3, 567);
-            this.selectAreaButton.Name = "selectAreaButton";
-            this.selectAreaButton.Size = new System.Drawing.Size(90, 26);
-            this.selectAreaButton.TabIndex = 0;
-            this.selectAreaButton.Text = "Select Area";
-            this.selectAreaButton.UseVisualStyleBackColor = true;
-            this.selectAreaButton.Click += new System.EventHandler(this.SelectAreaButtonClick);
-            // 
             // aoiTypeComboBox
             // 
             this.aoiTypeComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
@@ -114,7 +103,7 @@
             this.aoiTypeComboBox.Items.AddRange(new object[] {
             "Draw Rectangle",
             "Use Selected Polygon(s)"});
-            this.aoiTypeComboBox.Location = new System.Drawing.Point(155, 536);
+            this.aoiTypeComboBox.Location = new System.Drawing.Point(155, 535);
             this.aoiTypeComboBox.Name = "aoiTypeComboBox";
             this.aoiTypeComboBox.Size = new System.Drawing.Size(142, 24);
             this.aoiTypeComboBox.TabIndex = 4;
@@ -129,6 +118,17 @@
             this.label1.Size = new System.Drawing.Size(116, 17);
             this.label1.TabIndex = 5;
             this.label1.Text = "Selection Type";
+            // 
+            // selectAreaButton
+            // 
+            this.selectAreaButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.selectAreaButton.Location = new System.Drawing.Point(3, 567);
+            this.selectAreaButton.Name = "selectAreaButton";
+            this.selectAreaButton.Size = new System.Drawing.Size(90, 26);
+            this.selectAreaButton.TabIndex = 0;
+            this.selectAreaButton.Text = "Select Area";
+            this.selectAreaButton.UseVisualStyleBackColor = true;
+            this.selectAreaButton.Click += new System.EventHandler(this.SelectAreaButtonClick);
             // 
             // VectorIndexDockable
             // 
