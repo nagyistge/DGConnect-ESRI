@@ -188,7 +188,7 @@ namespace Gbdx.Aggregations {
     /// <param name="timeA"></param>
     /// <param name="timeB"></param>A PivotTable that is full
     /// <returns></returns>
-    public PivotTable DetectChange(PivotTable ptA, PivotTable ptB) {
+    public PivotTable DetectChange(PivotTable ptA, PivotTable ptB, string label, bool diffs) {
      
    
       PivotTable outList = new PivotTable();
@@ -221,19 +221,117 @@ namespace Gbdx.Aggregations {
         if (a.ContainsKey(geohash)) { ava = a[geohash]; }
         if (b.ContainsKey(geohash)) { avb = b[geohash]; }
         if (ava == null || avb == null) {
-          outList.Add(new PivotTableAnalysisResult() { RowKey = geohash, prob = 0d, Data = empty });
+          outList.Add(new PivotTableAnalysisResult() { RowKey = geohash, prob = 0d, Data = empty, Label = label });
         }
         else {
           PivotTableAnalysisResult p = GetSparseSimilarity(ava, avb, true, false);
           p.RowKey = geohash;
+          p.Label = label;
+          if (diffs) {
           p.Data = CalculateDiffs(ava, avb);
+          }
+          else {
+            p.Data = new Dictionary<string, double>();
+          }
           p.Data.Add("cos_sim", p.prob);
+          p.Data.Add("percent_change", Math.Abs(p.prob - 1) * 100);
           outList.Add(p);
         }
       }
       return outList;
     }
 
+    public double stdev(List<Double> list) {
+      double sum = 0.0;
+      double mean = 0.0;
+      double num = 0.0;
+      double numi = 0.0;
+      double deno = 0.0;
+      for (int i = 0; i < list.Count; i++) {
+        sum += list[i];
+        mean = sum / list.Count - 1;
+      }
+
+      for (int i = 0; i < list.Count; i++) {
+        numi = Math.Pow((list.Count - mean), 2);
+        num += numi;
+        deno = list.Count - 1;
+      }
+
+      double stdevResult = Math.Sqrt(num / deno);
+      return stdevResult;
+    }
+
+
+    public double avg(List<Double> nums) {
+      double av = 0d;
+      for (int i = 0; i < nums.Count; i++) {
+        av += nums[i];
+      }
+      return av / nums.Count;
+    }
+
+    public double max(List<Double> nums) {
+      if (nums.Count == 0) {
+        return 0d;
+      }
+      double max = Double.MinValue;
+      foreach (Double d in nums) {
+        if (d > max) {
+          max = d;
+        }
+      }
+      return max;
+    }
+
+    public double min(List<Double> nums) {
+      if (nums.Count == 0) {
+        return 0d;
+      }
+      double min = Double.MaxValue;
+      foreach (Double d in nums) {
+        if (d < min) {
+          min = d;
+        }
+      }
+      return min;
+    }
+
+
+
+    public PivotTable flattenAndSimplify(PivotTable withMultipleCompares, String pivCol) {
+      PivotTable output = new PivotTable();
+      Dictionary<String, Dictionary<String, Double>> outMap = new Dictionary<String, Dictionary<String, Double>>();
+
+      foreach (PivotTableEntry pte in withMultipleCompares) {
+        if (outMap.ContainsKey(pte.RowKey)) {
+          if (pte.Data.ContainsKey(pivCol)) {
+            outMap[pte.RowKey].Add(pte.Label, pte.Data[pivCol]);
+          }
+         else {
+            outMap[pte.RowKey].Add(pte.Label, 0d);
+         }
+        }
+        else {
+          Dictionary<String, double> newMap = new Dictionary<string, double>();
+          if (pte.Data.ContainsKey(pivCol)) {
+            newMap.Add(pte.Label, pte.Data[pivCol]);
+            outMap.Add(pte.RowKey, newMap);
+          }
+         // else {
+         //   newMap.Add(pte.Label, 0d);
+           // outMap.Add(pte.RowKey, newMap);
+          //}
+        }
+      }
+      foreach (String key in outMap.Keys) {
+        output.Add(new PivotTableEntry() { RowKey = key, Data = outMap[key] });
+
+      }
+
+      return output;
+    }
+    //@wurfless :^)
     public Dictionary<String, Dictionary<String, Double>> GetSimilarityGraph(PivotTable signature) {
    
       Dictionary<String, Dictionary<String, Double>> outputGraph = new Dictionary<string, Dictionary<string, double>>();

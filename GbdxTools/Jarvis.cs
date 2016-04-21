@@ -145,12 +145,24 @@
 
                 var tempField = new FieldClass();
                 IFieldEdit tempFieldEdit = (IFieldEdit)tempField;
-                tempFieldEdit.Name_2 = uniqueNames[name];
+                tempFieldEdit.Name_2 = "DG_" + uniqueNames[name];
+                if (name.EndsWith("_str")) {
+                  tempFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+                  tempFieldEdit.Length_2 = 250;
+                  tempFieldEdit.AliasName_2 = name;
+                  tempFieldEdit.IsNullable_2 = allowNull;
+                  tempFieldEdit.DefaultValue_2 = "";
+                }
+                else {
+                tempFieldEdit.Name_2 = "DG_"+uniqueNames[name];
                 tempFieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
                 tempFieldEdit.Length_2 = 20;
                 tempFieldEdit.AliasName_2 = name;
                 tempFieldEdit.IsNullable_2 = allowNull;
                 tempFieldEdit.DefaultValue_2 = defaultValue;
+                }
+                
+              
                 fieldsEdit.AddField(tempField);
             }
 
