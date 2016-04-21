@@ -35,7 +35,6 @@
             this.aoiTypeComboBox = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.selectAreaButton = new System.Windows.Forms.Button();
-
             this.label2 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();

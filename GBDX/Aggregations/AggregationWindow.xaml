@@ -4,7 +4,7 @@
     xmlns:Custom="http://schemas.microsoft.com/wpf/2008/toolkit" xmlns:System="clr-namespace:System;assembly=mscorlib"
     x:Class="Gbdx.Aggregations.AggregationWindow"
     Height="696.434" Width="279.235">
-    <Grid Margin="-4.8,20.8,10.057,10.178">
+    <Grid Margin="-4.8,10,0,10.178">
         <Grid.RowDefinitions>
             <RowDefinition Height="123*" />
             <RowDefinition Height="108*" />
@@ -15,7 +15,7 @@
             <ColumnDefinition Width="28*" />
             <ColumnDefinition Width="221*" />
         </Grid.ColumnDefinitions>
-        <Grid Margin="10,19.8,-33.235,-65.897" Grid.ColumnSpan="3" Grid.RowSpan="3">
+        <Grid Margin="0,0,0,-65.097" Grid.ColumnSpan="3" Grid.RowSpan="3">
             <Grid.RowDefinitions>
                 <RowDefinition Height="291*" />
                 <RowDefinition Height="201*" />
@@ -72,29 +72,20 @@
                             <System:Int32>1</System:Int32>
                         </Grid.Column>
                     </Custom:DatePicker>
-                    <Custom:DatePicker x:Name="endDatePicker" HorizontalAlignment="Left" Height="32.41"
-                                       Margin="84.068,41.288,-3.178,0" VerticalAlignment="Top" Width="115.91"
-                                       SelectedDateFormat="Short" Grid.Column="1" IsEnabled="False"
-                                       CalendarClosed="EndDatePickerCalendarClosed" />
+                    <Custom:DatePicker x:Name="endDatePicker" HorizontalAlignment="Left" Height="32.41" Margin="84.068,41.288,-35.426,0" VerticalAlignment="Top" Width="147.91" SelectedDateFormat="Short" Grid.Column="1" IsEnabled="False" CalendarClosed="EndDatePickerCalendarClosed"/>
                 </Grid>
             </GroupBox>
-            <Label Content="What are you looking for?" HorizontalAlignment="Left" Margin="58.572,5.6,0,0"
-                   Height="25.96" VerticalAlignment="Top" Width="147.537" />
-            <ComboBox Name="QuerySelectionComboBox" Height="21.869" Margin="-0.115,31.2,49.12,0"
-                      VerticalAlignment="Top">
-                <ComboBoxItem Content="What data is available in the region?" />
-                <ComboBoxItem Content="What is the twitter sentiment in the region?" />
-                <ComboBoxItem Content="What type of data is available in the region?" />
+            <Label Content="What are you looking for?" HorizontalAlignment="Left" Margin="58.572,5.6,0,0" Height="25.96" VerticalAlignment="Top" Width="147.537"/>
+            <ComboBox Name="QuerySelectionComboBox"  Height="21.869" Margin="10,31.56,10,0" VerticalAlignment="Top">
+                <ComboBoxItem Content="What data is available in the region?"/>
+                <ComboBoxItem Content="What is the twitter sentiment in the region?"/>
+                <ComboBoxItem Content="What type of data is available in the region?"/>
             </ComboBox>
-            <Button Name="selectAreaButton" Content="Select Area" HorizontalAlignment="Left" Margin="10,324.202,0,0"
-                    VerticalAlignment="Top" Width="75" Height="21.6" Click="SelectAreaButtonClick" />
-            <TextBox Name="tbFilter" HorizontalAlignment="Left" Height="55.935" Margin="10,231.413,0,0"
-                     TextWrapping="Wrap" VerticalAlignment="Top" Width="249.219" AcceptsReturn="True"
-                     VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;value&gt; AND|OR ..." />
+            <Button Name="selectAreaButton" Content="Select Area" HorizontalAlignment="Left" Margin="10,242.602,0,0" VerticalAlignment="Top" Width="75" Height="21.6" Click="SelectAreaButtonClick" Grid.Row="1"/>
+            <TextBox Name="tbFilter" Height="55.935" Margin="10,149.813,10,0" TextWrapping="Wrap" VerticalAlignment="Top" AcceptsReturn="True" 
+VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;value&gt; AND|OR ..." Grid.Row="1"/>
 
-            <ProgressBar x:Name="pbarChangeDet" HorizontalAlignment="Left" Height="17.938" Margin="10,167.743,0,0"
-                         VerticalAlignment="Top" Width="238.207" Grid.Row="1" />
-
+            <ProgressBar x:Name="pbarChangeDet" Height="17.938" Margin="10,167.743,37.994,0" VerticalAlignment="Top" Grid.Row="2"/>
             <TabControl x:Name="tabAggAnalytics" HorizontalAlignment="Left" Height="187.54" Margin="10,382.805,0,0"
                         VerticalAlignment="Top" Width="238.207" Grid.RowSpan="3">
                 <TabItem Header="Multi Change Detection" Margin="-8,0,4,-3" Visibility="Visible">
@@ -143,7 +134,7 @@
                     </Grid>
                 </TabItem>
                 <TabItem Header="MLTC" Margin="-8,0,4,-3">
-                    <Grid Background="#FFE5E5E5" Margin="0,0,0,2.8">
+                    <Grid Background="#FFE5E5E5" Margin="0,-2.4,0,5.2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="11*" />
                             <ColumnDefinition Width="25*" />
@@ -153,36 +144,24 @@
                             <ColumnDefinition Width="95*" />
                             <ColumnDefinition Width="17*" />
                         </Grid.ColumnDefinitions>
-                        <ComboBox x:Name="cbFocusLayer" HorizontalAlignment="Left" Margin="10,45.137,0,0"
-                                  VerticalAlignment="Top" Width="208.207" Grid.ColumnSpan="7" />
-                        <Button x:Name="butPopFocLyrCb" Content="Refresh drop down lists" HorizontalAlignment="Left"
-                                Margin="10,18.177,0,0" VerticalAlignment="Top" Width="143.4"
-                                RenderTransformOrigin="0.272,-0.055" Click="butPopFocLyrCb_Click" Grid.ColumnSpan="6" />
-                        <Button x:Name="butRunSignature" Content="Generate" Grid.Column="5" HorizontalAlignment="Left"
-                                Margin="26.807,85.937,0,0" VerticalAlignment="Top" Width="75"
-                                Click="butRunSignature_Click" Grid.ColumnSpan="2" />
-                        <Button Content="i" Grid.Column="5" HorizontalAlignment="Left" Margin="71.6,10,0,0"
-                                VerticalAlignment="Top" Width="19.807" Height="16.36" Click="Button_Click_1" />
+                        
+                        <ComboBox x:Name="cbFocusLayer" Margin="10,45.137,10,0" VerticalAlignment="Top" Grid.ColumnSpan="6"/>
+                        <Button x:Name="butPopFocLyrCb" Content="Refresh drop down lists" HorizontalAlignment="Left" Margin="10,18.177,0,0" VerticalAlignment="Top" Width="143.4" RenderTransformOrigin="0.272,-0.055" Click="butPopFocLyrCb_Click" Grid.ColumnSpan="6"/>
+                        <Button x:Name="butRunSignature" Content="Generate" Grid.Column="5" Margin="0,85.937,10.295,0" VerticalAlignment="Top" Click="butRunSignature_Click" HorizontalAlignment="Right" Width="75"/>
+                        <Button Content="i" Grid.Column="5" HorizontalAlignment="Right" Margin="0,10,20.695,0" VerticalAlignment="Top" Width="19.807" Height="16.36" Click="Button_Click_1"/>
                     </Grid>
                 </TabItem>
             </TabControl>
-            <Label Content="Add a Query Filter" HorizontalAlignment="Left" Margin="10,211.12,0,0"
-                   VerticalAlignment="Top" Height="25.96" Width="106.123" />
-            <Label Content="Aggregation result analyses" HorizontalAlignment="Left" Margin="19.022,350.802,0,0"
-                   VerticalAlignment="Top" Height="27.003" />
-            <Label Name="lblPbarStatus" Content="Status" HorizontalAlignment="Left" Margin="10,190.681,0,0"
-                   Grid.Row="1" VerticalAlignment="Top" Width="238.093" />
-            <ComboBox Name="selectionTypeComboBox" HorizontalAlignment="Left" Height="22.119"
-                      Margin="110.272,297.243,0,0" VerticalAlignment="Top" Width="148.947"
-                      SelectedIndex="0
-                      "
-                      SelectionChanged="selectionTypeComboBox_SelectionChanged">
+            <Label Content="Add a Query Filter" HorizontalAlignment="Left" Margin="19.022,129.52,0,0" VerticalAlignment="Top" Height="25.96" Width="106.123" Grid.Row="1"/>
+            <Label Content="Aggregation result analyses" HorizontalAlignment="Left" Margin="19.022,269.202,0,0" VerticalAlignment="Top" Height="27.003" Grid.Row="1"/>
+            <Label Name="lblPbarStatus" Content="Status" HorizontalAlignment="Left" Margin="10,190.681,0,0" Grid.Row="2" VerticalAlignment="Top" Width="238.093"/>
+            <ComboBox Name="selectionTypeComboBox" Height="22.119" Margin="0,215.643,21.194,0" VerticalAlignment="Top" SelectedIndex="0
+                      " SelectionChanged="selectionTypeComboBox_SelectionChanged" HorizontalAlignment="Right" Width="146.702" Grid.Row="1">
                 <ComboBoxItem>Draw Rectangle</ComboBoxItem>
                 <ComboBoxItem>Use Selected Polygons</ComboBoxItem>
             </ComboBox>
-            <Label Content="Selection Type" HorizontalAlignment="Left" Margin="10,293.242,0,0" VerticalAlignment="Top" />
-            <Label Content="Label" HorizontalAlignment="Left" Height="3.602" Margin="116.139,342.2,0,0"
-                   VerticalAlignment="Top" Width="7.461" />
+            <Label Content="Selection Type" Margin="10,211.641,181.75,0" VerticalAlignment="Top" Grid.Row="1"/>
+            <Label Content="Label" HorizontalAlignment="Left" Height="3.602" Margin="116.139,260.6,0,0" VerticalAlignment="Top" Width="7.461" Grid.Row="1"/>
         </Grid>
         <Grid HorizontalAlignment="Left" Height="0" Margin="119.8,61.2,0,-57.349" VerticalAlignment="Top" Width="3.2"
               Grid.Column="2" Grid.Row="2" />

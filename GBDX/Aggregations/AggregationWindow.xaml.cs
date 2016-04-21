@@ -537,7 +537,6 @@ namespace Gbdx.Aggregations
                 {
                     if (uniqueFieldNames.ContainsKey(val))
                     {
-
                         try
                         {
                             if (val.EndsWith("_str"))
