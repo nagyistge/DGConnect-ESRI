@@ -40,14 +40,16 @@
             this.projectNameTextbox = new System.Windows.Forms.TextBox();
             this.bufferTextbox = new System.Windows.Forms.TextBox();
             this.availableRecipesCombobox = new System.Windows.Forms.ComboBox();
+            this.resetButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.existingProjectsListView = new System.Windows.Forms.ListView();
-            this.showResultsButton = new System.Windows.Forms.Button();
             this.nameHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.idHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.recipeHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.showResultsButton = new System.Windows.Forms.Button();
             this.resultRefrshButton = new System.Windows.Forms.Button();
-            this.resetButton = new System.Windows.Forms.Button();
+            this.statusHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.idHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -199,10 +201,21 @@
             // 
             this.availableRecipesCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.availableRecipesCombobox.FormattingEnabled = true;
-            this.availableRecipesCombobox.Location = new System.Drawing.Point(129, 161);
+            this.availableRecipesCombobox.Location = new System.Drawing.Point(129, 160);
             this.availableRecipesCombobox.Name = "availableRecipesCombobox";
             this.availableRecipesCombobox.Size = new System.Drawing.Size(166, 24);
             this.availableRecipesCombobox.TabIndex = 9;
+            // 
+            // resetButton
+            // 
+            this.resetButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.resetButton.Location = new System.Drawing.Point(25, 209);
+            this.resetButton.Name = "resetButton";
+            this.resetButton.Size = new System.Drawing.Size(75, 27);
+            this.resetButton.TabIndex = 10;
+            this.resetButton.Text = "Reset";
+            this.resetButton.UseVisualStyleBackColor = true;
+            this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
             // 
             // groupBox2
             // 
@@ -248,6 +261,8 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.existingProjectsListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.nameHeader,
+            this.recipeHeader,
+            this.statusHeader,
             this.idHeader});
             this.tableLayoutPanel3.SetColumnSpan(this.existingProjectsListView, 3);
             this.existingProjectsListView.FullRowSelect = true;
@@ -261,6 +276,17 @@
             this.existingProjectsListView.UseCompatibleStateImageBehavior = false;
             this.existingProjectsListView.View = System.Windows.Forms.View.Details;
             // 
+            // nameHeader
+            // 
+            this.nameHeader.Text = "Name";
+            this.nameHeader.Width = 125;
+            // 
+            // recipeHeader
+            // 
+            this.recipeHeader.Text = "Recipe";
+            this.recipeHeader.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.recipeHeader.Width = 163;
+            // 
             // showResultsButton
             // 
             this.showResultsButton.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -271,17 +297,6 @@
             this.showResultsButton.Text = "Show Results";
             this.showResultsButton.UseVisualStyleBackColor = true;
             this.showResultsButton.Click += new System.EventHandler(this.showResultsButton_Click);
-            // 
-            // nameHeader
-            // 
-            this.nameHeader.Text = "Name";
-            this.nameHeader.Width = 200;
-            // 
-            // idHeader
-            // 
-            this.idHeader.Text = "ID";
-            this.idHeader.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
-            this.idHeader.Width = 300;
             // 
             // resultRefrshButton
             // 
@@ -296,16 +311,16 @@
             this.resultRefrshButton.UseVisualStyleBackColor = true;
             this.resultRefrshButton.Click += new System.EventHandler(this.resultRefrshButton_Click);
             // 
-            // resetButton
+            // statusHeader
             // 
-            this.resetButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.resetButton.Location = new System.Drawing.Point(25, 209);
-            this.resetButton.Name = "resetButton";
-            this.resetButton.Size = new System.Drawing.Size(75, 27);
-            this.resetButton.TabIndex = 10;
-            this.resetButton.Text = "Reset";
-            this.resetButton.UseVisualStyleBackColor = true;
-            this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
+            this.statusHeader.Text = "Status";
+            this.statusHeader.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.statusHeader.Width = 72;
+            // 
+            // idHeader
+            // 
+            this.idHeader.Text = "ID";
+            this.idHeader.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // AnswerFactoryDockableWindow
             // 
@@ -341,9 +356,11 @@
         private System.Windows.Forms.ListView existingProjectsListView;
         private System.Windows.Forms.Button showResultsButton;
         private System.Windows.Forms.ColumnHeader nameHeader;
-        private System.Windows.Forms.ColumnHeader idHeader;
+        private System.Windows.Forms.ColumnHeader recipeHeader;
         private System.Windows.Forms.Button resultRefrshButton;
         private System.Windows.Forms.Button resetButton;
+        private System.Windows.Forms.ColumnHeader statusHeader;
+        private System.Windows.Forms.ColumnHeader idHeader;
 
     }
 }

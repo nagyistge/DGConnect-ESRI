@@ -16,6 +16,7 @@ namespace Gbdx.Answer_Factory
 
     using GbdxSettings;
     using GbdxSettings.Properties;
+
     using System.Windows.Threading;
 
     using ESRI.ArcGIS.Geometry;
@@ -37,11 +38,12 @@ namespace Gbdx.Answer_Factory
     /// </summary>
     public partial class AnswerFactoryDockableWindow : UserControl
     {
-
         private string token;
 
         List<Recipe> recipeList = new List<Recipe>();
-        List<Project2> existingProjects = new List<Project2>(); 
+
+        List<Project2> existingProjects = new List<Project2>();
+
         private IRestClient client;
 
         public AnswerFactoryDockableWindow(object hook)
@@ -50,7 +52,6 @@ namespace Gbdx.Answer_Factory
             this.client = new RestClient(Settings.Default.baseUrl);
             this.GetToken();
             this.Hook = hook;
-
         }
 
         /// <summary>
@@ -62,9 +63,7 @@ namespace Gbdx.Answer_Factory
             IRestClient restClient = new RestClient(Settings.Default.AuthBase);
 
             string password;
-            var result = Encryption.Aes.Instance.Decrypt128(
-                Settings.Default.password,
-                out password);
+            var result = Encryption.Aes.Instance.Decrypt128(Settings.Default.password, out password);
 
             if (!result)
             {
@@ -86,7 +85,7 @@ namespace Gbdx.Answer_Factory
                     {
                         Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-                        if(resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
+                        if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
                         {
                             this.token = resp.Data.access_token;
                             this.GetRecipes();
@@ -101,7 +100,7 @@ namespace Gbdx.Answer_Factory
 
         private void GetRecipes()
         {
-            this.CheckBaseUrl();   
+            this.CheckBaseUrl();
             var request = new RestRequest("/answer-factory-recipe-service/api/recipes", Method.GET);
             request.AddHeader("Authorization", "Bearer" + this.token);
             request.AddHeader("Content-Type", "application/json");
@@ -124,18 +123,17 @@ namespace Gbdx.Answer_Factory
                                     }));
                         }
                     });
-
         }
 
         private void CheckBaseUrl()
         {
-            if(this.client == null || !this.client.BaseUrl.Equals(new Uri(Settings.Default.baseUrl)))
+            if (this.client == null || !this.client.BaseUrl.Equals(new Uri(Settings.Default.baseUrl)))
             {
                 this.client = new RestClient(Settings.Default.baseUrl);
             }
         }
 
-        private string CreateProjectJson(List<IPolygon> polygons )
+        private string CreateProjectJson(List<IPolygon> polygons)
         {
             // get the geojson of the aois
             var aoi = Jarvis.ConvertPolygonsToGeoJson(polygons);
@@ -166,7 +164,7 @@ namespace Gbdx.Answer_Factory
         private Recipe GetRecipe(string name)
         {
             IEnumerable<Recipe> query = (from q in this.recipeList where q.name.Equals(name) select q);
-            
+
             if (query.Count() == 1)
             {
                 return query.Single();
@@ -176,7 +174,6 @@ namespace Gbdx.Answer_Factory
 
         private void GetExistingProjects()
         {
-
             var request = new RestRequest("/answer-factory-project-service/api/project", Method.GET);
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
@@ -187,51 +184,52 @@ namespace Gbdx.Answer_Factory
                 resp =>
                     {
                         Jarvis.Logger.Info(resp.ResponseUri.ToString());
-                        
+
                         if (resp.Data != null && resp.StatusCode == HttpStatusCode.OK)
                         {
                             this.existingProjects = resp.Data;
-                            this.Invoke(
-                                (MethodInvoker)(() =>
-                                    {
-                                        this.UpdateUiWithExistingProjects();
-                                    }));
+                            this.Invoke((MethodInvoker)(() => { this.UpdateUiWithExistingProjects(); }));
                         }
-
                     });
         }
 
-        private void GetResult(string id, string projectId)
+        private void GetResult(string id, string recipeName)
         {
             this.CheckBaseUrl();
 
-            if (string.IsNullOrEmpty(id) || string.IsNullOrEmpty(projectId))
+            if (string.IsNullOrEmpty(id))
             {
-                MessageBox.Show("No id or project id");
+                MessageBox.Show("No Project id");
                 return;
             }
             var request =
                 new RestRequest(
-                    string.Format("/answer-factory-recipe-service/api/result/{0}/{1}", id, projectId),
+                    string.Format("/answer-factory-recipe-service/api/result/project/{0}", id),
                     Method.GET);
 
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
-            this.client.ExecuteAsync<ResultItem>(
+            this.client.ExecuteAsync<List<ResultItem>>(
                 request,
                 resp =>
                     {
-                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
-
-                        if (resp.Data == null)
-                        {
-                            MessageBox.Show("recipe isn't ready");
-                        }
-                        else
-                        {
-                            Jarvis.Logger.Info(resp.Data.properties.query_string);
-                        }
+                        ProcessResult(recipeName, resp);
                     });
+        }
+
+        private static void ProcessResult(string recipeName, IRestResponse<List<ResultItem>> resp)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            if(resp.Data != null)
+            {
+                var query = from a in resp.Data where a.recipeName == recipeName select a;
+
+                foreach (var item in query)
+                {
+                    Jarvis.Logger.Info(item.properties.query_string);
+                }
+            }
         }
 
         private void UpdateUiWithExistingProjects()
@@ -239,21 +237,36 @@ namespace Gbdx.Answer_Factory
             this.existingProjectsListView.Items.Clear();
             foreach (var item in this.existingProjects)
             {
-                string[] arr = new string[2];
-                arr[0] = item.name;
-                arr[1] = item.id;
-                this.existingProjectsListView.Items.Add(new ListViewItem(arr));
+                foreach (var recipe in item.recipeConfigs)
+                {
+                    string[] arr = new string[4];
+                    arr[0] = item.name;
+                    arr[1] = recipe.recipeName;
+                    arr[2] = "Uknown";
+                    arr[3] = item.id;
+                    this.existingProjectsListView.Items.Add(new ListViewItem(arr));
+                }
             }
+        }
+
+        private void GetProjectRecipeStatus(string projectid)
+        {
+            this.CheckBaseUrl();
+
+            var request =
+                new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectid));
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+
+            var response = this.client.ExecuteAsync(
+                request,
+                resp => { Jarvis.Logger.Info(resp.ResponseUri.ToString()); });
         }
 
         /// <summary>
         /// Host object of the dockable window
         /// </summary>
-        private object Hook
-        {
-            get;
-            set;
-        }
+        private object Hook { get; set; }
 
         /// <summary>
         /// Implementation class of the dockable window add-in. It is responsible for 
@@ -276,11 +289,12 @@ namespace Gbdx.Answer_Factory
             protected override void Dispose(bool disposing)
             {
                 if (m_windowUI != null)
+                {
                     m_windowUI.Dispose(disposing);
+                }
 
                 base.Dispose(disposing);
             }
-
         }
 
         private void saveButton_Click(object sender, EventArgs e)
@@ -310,15 +324,10 @@ namespace Gbdx.Answer_Factory
                 request.AddHeader("Content-Type", "application/json");
                 request.AddParameter("application/json", projectJson, ParameterType.RequestBody);
                 this.CheckBaseUrl();
-                this.client.ExecuteAsync(request,
-                    resp =>
-                        {
-                            Jarvis.Logger.Info(resp.ResponseUri.ToString());
-                        });
+                this.client.ExecuteAsync(request, resp => { Jarvis.Logger.Info(resp.ResponseUri.ToString()); });
 
                 this.projectNameTextbox.Clear();
                 this.availableRecipesCombobox.SelectedIndex = -1;
-
             }
             catch (Exception error)
             {
@@ -331,24 +340,27 @@ namespace Gbdx.Answer_Factory
             foreach (ListViewItem item in this.existingProjectsListView.SelectedItems)
             {
                 var name = item.SubItems[0].Text;
-                var id = item.SubItems[1].Text;
+                var recipeName = item.SubItems[1].Text;
+                var id = item.SubItems[3].Text;
+                
+                // linq query to get the project where the all the criteria match just as a double check
+                var query = from proj in this.existingProjects
+                            from recipe in proj.recipeConfigs
+                            where proj.id == id
+                            where proj.name == name
+                            where recipe.recipeName == recipeName
+                            select proj;
 
-                //var query = from i in this.existingProjects where i.id == id select i;
-
-                foreach (var projItem in this.existingProjects)
+                var selectedItems = query as Project2[] ?? query.ToArray();
+                if (selectedItems.Any())
                 {
-                    if (projItem.id == id)
-                    {
-                        if (projItem.recipeConfigs.Count >= 1)
-                        {
-                            this.GetResult(projItem.id, projItem.recipeConfigs[0].recipeId);
-                        }
-                        else
-                        {
-                            MessageBox.Show("No recipe was applied to the result");
-                        }
-                    }
+                    this.GetResult(id, recipeName);
                 }
+                else
+                {
+                    MessageBox.Show("Error in selection.  Please try again.");
+                }
+                return;
             }
         }
 
