@@ -15,7 +15,7 @@
         public string name { get; set; }
         public string accountId { get; set; }
         public object idahoImages { get; set; }
-        public List<Aois> aois { get; set; }
+        public List<string> aois { get; set; }
         public List<RecipeConfig> recipeConfigs { get; set; }
         public List<object> bestIdahoIds { get; set; }
         public object originalGeometries { get; set; }

@@ -1,4 +1,6 @@
-﻿using System;
+﻿// Author: Russ Wittmer
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -20,6 +22,8 @@ namespace Gbdx.Answer_Factory
     using System.Windows.Threading;
 
     using ESRI.ArcGIS.Geometry;
+
+    using Gbdx.Vector_Index;
 
     using GbdxTools;
 
@@ -213,11 +217,11 @@ namespace Gbdx.Answer_Factory
                 request,
                 resp =>
                     {
-                        ProcessResult(recipeName, resp);
+                        ProcessResult(recipeName, resp, this.existingProjects, this.token, this.client);
                     });
         }
 
-        private static void ProcessResult(string recipeName, IRestResponse<List<ResultItem>> resp)
+        private static void ProcessResult(string recipeName, IRestResponse<List<ResultItem>> resp, List<Project2> existingProjects, string token, IRestClient client )
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
@@ -225,9 +229,18 @@ namespace Gbdx.Answer_Factory
             {
                 var query = from a in resp.Data where a.recipeName == recipeName select a;
 
+                
                 foreach (var item in query)
                 {
+                    var aoiQuery = from b in existingProjects where b.id == item.projectId select b;
+                    string aoi = string.Empty;
+                    foreach (var projectItem in aoiQuery)
+                    {
+                        aoi = ConvertAoisToGeometryCollection(projectItem.aois);
+                    }
+
                     Jarvis.Logger.Info(item.properties.query_string);
+                    GetGeometries(item.properties.query_string, token,aoi, client);
                 }
             }
         }
@@ -262,6 +275,157 @@ namespace Gbdx.Answer_Factory
                 request,
                 resp => { Jarvis.Logger.Info(resp.ResponseUri.ToString()); });
         }
+
+        private static string ConvertAoisToGeometryCollection(List<string> aois)
+        {
+            StringBuilder builder = new StringBuilder("{\"type\":\"GeometryCollection\",\"geometries\":[");
+            foreach (var item in aois)
+            {
+                builder.Append(item + ",");
+            }
+            builder.Remove(builder.Length - 1,1);
+            builder.Append("]}");
+            return builder.ToString();
+        }
+
+
+        #region Download Vector Items
+
+        private static void GetGeometries(string query, string token, string aoi, IRestClient client, int attempt = 0)
+        {
+            var request = new RestRequest("/insight-vector/api/shape/query/geometries?q=" + query, Method.POST);
+            request.AddHeader("Authorization", "Bearer " + token);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json", aoi, ParameterType.RequestBody);
+
+            attempt++;
+
+            client.ExecuteAsync<List<SourceType>>(
+                request,
+                resp => GetGeometriesResponseProcess(resp, query, token, aoi, client, attempt));
+        }
+
+        private static void GetGeometriesResponseProcess(IRestResponse<List<SourceType>> resp, string query, string token, string aoi, IRestClient client, int geomAttempts)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            // Check to see if we have a good status if not try it again
+            if (resp.StatusCode != HttpStatusCode.OK && geomAttempts <= 3)
+            {
+                GetGeometries(query, token, aoi, client, geomAttempts);
+            }
+            else
+            {
+                MessageBox.Show("An Error occurred.  Please try again");
+            }
+
+            if (resp.Data != null)
+            {
+                var sources = resp.Data;
+
+                foreach (var source in sources)
+                {
+                    GetTypes(source.Name, query, token, aoi, client);
+                }
+            }
+
+        }
+
+        private static void GetTypes(string geometry, string query, string token, string aoi, IRestClient client, int attempts = 0)
+        {
+            var request = new RestRequest(string.Format("/insight-vector/api/shape/query/{0}/types?q={1}", geometry, query), Method.POST);
+            request.AddHeader("Authorization", "Bearer " + token);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json", aoi, ParameterType.RequestBody);
+
+            attempts++;
+
+            client.ExecuteAsync<List<SourceType>>(
+                request,
+                resp => GetTypesResponseProcess(resp, geometry, query, token, aoi, client, attempts));
+
+        }
+
+        private static void GetTypesResponseProcess(
+            IRestResponse<List<SourceType>> resp,
+            string geometry, 
+            string query,
+            string token,
+            string aoi,
+            IRestClient client,
+            int typeAttempts)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            // Check to see if we have a good status if not try it again
+            if (resp.StatusCode != HttpStatusCode.OK && typeAttempts <= 3)
+            {
+                GetTypes(geometry, query, token, aoi, client, typeAttempts);
+            }
+            else
+            {
+                MessageBox.Show("An Error occurred.  Please try again");
+            }
+
+            if (resp.Data != null)
+            {
+                var types = resp.Data;
+                foreach (var type in types)
+                {
+                    GetPagingId(geometry, type.Name, query, token, aoi, client);
+                }
+            }
+
+            
+        }
+
+        private static void GetPagingId(string geometry, string type, string query, string token, string aoi, IRestClient client, int attempts =0)
+        {
+            var request = new RestRequest(string.Format("/insight-vector/api/shape/query/{0}/{1}/paging?q={2}", geometry, type, query), Method.POST);
+            request.AddHeader("Authorization", "Bearer " + token);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json", aoi, ParameterType.RequestBody);
+
+            attempts ++;
+
+            client.ExecuteAsync<PageId>(
+                request,
+                resp => GetPageIdResponseProcess(resp, geometry, type, query, token, aoi, client, attempts));
+
+        }
+
+        private static void GetPageIdResponseProcess(
+            IRestResponse<PageId> resp,
+            string geometry,
+            string type,
+            string query,
+            string token,
+            string aoi,
+            IRestClient client,
+            int pageIdAttempts = 0)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            // Check to see if we have a good status if not try it again
+            if (resp.StatusCode != HttpStatusCode.OK && pageIdAttempts <= 3)
+            {
+                GetPagingId(geometry,type, query, token, aoi, client, pageIdAttempts);
+            }
+            else
+            {
+                MessageBox.Show("An Error occurred.  Please try again");
+            }
+            if (resp.Data != null)
+            {
+                var pageId = resp.Data;
+            }
+        }
+
+        private static void GetPages(string pageId, IRestClient client)
+        {
+            
+        }
+        #endregion
 
         /// <summary>
         /// Host object of the dockable window

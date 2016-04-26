@@ -723,7 +723,7 @@ namespace Gbdx.Vector_Index
             {
                 var pageID = JsonConvert.DeserializeObject<PageId>(json);
 
-                return pageID.PagingId;
+                return pageID.pagingId;
             }
             catch (Exception error)
             {
