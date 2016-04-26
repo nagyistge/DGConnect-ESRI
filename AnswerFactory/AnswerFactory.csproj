@@ -42,6 +42,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Datum.cs" />
     <Compile Include="IdahoImage.cs" />
     <Compile Include="NamedBuffer.cs" />
     <Compile Include="Project.cs" />

@@ -206,10 +206,9 @@ namespace Gbdx.Answer_Factory
                 MessageBox.Show("No Project id");
                 return;
             }
-            var request =
-                new RestRequest(
-                    string.Format("/answer-factory-recipe-service/api/result/project/{0}", id),
-                    Method.GET);
+            var request = new RestRequest(
+                string.Format("/answer-factory-recipe-service/api/result/project/{0}", id),
+                Method.GET);
 
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
@@ -221,15 +220,20 @@ namespace Gbdx.Answer_Factory
                     });
         }
 
-        private static void ProcessResult(string recipeName, IRestResponse<List<ResultItem>> resp, List<Project2> existingProjects, string token, IRestClient client )
+        private static void ProcessResult(
+            string recipeName,
+            IRestResponse<List<ResultItem>> resp,
+            List<Project2> existingProjects,
+            string token,
+            IRestClient client)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if(resp.Data != null)
+            if (resp.Data != null)
             {
                 var query = from a in resp.Data where a.recipeName == recipeName select a;
 
-                
+
                 foreach (var item in query)
                 {
                     var aoiQuery = from b in existingProjects where b.id == item.projectId select b;
@@ -240,7 +244,7 @@ namespace Gbdx.Answer_Factory
                     }
 
                     Jarvis.Logger.Info(item.properties.query_string);
-                    GetGeometries(item.properties.query_string, token,aoi, client);
+                    GetGeometries(item.properties.query_string, token, aoi, client);
                 }
             }
         }
@@ -283,7 +287,7 @@ namespace Gbdx.Answer_Factory
             {
                 builder.Append(item + ",");
             }
-            builder.Remove(builder.Length - 1,1);
+            builder.Remove(builder.Length - 1, 1);
             builder.Append("]}");
             return builder.ToString();
         }
@@ -300,12 +304,18 @@ namespace Gbdx.Answer_Factory
 
             attempt++;
 
-            client.ExecuteAsync<List<SourceType>>(
+            client.ExecuteAsync<ResponseData>(
                 request,
                 resp => GetGeometriesResponseProcess(resp, query, token, aoi, client, attempt));
         }
 
-        private static void GetGeometriesResponseProcess(IRestResponse<List<SourceType>> resp, string query, string token, string aoi, IRestClient client, int geomAttempts)
+        private static void GetGeometriesResponseProcess(
+            IRestResponse<ResponseData> resp,
+            string query,
+            string token,
+            string aoi,
+            IRestClient client,
+            int geomAttempts)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
@@ -314,41 +324,51 @@ namespace Gbdx.Answer_Factory
             {
                 GetGeometries(query, token, aoi, client, geomAttempts);
             }
-            else
+            else if (geomAttempts > 3)
             {
                 MessageBox.Show("An Error occurred.  Please try again");
+                return;
             }
 
             if (resp.Data != null)
             {
                 var sources = resp.Data;
 
-                foreach (var source in sources)
+                foreach (var source in sources.data)
                 {
-                    GetTypes(source.Name, query, token, aoi, client);
+                    GetTypes(source.name, query, token, aoi, client);
                 }
             }
 
         }
 
-        private static void GetTypes(string geometry, string query, string token, string aoi, IRestClient client, int attempts = 0)
+        private static void GetTypes(
+            string geometry,
+            string query,
+            string token,
+            string aoi,
+            IRestClient client,
+            int attempts = 0)
         {
-            var request = new RestRequest(string.Format("/insight-vector/api/shape/query/{0}/types?q={1}", geometry, query), Method.POST);
+            var request =
+                new RestRequest(
+                    string.Format("/insight-vector/api/shape/query/{0}/types?q={1}", geometry, query),
+                    Method.POST);
             request.AddHeader("Authorization", "Bearer " + token);
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json", aoi, ParameterType.RequestBody);
 
             attempts++;
 
-            client.ExecuteAsync<List<SourceType>>(
+            client.ExecuteAsync<ResponseData>(
                 request,
                 resp => GetTypesResponseProcess(resp, geometry, query, token, aoi, client, attempts));
 
         }
 
         private static void GetTypesResponseProcess(
-            IRestResponse<List<SourceType>> resp,
-            string geometry, 
+            IRestResponse<ResponseData> resp,
+            string geometry,
             string query,
             string token,
             string aoi,
@@ -362,26 +382,37 @@ namespace Gbdx.Answer_Factory
             {
                 GetTypes(geometry, query, token, aoi, client, typeAttempts);
             }
-            else
+            else if (typeAttempts > 3)
             {
                 MessageBox.Show("An Error occurred.  Please try again");
+                return;
             }
 
             if (resp.Data != null)
             {
                 var types = resp.Data;
-                foreach (var type in types)
+                foreach (var type in types.data)
                 {
-                    GetPagingId(geometry, type.Name, query, token, aoi, client);
+                    GetPagingId(geometry, type.name, query, token, aoi, client);
                 }
             }
 
-            
+
         }
 
-        private static void GetPagingId(string geometry, string type, string query, string token, string aoi, IRestClient client, int attempts =0)
+        private static void GetPagingId(
+            string geometry,
+            string type,
+            string query,
+            string token,
+            string aoi,
+            IRestClient client,
+            int attempts = 0)
         {
-            var request = new RestRequest(string.Format("/insight-vector/api/shape/query/{0}/{1}/paging?q={2}", geometry, type, query), Method.POST);
+            var request =
+                new RestRequest(
+                    string.Format("/insight-vector/api/shape/query/{0}/{1}/paging?q={2}", geometry, type, query),
+                    Method.POST);
             request.AddHeader("Authorization", "Bearer " + token);
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json", aoi, ParameterType.RequestBody);
@@ -409,11 +440,12 @@ namespace Gbdx.Answer_Factory
             // Check to see if we have a good status if not try it again
             if (resp.StatusCode != HttpStatusCode.OK && pageIdAttempts <= 3)
             {
-                GetPagingId(geometry,type, query, token, aoi, client, pageIdAttempts);
+                GetPagingId(geometry, type, query, token, aoi, client, pageIdAttempts);
             }
-            else
+            else if (pageIdAttempts > 3)
             {
                 MessageBox.Show("An Error occurred.  Please try again");
+                return;
             }
             if (resp.Data != null)
             {
@@ -423,8 +455,9 @@ namespace Gbdx.Answer_Factory
 
         private static void GetPages(string pageId, IRestClient client)
         {
-            
+
         }
+
         #endregion
 
         /// <summary>
@@ -506,7 +539,7 @@ namespace Gbdx.Answer_Factory
                 var name = item.SubItems[0].Text;
                 var recipeName = item.SubItems[1].Text;
                 var id = item.SubItems[3].Text;
-                
+
                 // linq query to get the project where the all the criteria match just as a double check
                 var query = from proj in this.existingProjects
                             from recipe in proj.recipeConfigs
