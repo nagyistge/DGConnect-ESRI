@@ -487,7 +487,7 @@ namespace Gbdx.Aggregations
                 {
                     var field = uniqueFieldNames[subKey];
                     var value = resultDictionary[key][subKey];
-                    var index = featureClass.FindField(field);
+                    var index = featureClass.FindField("DG_"+field);
 
                     if (index != -1)
                     {
