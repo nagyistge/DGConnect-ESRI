@@ -244,7 +244,7 @@ namespace Gbdx.Answer_Factory
                     });
         }
 
-        private static void ProcessResult(
+        private void ProcessResult(
             string recipeName,
             IRestResponse<List<ResultItem>> resp,
             List<Project2> existingProjects,
@@ -265,7 +265,7 @@ namespace Gbdx.Answer_Factory
                     foreach (var projectItem in aoiQuery)
                     {
                         aoi = ConvertAoisToGeometryCollection(projectItem.aois);
-                        layername = string.Format("{0} {1}", projectItem.name, recipeName);
+                        layername = string.Format("{0}|{1}", projectItem.name, recipeName);
                     }
                      
                     Jarvis.Logger.Info(item.properties.query_string);
@@ -304,12 +304,32 @@ namespace Gbdx.Answer_Factory
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
 
-            var response = this.client.ExecuteAsync(
+            this.client.ExecuteAsync<List<ResultItem>>(
                 request,
                 resp =>
                     {
-                        
                         Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                        this.Invoke(
+                                (MethodInvoker)(() =>
+                                {
+                                    foreach (var item in resp.Data)
+                                    {
+                                        foreach (ListViewItem listItem in this.existingProjectsListView.Items)
+                                        {
+                                            var name = listItem.SubItems[0].Text;
+                                            var recipeName = listItem.SubItems[1].Text;
+                                            var id = listItem.SubItems[3].Text;
+                                            if (id == item.projectId)
+                                            {
+                                                if (string.Equals(item.status, "success", StringComparison.OrdinalIgnoreCase))
+                                                {
+                                                    listItem.SubItems[2].Text = "Complete";
+                                                }
+                                            }
+                                        }
+                                    }
+                                }));
+                        
                     });
         }
 
@@ -327,7 +347,7 @@ namespace Gbdx.Answer_Factory
         
         #region Download Vector Items
 
-        private static void GetGeometries(string query, string token, string aoi, IRestClient client, string layerName, int attempt = 0)
+        private void GetGeometries(string query, string token, string aoi, IRestClient client, string layerName, int attempt = 0)
         {
             var request = new RestRequest("/insight-vector/api/shape/query/geometries?q=" + query, Method.POST);
             request.AddHeader("Authorization", "Bearer " + token);
@@ -341,7 +361,7 @@ namespace Gbdx.Answer_Factory
                 resp => GetGeometriesResponseProcess(resp, query, token, aoi, client,layerName, attempt));
         }
 
-        private static void GetGeometriesResponseProcess(
+        private void GetGeometriesResponseProcess(
             IRestResponse<ResponseData> resp,
             string query,
             string token,
@@ -375,7 +395,7 @@ namespace Gbdx.Answer_Factory
 
         }
 
-        private static void GetTypes(
+        private void GetTypes(
             string geometry,
             string query,
             string token,
@@ -400,7 +420,7 @@ namespace Gbdx.Answer_Factory
 
         }
 
-        private static void GetTypesResponseProcess(
+        private void GetTypesResponseProcess(
             IRestResponse<ResponseData> resp,
             string geometry,
             string query,
@@ -435,7 +455,7 @@ namespace Gbdx.Answer_Factory
 
         }
 
-        private static void GetPagingId(
+        private void GetPagingId(
             string geometry,
             string type,
             string query,
@@ -461,7 +481,7 @@ namespace Gbdx.Answer_Factory
 
         }
 
-        private static void GetPageIdResponseProcess(
+        private void GetPageIdResponseProcess(
             IRestResponse<PageId> resp,
             string geometry,
             string type,
@@ -496,7 +516,7 @@ namespace Gbdx.Answer_Factory
             }
         }
 
-        private static void GetPages(string pageId, string token, IRestClient client, StreamWriter fileStreamWriter, string layerName, int attempts=0)
+        private void GetPages(string pageId, string token, IRestClient client, StreamWriter fileStreamWriter, string layerName, int attempts=0)
         {
             var request = new RestRequest("/insight-vector/api/esri/paging", Method.POST);
             request.AddHeader("Authorization", "Bearer " + token);
@@ -507,11 +527,11 @@ namespace Gbdx.Answer_Factory
             request.AddParameter("pagingId", pageId);
 
             attempts++;
-            client.ExecuteAsync<PagedData>(request, resp => ProcessPageResponse(resp, token, pageId, client, layerName, attempts, fileStreamWriter));
+            client.ExecuteAsync<PagedData2>(request, resp => ProcessPageResponse(resp, token, pageId, client, layerName, attempts, fileStreamWriter));
         }
 
-        private static void ProcessPageResponse(
-            IRestResponse<PagedData> resp,
+        private void ProcessPageResponse(
+            IRestResponse<PagedData2> resp,
             string token,
             string pageId,
             IRestClient client,
@@ -555,7 +575,7 @@ namespace Gbdx.Answer_Factory
             }
         }
 
-        private static void ConvertPagesToFeatureClass(string filepath, string layerName)
+        private void ConvertPagesToFeatureClass(string filepath, string layerName)
         {
             try
             {
@@ -579,7 +599,8 @@ namespace Gbdx.Answer_Factory
 
                 WriteToTable(workspace, jsonOutput, tableName);
 
-                AddLayerToMap(tableName, layerName);
+                this.Invoke((MethodInvoker)(() => { AddLayerToMap(tableName, layerName); }));
+                
                 if (File.Exists(filepath))
                 {
                     File.Delete(filepath);
@@ -801,6 +822,8 @@ namespace Gbdx.Answer_Factory
 
                 this.projectNameTextbox.Clear();
                 this.availableRecipesCombobox.SelectedIndex = -1;
+
+                this.GetExistingProjects();
             }
             catch (Exception error)
             {

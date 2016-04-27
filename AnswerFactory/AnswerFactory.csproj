@@ -52,6 +52,7 @@
     <Compile Include="Datum.cs" />
     <Compile Include="IdahoImage.cs" />
     <Compile Include="NamedBuffer.cs" />
+    <Compile Include="PagedData2.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Project2.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

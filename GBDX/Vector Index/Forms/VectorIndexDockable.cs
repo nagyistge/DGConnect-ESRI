@@ -1088,9 +1088,10 @@ namespace Gbdx.Vector_Index.Forms
 
                     var pagedResult = JsonConvert.DeserializeObject<PagedData>(networkObj.Result);
 
+                    
                     networkObj.PageId = pagedResult.next_paging_id;
                     networkObj.PageItemCount = Convert.ToInt32( pagedResult.item_count);
-
+                    
                     // Download didn't start so lets try it again.  but after a 250 ms nap to give the service a chance to catch up
                     if (itemsReceived == 0 && !success)
                     {

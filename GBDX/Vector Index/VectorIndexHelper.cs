@@ -778,14 +778,21 @@ namespace Gbdx.Vector_Index
         /// </param>
         public static void AddFeatureLayerToMap(ILayer layer)
         {
-            var mxdoc = ArcMap.Application.Document as IMxDocument;
-            if (mxdoc == null)
+            try
             {
-                return;
-            }
+                var mxdoc = ArcMap.Application.Document as IMxDocument;
+                if (mxdoc == null)
+                {
+                    return;
+                }
 
-            var map = mxdoc.FocusMap;
-            map.AddLayer(layer);
+                var map = mxdoc.FocusMap;
+                map.AddLayer(layer);
+            }
+            catch(Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
         }
 
         /// <summary>
