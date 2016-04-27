@@ -6,7 +6,7 @@
   <Image>Images\Atlas_Icon.ico</Image>
   <Author>DigitalGlobe Inc.</Author>
   <Company>DigitalGlobe Inc.</Company>
-  <Date>4/13/2016</Date>
+  <Date>4/27/2016</Date>
   <Targets>
     <Target name="Desktop" version="10.2" />
   </Targets>
@@ -23,6 +23,7 @@
         <Tool id="DigitalGlobe_Inc_AggregationSelector" class="Gbdx.Aggregations.AggregationSelector" message="When used will select the AOI that will be used by the Aggregation query service" caption="Select AOI for aggregation service" tip="Selects the AOI for the Aggregation service" category="Add-In Controls" image="Images\AggregationSelector.png" />
         <Button id="DigitalGlobe_Inc_Gbdx_VectorUpload" class="VectorUpload" message="Allows a user to upload a shapefile to the vector services." caption="Upload a Vector Shapefile" tip="Upload a Vector Shapefile" category="Add-In Controls" image="Images\VectorUpload.png" />
         <Button id="DigitalGlobe_Inc_Gbdx_AnswerFactoryButton" class="AnswerFactoryButton" message="Opens Answer Factory where projects can be loaded or created from " caption="Opens Answer Factory" tip="Opens Answer Factory where projects can be loaded or created from" category="Add-In Controls" image="Images\AnswerFactoryButton.png" />
+        <Tool id="DigitalGlobe_Inc_Gbdx_AnswerFactorySelector" class="Gbdx.Answer_Factory.AnswerFactorySelector" message="AOI Drawing Tool" caption="AOI Drawing Tool" tip="AOI Drawing Tool" category="Add-In Controls" image="Images\AnswerFactorySelector.png" />
       </Commands>
       <Toolbars>
         <Toolbar id="DigitalGlobe_Inc_sma_Social_Media_Analytics" caption="GBDX Toolbar" showInitially="true">

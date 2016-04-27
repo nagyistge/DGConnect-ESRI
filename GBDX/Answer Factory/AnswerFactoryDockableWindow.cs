@@ -9,6 +9,7 @@ using System.Text;
 
 namespace Gbdx.Answer_Factory
 {
+    using System.IO;
     using System.Linq;
     using System.Net;
     using System.Windows.Controls;
@@ -21,6 +22,10 @@ namespace Gbdx.Answer_Factory
 
     using System.Windows.Threading;
 
+    using ESRI.ArcGIS.Carto;
+    using ESRI.ArcGIS.esriSystem;
+    using ESRI.ArcGIS.Framework;
+    using ESRI.ArcGIS.Geodatabase;
     using ESRI.ArcGIS.Geometry;
 
     using Gbdx.Vector_Index;
@@ -30,10 +35,13 @@ namespace Gbdx.Answer_Factory
     using NetworkConnections;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     using RestSharp;
 
+    using FileStream = System.IO.FileStream;
     using ListViewItem = System.Windows.Forms.ListViewItem;
+    using Path = System.IO.Path;
     using UserControl = System.Windows.Forms.UserControl;
 
     /// <summary>
@@ -42,6 +50,8 @@ namespace Gbdx.Answer_Factory
     /// </summary>
     public partial class AnswerFactoryDockableWindow : UserControl
     {
+        private static readonly object locker = new object();
+
         private string token;
 
         List<Recipe> recipeList = new List<Recipe>();
@@ -50,12 +60,19 @@ namespace Gbdx.Answer_Factory
 
         private IRestClient client;
 
+        private ICommandItem PreviouslySelectedItem { get; set; }
+
+        private IPolygon drawnPolygon = null;
+
+        private IElement drawnElement = null;
+
         public AnswerFactoryDockableWindow(object hook)
         {
             this.InitializeComponent();
             this.client = new RestClient(Settings.Default.baseUrl);
             this.GetToken();
             this.Hook = hook;
+            this.selectionTypecomboBox.SelectedIndex = 0;
         }
 
         /// <summary>
@@ -192,7 +209,14 @@ namespace Gbdx.Answer_Factory
                         if (resp.Data != null && resp.StatusCode == HttpStatusCode.OK)
                         {
                             this.existingProjects = resp.Data;
+
+                            // Update the list of projects with an unknown status
                             this.Invoke((MethodInvoker)(() => { this.UpdateUiWithExistingProjects(); }));
+
+                            foreach (var project in this.existingProjects)
+                            {
+                                GetProjectRecipeStatus(project.id);
+                            }
                         }
                     });
         }
@@ -228,7 +252,7 @@ namespace Gbdx.Answer_Factory
             IRestClient client)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
-
+            string layername = string.Empty;
             if (resp.Data != null)
             {
                 var query = from a in resp.Data where a.recipeName == recipeName select a;
@@ -241,10 +265,15 @@ namespace Gbdx.Answer_Factory
                     foreach (var projectItem in aoiQuery)
                     {
                         aoi = ConvertAoisToGeometryCollection(projectItem.aois);
+                        layername = string.Format("{0} {1}", projectItem.name, recipeName);
                     }
-
+                     
                     Jarvis.Logger.Info(item.properties.query_string);
-                    GetGeometries(item.properties.query_string, token, aoi, client);
+
+                    if(!string.IsNullOrEmpty(aoi) && !string.IsNullOrEmpty(layername))
+                    {
+                        GetGeometries(item.properties.query_string, token, aoi, client, layername);
+                    }
                 }
             }
         }
@@ -259,7 +288,7 @@ namespace Gbdx.Answer_Factory
                     string[] arr = new string[4];
                     arr[0] = item.name;
                     arr[1] = recipe.recipeName;
-                    arr[2] = "Uknown";
+                    arr[2] = "Working";
                     arr[3] = item.id;
                     this.existingProjectsListView.Items.Add(new ListViewItem(arr));
                 }
@@ -277,7 +306,11 @@ namespace Gbdx.Answer_Factory
 
             var response = this.client.ExecuteAsync(
                 request,
-                resp => { Jarvis.Logger.Info(resp.ResponseUri.ToString()); });
+                resp =>
+                    {
+                        
+                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                    });
         }
 
         private static string ConvertAoisToGeometryCollection(List<string> aois)
@@ -291,11 +324,10 @@ namespace Gbdx.Answer_Factory
             builder.Append("]}");
             return builder.ToString();
         }
-
-
+        
         #region Download Vector Items
 
-        private static void GetGeometries(string query, string token, string aoi, IRestClient client, int attempt = 0)
+        private static void GetGeometries(string query, string token, string aoi, IRestClient client, string layerName, int attempt = 0)
         {
             var request = new RestRequest("/insight-vector/api/shape/query/geometries?q=" + query, Method.POST);
             request.AddHeader("Authorization", "Bearer " + token);
@@ -306,7 +338,7 @@ namespace Gbdx.Answer_Factory
 
             client.ExecuteAsync<ResponseData>(
                 request,
-                resp => GetGeometriesResponseProcess(resp, query, token, aoi, client, attempt));
+                resp => GetGeometriesResponseProcess(resp, query, token, aoi, client,layerName, attempt));
         }
 
         private static void GetGeometriesResponseProcess(
@@ -315,6 +347,7 @@ namespace Gbdx.Answer_Factory
             string token,
             string aoi,
             IRestClient client,
+            string layerName,
             int geomAttempts)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
@@ -322,7 +355,7 @@ namespace Gbdx.Answer_Factory
             // Check to see if we have a good status if not try it again
             if (resp.StatusCode != HttpStatusCode.OK && geomAttempts <= 3)
             {
-                GetGeometries(query, token, aoi, client, geomAttempts);
+                GetGeometries(query, token, aoi, client, layerName, geomAttempts);
             }
             else if (geomAttempts > 3)
             {
@@ -336,7 +369,7 @@ namespace Gbdx.Answer_Factory
 
                 foreach (var source in sources.data)
                 {
-                    GetTypes(source.name, query, token, aoi, client);
+                    GetTypes(source.name, query, token, aoi, client, layerName);
                 }
             }
 
@@ -348,6 +381,7 @@ namespace Gbdx.Answer_Factory
             string token,
             string aoi,
             IRestClient client,
+            string layerName,
             int attempts = 0)
         {
             var request =
@@ -362,7 +396,7 @@ namespace Gbdx.Answer_Factory
 
             client.ExecuteAsync<ResponseData>(
                 request,
-                resp => GetTypesResponseProcess(resp, geometry, query, token, aoi, client, attempts));
+                resp => GetTypesResponseProcess(resp, geometry, query, token, aoi, client,layerName, attempts));
 
         }
 
@@ -373,6 +407,7 @@ namespace Gbdx.Answer_Factory
             string token,
             string aoi,
             IRestClient client,
+            string layerName,
             int typeAttempts)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
@@ -380,7 +415,7 @@ namespace Gbdx.Answer_Factory
             // Check to see if we have a good status if not try it again
             if (resp.StatusCode != HttpStatusCode.OK && typeAttempts <= 3)
             {
-                GetTypes(geometry, query, token, aoi, client, typeAttempts);
+                GetTypes(geometry, query, token, aoi, client,layerName, typeAttempts);
             }
             else if (typeAttempts > 3)
             {
@@ -393,7 +428,7 @@ namespace Gbdx.Answer_Factory
                 var types = resp.Data;
                 foreach (var type in types.data)
                 {
-                    GetPagingId(geometry, type.name, query, token, aoi, client);
+                    GetPagingId(geometry, type.name, query, token, aoi, client, layerName);
                 }
             }
 
@@ -407,6 +442,7 @@ namespace Gbdx.Answer_Factory
             string token,
             string aoi,
             IRestClient client,
+            string layerName,
             int attempts = 0)
         {
             var request =
@@ -421,7 +457,7 @@ namespace Gbdx.Answer_Factory
 
             client.ExecuteAsync<PageId>(
                 request,
-                resp => GetPageIdResponseProcess(resp, geometry, type, query, token, aoi, client, attempts));
+                resp => GetPageIdResponseProcess(resp, geometry, type, query, token, aoi, client, layerName, attempts));
 
         }
 
@@ -433,6 +469,7 @@ namespace Gbdx.Answer_Factory
             string token,
             string aoi,
             IRestClient client,
+            string layerName,
             int pageIdAttempts = 0)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
@@ -440,7 +477,7 @@ namespace Gbdx.Answer_Factory
             // Check to see if we have a good status if not try it again
             if (resp.StatusCode != HttpStatusCode.OK && pageIdAttempts <= 3)
             {
-                GetPagingId(geometry, type, query, token, aoi, client, pageIdAttempts);
+                GetPagingId(geometry, type, query, token, aoi, client,layerName, pageIdAttempts);
             }
             else if (pageIdAttempts > 3)
             {
@@ -449,17 +486,242 @@ namespace Gbdx.Answer_Factory
             }
             if (resp.Data != null)
             {
-                var pageId = resp.Data;
+                var pageId = resp.Data.pagingId;
+                var tempFile = Path.GetTempFileName();
+
+                var fileStream = File.Open(tempFile, FileMode.Append);
+                var fileStreamWriter = new StreamWriter(fileStream);
+
+                GetPages(pageId,token, client, fileStreamWriter, layerName);
             }
         }
 
-        private static void GetPages(string pageId, IRestClient client)
+        private static void GetPages(string pageId, string token, IRestClient client, StreamWriter fileStreamWriter, string layerName, int attempts=0)
         {
+            var request = new RestRequest("/insight-vector/api/esri/paging", Method.POST);
+            request.AddHeader("Authorization", "Bearer " + token);
+            request.AddHeader("Content-Type", "application/json");
+
+            request.AddParameter("ttl", "5m");
+            request.AddParameter("fields", "attributes");
+            request.AddParameter("pagingId", pageId);
+
+            attempts++;
+            client.ExecuteAsync<PagedData>(request, resp => ProcessPageResponse(resp, token, pageId, client, layerName, attempts, fileStreamWriter));
+        }
+
+        private static void ProcessPageResponse(
+            IRestResponse<PagedData> resp,
+            string token,
+            string pageId,
+            IRestClient client,
+            string layerName,
+            int pageAttempts,
+            StreamWriter fileStreamWriter)
+        {
+            try
+            {
+                Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+                if (resp.StatusCode != HttpStatusCode.OK && pageAttempts <= 3)
+                {
+                    GetPages(pageId, token, client, fileStreamWriter, layerName, pageAttempts);
+                }
+                else if (pageAttempts > 3)
+                {
+                    MessageBox.Show("An error occurred.  Please try again");
+                    return;
+                }
+
+                if (resp.Data != null)
+                {
+                    if (resp.Data.item_count != "0")
+                    {
+                        fileStreamWriter.WriteLine(resp.Data.data.ToString().Replace("\r", "").Replace("\n", ""));
+                        GetPages(resp.Data.next_paging_id, token, client, fileStreamWriter, layerName);
+                    }
+                    else
+                    {
+                        FileStream fs = (FileStream)fileStreamWriter.BaseStream;
+                        string filepath = fs.Name;
+                        fileStreamWriter.Close();
+                        ConvertPagesToFeatureClass(filepath, layerName);
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
+        }
+
+        private static void ConvertPagesToFeatureClass(string filepath, string layerName)
+        {
+            try
+            {
+
+
+                var json = MergeJsonStrings(filepath);
+
+                json = MergeProperties(json);
+
+                string jsonOutput = json.ToString(Formatting.None);
+
+                IWorkspace workspace = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+
+                IFieldChecker fieldChecker = new FieldCheckerClass();
+                fieldChecker.ValidateWorkspace = workspace;
+
+                var proposedTableName = string.Format("AnswerFactory{0}", Guid.NewGuid());
+                string tableName;
+
+                fieldChecker.ValidateTableName(proposedTableName, out tableName);
+
+                WriteToTable(workspace, jsonOutput, tableName);
+
+                AddLayerToMap(tableName, layerName);
+                if (File.Exists(filepath))
+                {
+                    File.Delete(filepath);
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
 
         }
 
-        #endregion
+        private static JObject MergeJsonStrings(string filePath)
+        {
+            var mergeSettings = new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union };
 
+            JObject jsonObject = null;
+            try
+            {
+                string line;
+                using (var file = new StreamReader(filePath))
+                {
+                    while ((line = file.ReadLine()) != null)
+                    {
+
+                        if (jsonObject != null)
+                        {
+                            jsonObject.Merge(JObject.Parse(line), mergeSettings);
+                        }
+                        else
+                        {
+                            jsonObject = JObject.Parse(line);
+                        }
+
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+                return null;
+            }
+
+            return jsonObject;
+        }
+
+        private static JObject MergeProperties(JObject jsonObject)
+        {
+            try
+            {
+                var fields = new Dictionary<string, FieldDefinition>();
+                if (jsonObject != null)
+                {
+                    var jsonFields = (JArray)jsonObject["fields"];
+
+                    // This for loops looks through all of the fields and updtes the max length for the fields
+                    foreach (JToken t in jsonFields)
+                    {
+                        var tempFieldDefintion = JsonConvert.DeserializeObject<FieldDefinition>(t.ToString());
+                        FieldDefinition value;
+
+                        // Attempt to get the value if one is received will evaluate to true and return the object.
+                        if (fields.TryGetValue(tempFieldDefintion.Alias, out value))
+                        {
+                            if (value.Length < tempFieldDefintion.Length)
+                            {
+                                value.Length = tempFieldDefintion.Length;
+                            }
+                        }
+                        else
+                        {
+                            fields.Add(tempFieldDefintion.Alias, tempFieldDefintion);
+                        }
+                    }
+
+                    jsonFields.RemoveAll();
+                    foreach (var defintion in fields.Values)
+                    {
+                        jsonFields.Add(JObject.FromObject(defintion));
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+                return null;
+            }
+
+            return jsonObject;
+        }
+
+        private static bool WriteToTable(IWorkspace workspace, string featureClassJson, string tableName)
+        {
+            var success = true;
+            if (string.IsNullOrEmpty(featureClassJson))
+            {
+                return false;
+            }
+
+            try
+            {
+                var outputTable = VectorIndexHelper.GetTable(featureClassJson);
+                lock (locker)
+                {
+                    outputTable.SaveAsTable(workspace, tableName);
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+                success = false;
+            }
+
+            return success;
+        }
+
+        private static bool AddLayerToMap(string tableName, string layerName)
+        {
+            var success = false;
+            try
+            {
+                lock (locker)
+                {
+                    var featureWorkspace = (IFeatureWorkspace)Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+                    var featureClass = featureWorkspace.OpenFeatureClass(tableName);
+                    ILayer featureLayer;
+                    featureLayer = VectorIndexHelper.CreateFeatureLayer(featureClass, layerName);
+                    VectorIndexHelper.AddFeatureLayerToMap(featureLayer);
+                    success = true;
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+                success = false;
+            }
+
+            return success;
+        }
+
+        #endregion
+        
         /// <summary>
         /// Host object of the dockable window
         /// </summary>
@@ -505,17 +767,31 @@ namespace Gbdx.Answer_Factory
                     return;
                 }
 
-                var polygons = Jarvis.GetPolygons(ArcMap.Document.FocusMap);
-
-                // check to make sure an aoi(s) have been selected.
-                if (polygons.Count == 0)
+                List<IPolygon> polygons;
+                if(this.selectionTypecomboBox.SelectedIndex == 1)
                 {
-                    MessageBox.Show("Please select polygon(s)");
-                    return;
+                    polygons = Jarvis.GetPolygons(ArcMap.Document.FocusMap);
+
+                    // check to make sure an aoi(s) have been selected.
+                    if (polygons.Count == 0)
+                    {
+                        MessageBox.Show("Please select polygon(s)");
+                        return;
+                    }
+                }
+                else
+                {
+                    if (this.drawnPolygon == null)
+                    {
+                        MessageBox.Show(
+                            "Please draw a bounding box by clicking Draw button and clicking and dragging on the map");
+                        return;
+                    }
+
+                    polygons = new List<IPolygon> { this.drawnPolygon };
                 }
 
                 var projectJson = this.CreateProjectJson(polygons);
-
                 var request = new RestRequest("/answer-factory-project-service/api/project", Method.POST);
                 request.AddHeader("Authorization", "Bearer " + this.token);
                 request.AddHeader("Content-Type", "application/json");
@@ -569,8 +845,67 @@ namespace Gbdx.Answer_Factory
         private void resetButton_Click(object sender, EventArgs e)
         {
             this.projectNameTextbox.Clear();
-            this.bufferTextbox.Clear();
             this.availableRecipesCombobox.SelectedIndex = -1;
+
+            // if there is already a element on the screen remove it.
+            if (this.drawnElement != null)
+            {
+                ArcUtility.DeleteElementFromGraphicContainer(ArcMap.Document.ActiveView, this.drawnElement);
+            }
+            this.drawnPolygon = null;
+            this.drawnElement = null;
+
+        }
+
+        private void selectionTypecomboBox_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.selectionTypecomboBox.SelectedIndex == 0)
+            {
+                this.drawButton.Enabled = true;
+            }
+            else
+            {
+                this.drawButton.Enabled = false;
+            }
+        }
+
+        private void drawButton_Click(object sender, EventArgs e)
+        {
+            // if there is already a element on the screen remove it.
+            if (this.drawnElement != null)
+            {
+                 ArcUtility.DeleteElementFromGraphicContainer(ArcMap.Document.ActiveView, this.drawnElement);
+            }
+
+            this.drawnPolygon = null;
+            this.drawnElement = null;
+
+            // Unsubscribe to pre-existing events if any then subscibe so only one 
+            // subscription is active.
+            AnswerFactoryRelay.Instance.AoiHasBeenDrawn -= this.Instance_AoiHasBeenDrawn;
+            AnswerFactoryRelay.Instance.AoiHasBeenDrawn += this.Instance_AoiHasBeenDrawn;
+
+            var commandBars = ArcMap.Application.Document.CommandBars;
+            var commandId = new UIDClass(){Value = ThisAddIn.IDs.Gbdx_Answer_Factory_AnswerFactorySelector};
+            var commandItem = commandBars.Find(commandId, false, false);
+
+            if (commandItem != null)
+            {
+                this.PreviouslySelectedItem = ArcMap.Application.CurrentTool;
+                ArcMap.Application.CurrentTool = commandItem;
+            }
+        }
+
+        void Instance_AoiHasBeenDrawn(IPolygon poly, IElement elm)
+        {
+            //unsubscribe from the event
+            AnswerFactoryRelay.Instance.AoiHasBeenDrawn -= this.Instance_AoiHasBeenDrawn;
+
+            this.drawnPolygon = poly;
+            this.drawnElement = elm;
+
+            // reset arcmap to whatever tool was selected prior to clicking the draw button 
+            ArcMap.Application.CurrentTool = this.PreviouslySelectedItem;
         }
     }
 }

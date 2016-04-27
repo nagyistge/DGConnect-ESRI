@@ -64,7 +64,7 @@
         /// The logger.
         /// </summary>
         public static readonly Logger Logger = new Logger(LogFile, false);
-
+        
 
         /// <summary>
         /// The base 32 codes dictionary.
