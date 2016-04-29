@@ -31,12 +31,15 @@
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
-            this.saveButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.projectNameTextbox = new System.Windows.Forms.TextBox();
-            this.availableRecipesCombobox = new System.Windows.Forms.ComboBox();
             this.resetButton = new System.Windows.Forms.Button();
+            this.label1 = new System.Windows.Forms.Label();
+            this.projectNameTextbox = new System.Windows.Forms.TextBox();
+            this.label3 = new System.Windows.Forms.Label();
+            this.availableRecipesCombobox = new System.Windows.Forms.ComboBox();
+            this.label2 = new System.Windows.Forms.Label();
+            this.selectionTypecomboBox = new System.Windows.Forms.ComboBox();
+            this.drawButton = new System.Windows.Forms.Button();
+            this.saveButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.existingProjectsListView = new System.Windows.Forms.ListView();
@@ -46,9 +49,6 @@
             this.idHeader = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.showResultsButton = new System.Windows.Forms.Button();
             this.resultRefrshButton = new System.Windows.Forms.Button();
-            this.label2 = new System.Windows.Forms.Label();
-            this.selectionTypecomboBox = new System.Windows.Forms.ComboBox();
-            this.drawButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -117,6 +117,92 @@
             this.tableLayoutPanel2.Size = new System.Drawing.Size(377, 146);
             this.tableLayoutPanel2.TabIndex = 0;
             // 
+            // resetButton
+            // 
+            this.resetButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.resetButton.Location = new System.Drawing.Point(46, 112);
+            this.resetButton.Name = "resetButton";
+            this.resetButton.Size = new System.Drawing.Size(65, 30);
+            this.resetButton.TabIndex = 10;
+            this.resetButton.Text = "Reset";
+            this.resetButton.UseVisualStyleBackColor = true;
+            this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
+            // 
+            // label1
+            // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(38, 8);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(116, 20);
+            this.label1.TabIndex = 4;
+            this.label1.Text = "Project Name";
+            // 
+            // projectNameTextbox
+            // 
+            this.projectNameTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.tableLayoutPanel2.SetColumnSpan(this.projectNameTextbox, 2);
+            this.projectNameTextbox.Location = new System.Drawing.Point(160, 5);
+            this.projectNameTextbox.Name = "projectNameTextbox";
+            this.projectNameTextbox.Size = new System.Drawing.Size(214, 26);
+            this.projectNameTextbox.TabIndex = 7;
+            // 
+            // label3
+            // 
+            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.label3.AutoSize = true;
+            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label3.Location = new System.Drawing.Point(3, 44);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(151, 20);
+            this.label3.TabIndex = 6;
+            this.label3.Text = "Available Recipes";
+            // 
+            // availableRecipesCombobox
+            // 
+            this.availableRecipesCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.availableRecipesCombobox.FormattingEnabled = true;
+            this.availableRecipesCombobox.Location = new System.Drawing.Point(160, 40);
+            this.availableRecipesCombobox.Name = "availableRecipesCombobox";
+            this.availableRecipesCombobox.Size = new System.Drawing.Size(135, 28);
+            this.availableRecipesCombobox.TabIndex = 9;
+            // 
+            // label2
+            // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label2.Location = new System.Drawing.Point(15, 80);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(127, 20);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "Selection Type";
+            // 
+            // selectionTypecomboBox
+            // 
+            this.selectionTypecomboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.selectionTypecomboBox.FormattingEnabled = true;
+            this.selectionTypecomboBox.Items.AddRange(new object[] {
+            "Draw Rectangle",
+            "Use Selected Feature"});
+            this.selectionTypecomboBox.Location = new System.Drawing.Point(160, 76);
+            this.selectionTypecomboBox.Name = "selectionTypecomboBox";
+            this.selectionTypecomboBox.Size = new System.Drawing.Size(135, 28);
+            this.selectionTypecomboBox.TabIndex = 12;
+            this.selectionTypecomboBox.SelectedIndexChanged += new System.EventHandler(this.selectionTypecomboBox_SelectedIndexChanged);
+            // 
+            // drawButton
+            // 
+            this.drawButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.drawButton.Location = new System.Drawing.Point(305, 75);
+            this.drawButton.Name = "drawButton";
+            this.drawButton.Size = new System.Drawing.Size(65, 30);
+            this.drawButton.TabIndex = 13;
+            this.drawButton.Text = "Draw";
+            this.drawButton.UseVisualStyleBackColor = true;
+            this.drawButton.Click += new System.EventHandler(this.drawButton_Click);
+            // 
             // saveButton
             // 
             this.saveButton.Anchor = System.Windows.Forms.AnchorStyles.None;
@@ -127,57 +213,6 @@
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = true;
             this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
-            // 
-            // label1
-            // 
-            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(35, 9);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(105, 17);
-            this.label1.TabIndex = 4;
-            this.label1.Text = "Project Name";
-            // 
-            // label3
-            // 
-            this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(3, 45);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(137, 17);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "Available Recipes";
-            // 
-            // projectNameTextbox
-            // 
-            this.projectNameTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.tableLayoutPanel2.SetColumnSpan(this.projectNameTextbox, 2);
-            this.projectNameTextbox.Location = new System.Drawing.Point(146, 7);
-            this.projectNameTextbox.Name = "projectNameTextbox";
-            this.projectNameTextbox.Size = new System.Drawing.Size(228, 22);
-            this.projectNameTextbox.TabIndex = 7;
-            // 
-            // availableRecipesCombobox
-            // 
-            this.availableRecipesCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.availableRecipesCombobox.FormattingEnabled = true;
-            this.availableRecipesCombobox.Location = new System.Drawing.Point(146, 42);
-            this.availableRecipesCombobox.Name = "availableRecipesCombobox";
-            this.availableRecipesCombobox.Size = new System.Drawing.Size(149, 24);
-            this.availableRecipesCombobox.TabIndex = 9;
-            // 
-            // resetButton
-            // 
-            this.resetButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.resetButton.Location = new System.Drawing.Point(39, 112);
-            this.resetButton.Name = "resetButton";
-            this.resetButton.Size = new System.Drawing.Size(65, 30);
-            this.resetButton.TabIndex = 10;
-            this.resetButton.Text = "Reset";
-            this.resetButton.UseVisualStyleBackColor = true;
-            this.resetButton.Click += new System.EventHandler(this.resetButton_Click);
             // 
             // groupBox2
             // 
@@ -237,6 +272,7 @@
             this.existingProjectsListView.TabIndex = 0;
             this.existingProjectsListView.UseCompatibleStateImageBehavior = false;
             this.existingProjectsListView.View = System.Windows.Forms.View.Details;
+            this.existingProjectsListView.SelectedIndexChanged += new System.EventHandler(this.existingProjectsListView_SelectedIndexChanged);
             // 
             // nameHeader
             // 
@@ -281,41 +317,6 @@
             this.resultRefrshButton.Text = "Refresh";
             this.resultRefrshButton.UseVisualStyleBackColor = true;
             this.resultRefrshButton.Click += new System.EventHandler(this.resultRefrshButton_Click);
-            // 
-            // label2
-            // 
-            this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(13, 81);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(116, 17);
-            this.label2.TabIndex = 11;
-            this.label2.Text = "Selection Type";
-            // 
-            // selectionTypecomboBox
-            // 
-            this.selectionTypecomboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.selectionTypecomboBox.FormattingEnabled = true;
-            this.selectionTypecomboBox.Items.AddRange(new object[] {
-            "Draw Rectangle",
-            "Use Selected Feature"});
-            this.selectionTypecomboBox.Location = new System.Drawing.Point(146, 77);
-            this.selectionTypecomboBox.Name = "selectionTypecomboBox";
-            this.selectionTypecomboBox.Size = new System.Drawing.Size(149, 24);
-            this.selectionTypecomboBox.TabIndex = 12;
-            this.selectionTypecomboBox.SelectedIndexChanged += new System.EventHandler(this.selectionTypecomboBox_SelectedIndexChanged);
-            // 
-            // drawButton
-            // 
-            this.drawButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.drawButton.Location = new System.Drawing.Point(305, 75);
-            this.drawButton.Name = "drawButton";
-            this.drawButton.Size = new System.Drawing.Size(65, 30);
-            this.drawButton.TabIndex = 13;
-            this.drawButton.Text = "Draw";
-            this.drawButton.UseVisualStyleBackColor = true;
-            this.drawButton.Click += new System.EventHandler(this.drawButton_Click);
             // 
             // AnswerFactoryDockableWindow
             // 

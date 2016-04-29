@@ -930,5 +930,10 @@ namespace Gbdx.Answer_Factory
             // reset arcmap to whatever tool was selected prior to clicking the draw button 
             ArcMap.Application.CurrentTool = this.PreviouslySelectedItem;
         }
+
+        private void existingProjectsListView_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            
+        }
     }
 }

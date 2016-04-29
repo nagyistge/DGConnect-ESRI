@@ -94,21 +94,7 @@
       IFields validatedFields = null;
       IEnumFieldError enumFieldError = null;
       fieldChecker.Validate(fields, out enumFieldError, out validatedFields);
- 
-      // You can either notify the user of any errors or just skip this step.
-      IFieldError fieldError = null;
-      while ((fieldError = enumFieldError.Next()) != null)
-      {
-          int errorIndex = fieldError.FieldIndex;
-          var alias = fields.Field[errorIndex].AliasName;
-          if (fieldError.FieldError == esriFieldNameErrorType.esriInvalidFieldNameLength)
-          {
-              //Logger.Error("here we go");
-              //validatedFields.Field[errorIndex].Name
-          }
-          Logger.Error(string.Format("Error in field {0} AKA {1} : {2}", alias,fields.Field[errorIndex].Name, fieldError.FieldError));
-      }
- 
+
       // Return the validated fields.
       return validatedFields;
 }
