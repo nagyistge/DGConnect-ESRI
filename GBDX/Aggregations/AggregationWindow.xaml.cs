@@ -510,7 +510,6 @@ namespace Gbdx.Aggregations
             Dictionary<string, string> uniqueFieldNames)
         {
             // get the polygon of the geohash
-            //uniqueFieldNames.Add("cos_sim", "cos_sim");
             IFeatureCursor insertCur = featureClass.Insert(true);
             this.pbarChangeDet.Maximum = ptable.Count;
             this.pbarChangeDet.Minimum = 0;
@@ -533,6 +532,7 @@ namespace Gbdx.Aggregations
                 // Setup the features geometry.
                 buffer.Shape = (IGeometry)poly;
 
+                buffer.Value[featureClass.FindField("Geohash")] = entry.RowKey;
                 foreach (String val in entry.Data.Keys)
                 {
                     if (uniqueFieldNames.ContainsKey(val))
@@ -541,11 +541,19 @@ namespace Gbdx.Aggregations
                         {
                             if (val.EndsWith("_str"))
                             {
-                                buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Label;
+                                var fieldName = "DG_" + uniqueFieldNames[val];
+                                var field = featureClass.FindField(fieldName);
+                                var value = entry.Label;
+
+                                buffer.Value[field] = value;
                             }
                             else
                             {
-                                buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Data[val];
+                                var fieldName = "DG_" + uniqueFieldNames[val];
+                                var field = featureClass.FindField(fieldName);
+                                var value = entry.Data[val];
+
+                                buffer.Value[field] = value;
                             }
                         }
                         catch (Exception error)
@@ -553,11 +561,13 @@ namespace Gbdx.Aggregations
                             Jarvis.Logger.Error(error);
                         }
                     }
-                    // Feature has been created so add to the feature class.
-                    insertCur.InsertFeature(buffer);
+
                 }
-                insertCur.Flush();
+                // Feature has been created so add to the feature class.
+                insertCur.InsertFeature(buffer);
+
             }
+            insertCur.Flush();
         }
 
         private void WriteToFeatureClass(
@@ -1246,7 +1256,6 @@ namespace Gbdx.Aggregations
                 IWorkspace ws = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
                 String fcName = "change_" + layerA + "_" + layerB + "_" + DateTime.Now.Millisecond;
                 var featureClass = Jarvis.CreateStandaloneFeatureClass(ws, fcName, uniqueFieldNames, false, 0);
-                IFeatureCursor insertCur = featureClass.Insert(true);
                 this.UpdateStatusLabel("Loading Output Feature Class");
                 System.Windows.Forms.Application.DoEvents();
 
