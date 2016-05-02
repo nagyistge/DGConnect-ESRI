@@ -312,56 +312,73 @@ namespace Gbdx.Aggregations
                 request.AddHeader("Content-Type", "application/json");
                 request.AddParameter("application/json", aoi, ParameterType.RequestBody);
             }
-
             this.Client.ExecuteAsync<MotherOfGodAggregations>(request, response => this.HandleResponse(response));
         }
 
         private void HandleResponse(IRestResponse<MotherOfGodAggregations> response)
         {
-            if (response.Data != null)
+            try
             {
-                var workspace = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
-                var resultDictionary = new Dictionary<string, Dictionary<string, double>>();
-                var uniqueFieldNames = new Dictionary<string, string>();
+                Jarvis.Logger.Info(response.ResponseUri.ToString());
+                if (response.Data != null)
+                {
+                    var workspace = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+                    var resultDictionary = new Dictionary<string, Dictionary<string, double>>();
+                    var uniqueFieldNames = new Dictionary<string, string>();
 
-                AggregationHelper.ProcessAggregations(
-                    response.Data.aggregations,
-                    0,
-                    ref resultDictionary,
-                    string.Empty,
-                    false,
-                    ref uniqueFieldNames);
+                    AggregationHelper.ProcessAggregations(
+                        response.Data.aggregations,
+                        0,
+                        ref resultDictionary,
+                        string.Empty,
+                        false,
+                        ref uniqueFieldNames);
 
-                // Create a unique name for the feature class based on name.
-                var featureClassName = "Aggregation" + DateTime.Now.ToString("ddMMMHHmmss");
+                    if (resultDictionary.Count == 0 && uniqueFieldNames.Count == 0)
+                    {
+                        MessageBox.Show(GbdxResources.NoDataFound);
+                        this.Dispatcher.Invoke(
+                        DispatcherPriority.Normal,
+                        (MethodInvoker)delegate { this.goButton.IsEnabled = true; });
 
-                // Function being called really says it all but ... lets CREATE A FEATURE CLASS
-                var featureClass = Jarvis.CreateStandaloneFeatureClass(
-                    workspace,
-                    featureClassName,
-                    uniqueFieldNames,
-                    false,
-                    0);
+                        return;
 
-                this.WriteToFeatureClass(featureClass, resultDictionary, uniqueFieldNames, workspace);
+                    }
 
-                // Use the dispatcher to make sure the following calls occur on the MAIN thread.
-                this.Dispatcher.Invoke(
-                    DispatcherPriority.Normal,
-                    (MethodInvoker)delegate
-                        {
-                            this.AddLayerToArcMap(featureClassName);
-                            this.goButton.IsEnabled = true;
-                        });
+                    // Create a unique name for the feature class based on name.
+                    var featureClassName = "Aggregation" + DateTime.Now.ToString("ddMMMHHmmss");
+
+                    // Function being called really says it all but ... lets CREATE A FEATURE CLASS
+                    var featureClass = Jarvis.CreateStandaloneFeatureClass(
+                        workspace,
+                        featureClassName,
+                        uniqueFieldNames,
+                        false,
+                        0);
+
+                    this.WriteToFeatureClass(featureClass, resultDictionary, uniqueFieldNames, workspace);
+
+                    // Use the dispatcher to make sure the following calls occur on the MAIN thread.
+                    this.Dispatcher.Invoke(
+                        DispatcherPriority.Normal,
+                        (MethodInvoker)delegate
+                            {
+                                this.AddLayerToArcMap(featureClassName);
+                                this.goButton.IsEnabled = true;
+                            });
+                }
+                else
+                {
+                    var error = string.Format("STATUS: {0}\n{1}\n\n{2}", response.StatusCode ,response.ResponseUri.AbsoluteUri, response.Content);
+                    throw new Exception(error);
+                }
             }
-            else
+            catch (Exception error)
             {
-                var error = string.Format("\n{0}\n\n{1}", response.ResponseUri.AbsoluteUri, response.Content);
-                this.logWriter.Error(error);
-
+                Jarvis.Logger.Error(error);
                 this.Dispatcher.Invoke(
-                    DispatcherPriority.Normal,
-                    (MethodInvoker)delegate { this.goButton.IsEnabled = true; });
+                        DispatcherPriority.Normal,
+                        (MethodInvoker)delegate { this.goButton.IsEnabled = true; });
 
                 MessageBox.Show(GbdxResources.Source_ErrorMessage);
             }
@@ -387,7 +404,7 @@ namespace Gbdx.Aggregations
 
             if (this.tbFilter != null && this.tbFilter.Text != null && this.tbFilter.Text != "")
             {
-                request.AddParameter("query", this.tbFilter.Text, ParameterType.QueryString);
+                request.AddParameter("query", this.tbFilter.Text.Replace("\n","").Replace("\r",""), ParameterType.QueryString);
             }
 
             // If the user setup a custom date range then use that otherwise assume no date range has been specified.
@@ -470,7 +487,7 @@ namespace Gbdx.Aggregations
                 {
                     var field = uniqueFieldNames[subKey];
                     var value = resultDictionary[key][subKey];
-                    var index = featureClass.FindField(field);
+                    var index = featureClass.FindField("DG_"+field);
 
                     if (index != -1)
                     {
@@ -493,7 +510,6 @@ namespace Gbdx.Aggregations
             Dictionary<string, string> uniqueFieldNames)
         {
             // get the polygon of the geohash
-            //uniqueFieldNames.Add("cos_sim", "cos_sim");
             IFeatureCursor insertCur = featureClass.Insert(true);
             this.pbarChangeDet.Maximum = ptable.Count;
             this.pbarChangeDet.Minimum = 0;
@@ -515,24 +531,43 @@ namespace Gbdx.Aggregations
 
                 // Setup the features geometry.
                 buffer.Shape = (IGeometry)poly;
+
+                buffer.Value[featureClass.FindField("Geohash")] = entry.RowKey;
                 foreach (String val in entry.Data.Keys)
                 {
                     if (uniqueFieldNames.ContainsKey(val))
                     {
-                        if (val.EndsWith("_str"))
+                        try
                         {
-                            buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Label;
+                            if (val.EndsWith("_str"))
+                            {
+                                var fieldName = "DG_" + uniqueFieldNames[val];
+                                var field = featureClass.FindField(fieldName);
+                                var value = entry.Label;
+
+                                buffer.Value[field] = value;
+                            }
+                            else
+                            {
+                                var fieldName = "DG_" + uniqueFieldNames[val];
+                                var field = featureClass.FindField(fieldName);
+                                var value = entry.Data[val];
+
+                                buffer.Value[field] = value;
+                            }
                         }
-                        else
+                        catch (Exception error)
                         {
-                            buffer.Value[featureClass.FindField(uniqueFieldNames[val])] = entry.Data[val];
+                            Jarvis.Logger.Error(error);
                         }
                     }
-                    // Feature has been created so add to the feature class.
-                    insertCur.InsertFeature(buffer);
+
                 }
-                insertCur.Flush();
+                // Feature has been created so add to the feature class.
+                insertCur.InsertFeature(buffer);
+
             }
+            insertCur.Flush();
         }
 
         private void WriteToFeatureClass(
@@ -1048,8 +1083,6 @@ namespace Gbdx.Aggregations
         {
             IFeatureSelection featureSelection = (IFeatureSelection)featureLayer;
             var selectionSet = featureSelection.SelectionSet;
-            IFeatureClass featureClass = featureLayer.FeatureClass;
-            string shapeField = featureClass.ShapeFieldName;
 
             ICursor cursor;
             selectionSet.Search(new QueryFilterClass(), false, out cursor);
@@ -1160,7 +1193,6 @@ namespace Gbdx.Aggregations
 
                     String fcName = "mlt_" + entry.RowKey + "_" + DateTime.Now.Millisecond;
                     var featureClass = Jarvis.CreateStandaloneFeatureClass(ws, fcName, outputCols, false, 0);
-                    IFeatureCursor insertCur = featureClass.Insert(true);
                     this.UpdateStatusLabel("Loading Feature Class");
                     System.Windows.Forms.Application.DoEvents();
 
@@ -1224,7 +1256,6 @@ namespace Gbdx.Aggregations
                 IWorkspace ws = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
                 String fcName = "change_" + layerA + "_" + layerB + "_" + DateTime.Now.Millisecond;
                 var featureClass = Jarvis.CreateStandaloneFeatureClass(ws, fcName, uniqueFieldNames, false, 0);
-                IFeatureCursor insertCur = featureClass.Insert(true);
                 this.UpdateStatusLabel("Loading Output Feature Class");
                 System.Windows.Forms.Application.DoEvents();
 

@@ -5,6 +5,8 @@
     using System.Linq;
     using System.Text;
 
+    using GbdxTools;
+
     public class AggregationHelper
     {
         /// <summary>
@@ -118,9 +120,17 @@
                 {
                     if (terms.Count != 0)
                     {
-                        // if containing geohash data create the dictionary relationship
-                        output.Add(terms[index].term, new Dictionary<string, double>());
-                        geoHash = terms[index].term;
+                        try
+                        {
+                            // if containing geohash data create the dictionary relationship
+                            if(!output.ContainsKey(terms[index].term))
+                                output.Add(terms[index].term, new Dictionary<string, double>());
+                            geoHash = terms[index].term;
+                        }
+                        catch (Exception error)
+                        {
+                            Jarvis.Logger.Error(error);
+                        }
                     }
                 }
                 else
@@ -128,28 +138,47 @@
                     // Check to see if the dictionary already contains the key if not then create it.
                     if (!output[geoHash].ContainsKey(terms[index].term))
                     {
-                        output[geoHash].Add(terms[index].term, terms[index].count);
-
-
-                        if (!fieldNames.ContainsKey(terms[index].term))
+                        try
                         {
-                            var formattedValue = terms[index].term;
-                            formattedValue = CheckName(formattedValue);
+                            output[geoHash].Add(terms[index].term, terms[index].count);
 
 
-                            // Make sure the field hasn't already been processed.
                             if (!fieldNames.ContainsKey(terms[index].term))
                             {
-                                fieldNames.Add(terms[index].term, formattedValue);
+                                var formattedValue = terms[index].term;
+                                formattedValue = CheckName(formattedValue);
+
+
+                                // Make sure the field hasn't already been processed.
+                                if (!fieldNames.ContainsKey(terms[index].term))
+                                {
+                                    fieldNames.Add(terms[index].term, formattedValue);
+                                }
                             }
+                        }
+                        catch (Exception error)
+                        {
+                            Jarvis.Logger.Error(error);
                         }
                     }
                     else
                     {
-                        // If the dictionary already contains the key then add to the current count.
-                        output[geoHash][terms[index].term] += terms[index].count;
+                        try
+                        {
+                            // If the dictionary already contains the key then add to the current count.
+                            output[geoHash][terms[index].term] += terms[index].count;
+                        }
+                        catch (Exception error)
+                        {
+                            Jarvis.Logger.Error(error);
+                        }
                     }
                 }
+                if (terms.Count == 0)
+                {
+                    return;
+                }
+
                 if (terms[index].aggregations != null)
                 {
                     // There are still more nested aggregations to search through so get to it.
@@ -174,7 +203,7 @@
             }
 
             name = GbdxTools.Jarvis.InvalidFieldCharacters.Replace(name, "_");
-            return name;
+            return "DG_"+ name;
         }
     }
 } 

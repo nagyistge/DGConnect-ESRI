@@ -37,6 +37,35 @@
         /// </summary>
         private const string Base32Codes = "0123456789bcdefghjkmnpqrstuvwxyz";
 
+
+        /// <summary>
+        /// The invalid field starting characters.
+        /// </summary>
+        public static readonly Regex InvalidFieldStartingCharacters =
+            new Regex("[\\^`~@#$%^&*()-+=|,\\\\<>?/{}\\.!'[\\]:;_0123456789]");
+
+        /// <summary>
+        /// The invalid field characters.
+        /// </summary>
+        public static readonly Regex InvalidFieldCharacters = new Regex("[-@^\\%#\\s$!*{}\\.<>?/`'[:\\];=+()|,~&]");
+
+        /// <summary>
+        /// The spatial reference factory.
+        /// </summary>
+        public static readonly ISpatialReferenceFactory SpatialReferenceFactory = new SpatialReferenceEnvironment();
+
+        /// <summary>
+        /// The projected coordinate system.
+        /// </summary>
+        public static readonly IGeographicCoordinateSystem ProjectedCoordinateSystem =
+            SpatialReferenceFactory.CreateGeographicCoordinateSystem((int)esriSRGeoCSType.esriSRGeoCS_WGS1984);
+
+        /// <summary>
+        /// The logger.
+        /// </summary>
+        public static readonly Logger Logger = new Logger(LogFile, false);
+
+
         /// <summary>
         /// The base 32 codes dictionary.
         /// </summary>
@@ -48,6 +77,41 @@
                                                                 {
                                                                     '\\','^','`','~','@','#','$','^', '&', '*','(',')','-','+','=','|',',','<','>','?','/','{','}','.','!',':',';','_','0','1','2','3','4','5','6','7','8','9'
                                                                 };
+
+        public static IGeometry ProjectToWGS84(IGeometry geom)
+        {
+            geom.Project(ProjectedCoordinateSystem);
+            return geom;
+        }
+
+        public static IFields ValidateFields(IWorkspace workspace, IFields fields)
+{
+      // Create and initialize a field checker.
+      IFieldChecker fieldChecker = new FieldCheckerClass();
+      fieldChecker.ValidateWorkspace = workspace;
+                 
+      // Generate a validated fields collection.
+      IFields validatedFields = null;
+      IEnumFieldError enumFieldError = null;
+      fieldChecker.Validate(fields, out enumFieldError, out validatedFields);
+ 
+      // You can either notify the user of any errors or just skip this step.
+      IFieldError fieldError = null;
+      while ((fieldError = enumFieldError.Next()) != null)
+      {
+          int errorIndex = fieldError.FieldIndex;
+          var alias = fields.Field[errorIndex].AliasName;
+          if (fieldError.FieldError == esriFieldNameErrorType.esriInvalidFieldNameLength)
+          {
+              //Logger.Error("here we go");
+              //validatedFields.Field[errorIndex].Name
+          }
+          Logger.Error(string.Format("Error in field {0} AKA {1} : {2}", alias,fields.Field[errorIndex].Name, fieldError.FieldError));
+      }
+ 
+      // Return the validated fields.
+      return validatedFields;
+}
 
         public static IFeatureClass CreateStandaloneFeatureClass(
             IWorkspace workspace,
@@ -69,12 +133,19 @@
             // if a fields collection is not passed in then supply our own
             IFieldsEdit fieldsEdit = (IFieldsEdit)fields; // Explicit Cast
 
+            var tmpField = new FieldClass();
+                        IFieldEdit tmpFieldEdit = (IFieldEdit)tmpField;
+                        tmpFieldEdit.Name_2 = "GeoHash";
+                        tmpFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
+                        tmpFieldEdit.Length_2 = 20;
+                        fieldsEdit.AddField(tmpField);
+
             foreach (var name in uniqueNames.Keys)
             {
 
                 var tempField = new FieldClass();
                 IFieldEdit tempFieldEdit = (IFieldEdit)tempField;
-                tempFieldEdit.Name_2 = uniqueNames[name];
+                tempFieldEdit.Name_2 = "DG_" + uniqueNames[name];
                 if (name.EndsWith("_str")) {
                   tempFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
                   tempFieldEdit.Length_2 = 250;
@@ -83,6 +154,7 @@
                   tempFieldEdit.DefaultValue_2 = "";
                 }
                 else {
+                tempFieldEdit.Name_2 = "DG_"+uniqueNames[name];
                 tempFieldEdit.Type_2 = esriFieldType.esriFieldTypeDouble;
                 tempFieldEdit.Length_2 = 20;
                 tempFieldEdit.AliasName_2 = name;
@@ -93,13 +165,6 @@
               
                 fieldsEdit.AddField(tempField);
             }
-
-            var tmpField = new FieldClass();
-            IFieldEdit tmpFieldEdit = (IFieldEdit)tmpField;
-            tmpFieldEdit.Name_2 = "GeoHash";
-            tmpFieldEdit.Type_2 = esriFieldType.esriFieldTypeString;
-            tmpFieldEdit.Length_2 = 20;
-            fieldsEdit.AddField(tmpField);
 
             ISpatialReferenceFactory spatialReferenceFactory = new SpatialReferenceEnvironment();
             var geographicCoordinateSystem =
@@ -136,7 +201,8 @@
               return featureClass;
             }
             catch (Exception ex) {
-              throw new Exception("Jarvis hates you..." + ex.Message);                
+              Logger.Error(ex);
+                throw new Exception("Issue with creating feature class");
             }
           
         }
@@ -225,33 +291,6 @@
 
 
         /// <summary>
-        /// The invalid field starting characters.
-        /// </summary>
-        public static readonly Regex InvalidFieldStartingCharacters =
-            new Regex("[\\^`~@#$%^&*()-+=|,\\\\<>?/{}\\.!'[\\]:;_0123456789]");
-
-        /// <summary>
-        /// The invalid field characters.
-        /// </summary>
-        public static readonly Regex InvalidFieldCharacters = new Regex("[-@^\\%#\\s$!*{}\\.<>?/`'[:\\];=+()|,~&]");
-
-        /// <summary>
-        /// The spatial reference factory.
-        /// </summary>
-        public static readonly ISpatialReferenceFactory SpatialReferenceFactory = new SpatialReferenceEnvironment();
-
-        /// <summary>
-        /// The projected coordinate system.
-        /// </summary>
-        public static readonly IGeographicCoordinateSystem ProjectedCoordinateSystem =
-            SpatialReferenceFactory.CreateGeographicCoordinateSystem((int)esriSRGeoCSType.esriSRGeoCS_WGS1984);
-
-        /// <summary>
-        /// The logger.
-        /// </summary>
-        public static readonly Logger Logger = new Logger(LogFile,false);
-
-        /// <summary>
         /// Open the GBDX cloud workspace.  This defaults to the GBDX cloud file GDB.
         /// </summary>
         /// <param name="path">
@@ -306,10 +345,12 @@
             try
             {
                 IFeature pfeat;
-                while((pfeat = pEnumFeat.Next()) != null)
+                while ((pfeat = pEnumFeat.Next()) != null)
                 {
-                        IPolygon geo = (IPolygon)pfeat.ShapeCopy;
-                        polygons.Add(geo);
+                    IPolygon geo = (IPolygon)pfeat.ShapeCopy;
+                    var geo2 = (IPolygon) ProjectToWGS84(geo);
+                    polygons.Add(geo2);
+
                 }
             }
             catch (Exception error)

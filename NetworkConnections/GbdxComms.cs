@@ -31,6 +31,8 @@ namespace NetworkConnections
     using System.Text;
     using System.Web.SessionState;
 
+    using GbdxTools;
+
     using Logging;
 
     using RestSharp;
@@ -41,7 +43,7 @@ namespace NetworkConnections
     public class GbdxComms : IGbdxComms
     {
         /// <summary>
-        /// The logger.
+        /// The Jarvis.Logger.
         /// </summary>
         private static Logger logger = null;
 
@@ -146,7 +148,7 @@ namespace NetworkConnections
             }
             catch (Exception excp)
             {
-                logger.Error(excp);
+                Jarvis.Logger.Error(excp);
                 netObject.ErrorOccurred = true;
                 return false;
             }
@@ -185,7 +187,7 @@ namespace NetworkConnections
                 {
                     return netObject;
                 }
-
+                Jarvis.Logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
                 var request = new RestRequest(netObject.AddressUrl, Method.POST);
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 var postData = Encoding.ASCII.GetBytes(bodyPostData);
@@ -197,7 +199,7 @@ namespace NetworkConnections
             }
             catch (Exception error)
             {
-                logger.Error(error);
+                Jarvis.Logger.Error(error);
                 netObject.ErrorOccurred = true;
             }
 
@@ -231,6 +233,7 @@ namespace NetworkConnections
                     return netObject;
                 }
 
+                Jarvis.Logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
                 var request = new RestRequest(netObject.AddressUrl, Method.POST);
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 request.AddHeader("Content-Type", "application/json");
@@ -241,7 +244,7 @@ namespace NetworkConnections
             }
             catch (Exception error)
             {
-                logger.Error(error);
+                Jarvis.Logger.Error(error);
                 netObject.ErrorOccurred = true;
             }
 
@@ -277,6 +280,7 @@ namespace NetworkConnections
                     this.client = new RestClient(netObject.BaseUrl);
                 }
 
+                Jarvis.Logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
                 var request = new RestRequest(netObject.AddressUrl);
                 request.AddHeader("Authorization", string.Format("Bearer {0}", this.AccessToken));
                 var response = this.client.Execute(request);
@@ -285,7 +289,7 @@ namespace NetworkConnections
             }
             catch (Exception excp)
             {
-                logger.Error(excp);
+                Jarvis.Logger.Error(excp);
                 netObject.ErrorOccurred = true;
             }
 
@@ -325,6 +329,7 @@ namespace NetworkConnections
                 this.client = new RestClient(netObject.BaseUrl);
             }
 
+            Jarvis.Logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
             var request = new RestRequest(netObject.AddressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.AccessToken);
             request.AddParameter("application/json", jsonDataPayLoad, ParameterType.RequestBody);
@@ -363,7 +368,7 @@ namespace NetworkConnections
             {
                 this.client = new RestClient(netObject.BaseUrl);
             }
-
+            Jarvis.Logger.Info(this.client.BaseUrl.ToString().Remove(this.client.BaseUrl.ToString().Length - 1) + netObject.AddressUrl);
             IRestRequest request = new RestRequest(netObject.AddressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.AccessToken);
             var postData = ReadToEnd(filepath);
@@ -511,8 +516,11 @@ namespace NetworkConnections
             request.AddParameter("grant_type", "password");
             request.AddParameter("username", nobj.User);
             request.AddParameter("password", nobj.Password);
-            
 
+            var baseString = client.BaseUrl.ToString();
+            var modifiedString = baseString.Remove(baseString.Length - 1);
+            var finalString = modifiedString + nobj.AuthEndpoint;
+            Jarvis.Logger.Info(finalString);
             IRestResponse<AccessToken> response = client.Execute<AccessToken>(request);
 
             // Set the status code.
@@ -600,7 +608,15 @@ namespace NetworkConnections
             }
 
             obj.ErrorOccurred = true;
-            logger.Error(response.Content);
+            if (string.IsNullOrEmpty(response.Content))
+            {
+                Jarvis.Logger.Error(response.StatusCode.ToString());
+            }
+            else
+            {
+                Jarvis.Logger.Error(response.Content);
+            }
+            
             return obj;
         }
     }

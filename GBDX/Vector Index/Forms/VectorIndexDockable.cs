@@ -1576,8 +1576,7 @@ namespace Gbdx.Vector_Index.Forms
                 var newItem = new VectorIndexSourceNode
                                   {
                                       Text =
-                                          GbdxSettings.GbdxResources
-                                          .VectorIndexDockable_UpdateTreeViewWithSources_No_data_found_,
+                                          GbdxSettings.GbdxResources.NoDataFound,
                                       ResponseObject = work.ResponseObject
                                   };
                 this.treeView1.Nodes.Add(newItem);
