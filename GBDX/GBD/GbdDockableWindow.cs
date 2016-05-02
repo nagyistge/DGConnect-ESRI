@@ -467,6 +467,7 @@ namespace Gbdx.Gbd
             this.localDatatable.Clear();
             this.allResults.Clear();
             this.ClearPolygons();
+            this.catalogIdSearchTextBox.Clear();
 
             // Check the domain to see which label should be on the export button
             if (Settings.Default.baseUrl.Equals(Settings.Default.DefaultBaseUrl))
