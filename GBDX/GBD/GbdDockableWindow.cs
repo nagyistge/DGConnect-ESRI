@@ -242,6 +242,11 @@ namespace Gbdx.Gbd
             
             this.dataGridView1.DataSource = this.dataView;
 
+            var dataGridViewColumnHeaderStyle = new DataGridViewCellStyle();
+            dataGridViewColumnHeaderStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+
+            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewColumnHeaderStyle;
+
             // Set the current DateTime to last year
             this.fromDateTimePicker.Value = DateTime.Now.AddMonths(-1);
             this.startTime = DateTime.Now.AddMonths(-1);
@@ -359,8 +364,8 @@ namespace Gbdx.Gbd
         private DataTable CreateDataTable()
         {
             var dt = new DataTable();
-
-            dt.Columns.Add(new DataColumn("Selected", typeof(bool)){ReadOnly = false, DefaultValue = false});
+            dt.Columns.Add(new DataColumn("Selected", typeof(bool)) { ReadOnly = false, DefaultValue = false });
+            dt.Columns.Add(new DataColumn("View", typeof(bool)) { ReadOnly = false, DefaultValue = false });
             dt.Columns.Add(new DataColumn("Catalog ID", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Sensor", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Acquired", typeof(DateTime)) { ReadOnly = true });
