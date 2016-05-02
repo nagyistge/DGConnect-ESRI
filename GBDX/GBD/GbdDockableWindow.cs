@@ -31,6 +31,7 @@ namespace Gbdx.Gbd
     using System.Drawing;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using System.Text.RegularExpressions;
     using System.Threading;
     using System.Windows.Forms;
@@ -71,8 +72,9 @@ namespace Gbdx.Gbd
         /// <summary>
         /// The file path.
         /// </summary>
-        private readonly string filePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData) + Settings.Default.GbdOrders;
-        
+        private readonly string filePath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData)
+                                           + Settings.Default.GbdOrders;
+
 
         /// <summary>
         /// GBD Comms that will talk with the GBD services.
@@ -143,7 +145,7 @@ namespace Gbdx.Gbd
         /// Dictionary of cached images.
         /// </summary>
         private Dictionary<string, Image> cachedImages;
-        
+
 
         /// <summary>
         /// Hashset of the polygons that the user has selected.
@@ -209,6 +211,7 @@ namespace Gbdx.Gbd
         /// The gbd order list.
         /// </summary>
         private List<GbdOrder> gbdOrderList;
+
         #endregion
 
         /// <summary>
@@ -229,7 +232,7 @@ namespace Gbdx.Gbd
             // Initialize GBD Communications and authorize with GBD authentication.
             this.comms = new GbdxComms(Jarvis.LogFile, false);
 
-            this.logWriter = new Logger(Jarvis.LogFile,false);
+            this.logWriter = new Logger(Jarvis.LogFile, false);
 
             this.InitializeComponent();
             this.VisibleChanged += this.GbdDockableWindowVisibleChanged;
@@ -239,7 +242,7 @@ namespace Gbdx.Gbd
             this.localDatatable = this.CreateDataTable();
             this.workQueue = Queue.Synchronized(new Queue());
             this.dataView = new DataView(this.localDatatable);
-            
+
             this.dataGridView1.DataSource = this.dataView;
 
             // Set the current DateTime to last year
@@ -261,7 +264,7 @@ namespace Gbdx.Gbd
             this.userSelectedPolygons = new HashSet<string>();
 
             this.dataGridView1.CellContentClick += this.DataGridView1CellContentClick;
-            
+
             try
             {
                 this.cbHeader = new DataGridViewCheckBoxHeaderCell();
@@ -279,9 +282,7 @@ namespace Gbdx.Gbd
                 this.logWriter.Error(error);
             }
 
-            if (
-                Settings.Default.baseUrl.Equals(
-                    Settings.Default.DefaultBaseUrl))
+            if (Settings.Default.baseUrl.Equals(Settings.Default.DefaultBaseUrl))
             {
                 this.exportButton.Text = "Export";
             }
@@ -360,7 +361,7 @@ namespace Gbdx.Gbd
         {
             var dt = new DataTable();
 
-            dt.Columns.Add(new DataColumn("Selected", typeof(bool)){ReadOnly = false, DefaultValue = false});
+            dt.Columns.Add(new DataColumn("Selected", typeof(bool)) { ReadOnly = false, DefaultValue = false });
             dt.Columns.Add(new DataColumn("Catalog ID", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Sensor", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Acquired", typeof(DateTime)) { ReadOnly = true });
@@ -388,7 +389,7 @@ namespace Gbdx.Gbd
             dt.Columns.Add(new DataColumn("Order ID", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Order Date", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Service Provider", typeof(string)) { ReadOnly = true });
-            dt.Columns.Add(new DataColumn("Order Status", typeof (string)) {ReadOnly = false});
+            dt.Columns.Add(new DataColumn("Order Status", typeof(string)) { ReadOnly = false });
             var primary = new DataColumn[1];
             primary[0] = dt.Columns["Order ID"];
             dt.PrimaryKey = primary;
@@ -416,9 +417,9 @@ namespace Gbdx.Gbd
                 .GroupBy(d => d.Key)
                 .ToDictionary(d => d.Key, d => d.First().Value);
 
-            if(this.displayAllPolgons)
+            if (this.displayAllPolgons)
             {
-                this.SetAllCheckBoxes(this.displayAllPolgons,this.dataGridView1);
+                this.SetAllCheckBoxes(this.displayAllPolgons, this.dataGridView1);
             }
 
             this.DrawViewablePolygons();
@@ -436,7 +437,7 @@ namespace Gbdx.Gbd
             if (dataGridViewColumn != null)
             {
                 var chkBox = (DataGridViewCheckBoxHeaderCell)dataGridViewColumn.HeaderCell;
-                
+
                 if (chkBox.isChecked)
                 {
                     this.SetAllCheckBoxes(chkBox.isChecked, this.dataGridView1);
@@ -468,9 +469,7 @@ namespace Gbdx.Gbd
             this.ClearPolygons();
 
             // Check the domain to see which label should be on the export button
-            if (
-                Settings.Default.baseUrl.Equals(
-                    Settings.Default.DefaultBaseUrl))
+            if (Settings.Default.baseUrl.Equals(Settings.Default.DefaultBaseUrl))
             {
                 this.exportButton.Text = "Export";
             }
@@ -497,6 +496,7 @@ namespace Gbdx.Gbd
             newFilter += this.SunElevationFilterSetup(newFilter);
             newFilter += this.PanResolutionFilterSetup(newFilter);
             newFilter += this.AcquiredDateFilterSetup(newFilter, this.fromDateTimePicker, this.toDateTimePicker);
+            newFilter = CatalogIdFilter(newFilter, this.catalogIdSearchTextBox.Text);
             return newFilter;
         }
 
@@ -708,8 +708,7 @@ namespace Gbdx.Gbd
             var fromValue = from.Value.Date + startTimeSpan;
             var toValue = to.Value.Date + endTimeSpan;
 
-            output = "[Acquired] >= #" + fromValue.ToString("s") + "# AND [Acquired] <= #"
-                     + toValue.ToString("s") + "#";
+            output = "[Acquired] >= #" + fromValue.ToString("s") + "# AND [Acquired] <= #" + toValue.ToString("s") + "#";
 
             if (!string.IsNullOrEmpty(filter))
             {
@@ -717,6 +716,36 @@ namespace Gbdx.Gbd
             }
 
             return output;
+        }
+
+        private static string CatalogIdFilter(string filter, string catId)
+        {
+            // if there is no update to the Catalog ID filter just return the filter string.
+            if (string.IsNullOrEmpty(catId))
+            {
+                return filter;
+            }
+
+            var stringBuilder = new StringBuilder(filter);
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                stringBuilder.Append(" AND ");
+            }
+
+            stringBuilder.Append(string.Format("[Catalog ID] LIKE '{0}*'", catId));
+
+            return stringBuilder.ToString();
+        }
+        
+        /// <summary>
+        /// Event handler for filtering results based on catalogID
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CatalogIdSearchTextBoxTextChanged(object sender, EventArgs e)
+        {
+            this.FilterSetup();
         }
 
         #endregion
@@ -731,7 +760,7 @@ namespace Gbdx.Gbd
         /// </param>
         private void GetGbdData(List<GbdPolygon> polygons)
         {
-            
+
             // Add the polygons to the work queue
             foreach (var item in polygons)
             {
@@ -823,9 +852,7 @@ namespace Gbdx.Gbd
                     var serializedstring = JsonConvert.SerializeObject(searchObject);
 
                     string decryptedPassword;
-                    var success = Aes.Instance.Decrypt128(
-                        Settings.Default.password,
-                        out decryptedPassword);
+                    var success = Aes.Instance.Decrypt128(Settings.Default.password, out decryptedPassword);
                     if (!success)
                     {
                         return;
@@ -833,18 +860,15 @@ namespace Gbdx.Gbd
 
                     // Creating network object.
                     var netObj = new NetObject
-                                           {
-                                               AddressUrl =
-                                                   Settings.Default.GbdSearchPath,
-                                               BaseUrl = Settings.Default.DefaultAuthBase,
-                                               AuthEndpoint =
-                                                   Settings.Default
-                                                   .authenticationServer,
-                                               User = Settings.Default.username,
-                                               Password = decryptedPassword,
-                                               ApiKey = Settings.Default.apiKey,
-                                               AuthUrl = Settings.Default.DefaultAuthBase,
-                                           };
+                                     {
+                                         AddressUrl = Settings.Default.GbdSearchPath,
+                                         BaseUrl = Settings.Default.DefaultAuthBase,
+                                         AuthEndpoint = Settings.Default.authenticationServer,
+                                         User = Settings.Default.username,
+                                         Password = decryptedPassword,
+                                         ApiKey = Settings.Default.apiKey,
+                                         AuthUrl = Settings.Default.DefaultAuthBase,
+                                     };
 
                     var result = this.comms.Post<GbdResponse>(netObj, serializedstring);
 
@@ -894,7 +918,7 @@ namespace Gbdx.Gbd
                     }
 
                     // Only update the table if we are still allowed to do work.
-                    if(this.okToWork)
+                    if (this.okToWork)
                     {
                         // Now all the work has been completed so lets do a callback to the main thread to merge it with the existing results.
                         this.Invoke(new DataTableDone(this.UpdateDataTable), dt, responses);
@@ -953,7 +977,7 @@ namespace Gbdx.Gbd
         /// </param>
         private void ExportButtonClick(object sender, EventArgs e)
         {
-            if(Settings.Default.baseUrl.Equals(Settings.Default.DefaultBaseUrl))
+            if (Settings.Default.baseUrl.Equals(Settings.Default.DefaultBaseUrl))
             {
                 this.ExportSelectionToFile();
             }
@@ -989,7 +1013,8 @@ namespace Gbdx.Gbd
                 var columnHeader = string.Empty;
                 for (int i = 0; i <= currentView.Columns.Count - 1; i++)
                 {
-                    if (currentView.Columns[i] == null || currentView.Columns[i].Name == "showPolygon" || currentView.Columns[i].Name == "Selected")
+                    if (currentView.Columns[i] == null || currentView.Columns[i].Name == "showPolygon"
+                        || currentView.Columns[i].Name == "Selected")
                     {
                         continue;
                     }
@@ -1156,7 +1181,7 @@ namespace Gbdx.Gbd
         /// </param>
         private void CheckDateTime(object sender)
         {
-            if (sender.GetType() != typeof(DateTimePicker)||this.dateTimeChanging)
+            if (sender.GetType() != typeof(DateTimePicker) || this.dateTimeChanging)
             {
                 return;
             }
@@ -1187,7 +1212,7 @@ namespace Gbdx.Gbd
         {
             try
             {
-                
+
                 this.CheckDateTime(sender);
 
                 this.SetHeaderBoxToOff();
@@ -1245,7 +1270,7 @@ namespace Gbdx.Gbd
                 else
                 {
                     var graphicsContainer = ArcMap.Document.ActiveView.FocusMap as IGraphicsContainer;
-                    
+
                     this.ClearPolygons();
                     this.DrawAoi(graphicsContainer);
                 }
@@ -1268,7 +1293,7 @@ namespace Gbdx.Gbd
                 // header cell click
                 if (e.RowIndex == -1)
                 {
-                    if(this.dataGridView1.Columns[e.ColumnIndex].Name == "Selected")
+                    if (this.dataGridView1.Columns[e.ColumnIndex].Name == "Selected")
                     {
                         this.HeaderBoxClicked();
                     }
@@ -1290,7 +1315,7 @@ namespace Gbdx.Gbd
                         var catId = formattedValue.ToString();
 
                         // Find the row that has the corresponding catalog id
-                        var result = this.localDatatable.Select("[Catalog ID] = '" + catId+"'");
+                        var result = this.localDatatable.Select("[Catalog ID] = '" + catId + "'");
                         if (result.Length == 0)
                         {
                             return;
@@ -1344,7 +1369,9 @@ namespace Gbdx.Gbd
                 }
 
                 // Url of the image finder's thumbnail.
-                var url = string.Format("/imagefinder/showBrowseImage?catalogId={0}&imageHeight=512&imageWidth=512", catId);
+                var url = string.Format(
+                    "/imagefinder/showBrowseImage?catalogId={0}&imageHeight=512&imageWidth=512",
+                    catId);
 
                 var request = new RestRequest(url, Method.GET);
 
@@ -1357,7 +1384,7 @@ namespace Gbdx.Gbd
 
                 // Throw up the please wait image
                 this.thumbnailPictureBox.Image = new Bitmap(GbdxResources.PleaseStandBy, this.thumbnailPictureBox.Size);
-                
+
                 // get the image asynchronsly 
                 this.asyncHandle = this.client.ExecuteAsync(
                     request,
@@ -1412,7 +1439,7 @@ namespace Gbdx.Gbd
             this.localPolygon = poly;
             this.localElement = elm;
             this.localDatatable.Clear();
-            
+
             var output = GbdJarvis.CreateAois(this.localPolygon.Envelope);
 
             if (output == null)
@@ -1479,7 +1506,7 @@ namespace Gbdx.Gbd
         }
 
         #endregion
-        
+
         #region Imagery Ordering
 
         /// <summary>
@@ -1654,9 +1681,7 @@ namespace Gbdx.Gbd
         private static NetObject CreateNetObject(ref bool success)
         {
             string decryptedPassword;
-            success = Aes.Instance.Decrypt128(
-                Settings.Default.password,
-                out decryptedPassword);
+            success = Aes.Instance.Decrypt128(Settings.Default.password, out decryptedPassword);
             if (!success)
             {
                 return null;
@@ -1664,18 +1689,13 @@ namespace Gbdx.Gbd
 
             // Creating network object.
             NetObject netObj = new NetObject
-            {
-                AddressUrl =
-                    Settings.Default.GbdSearchPath,
-                BaseUrl =
-                    GbdxHelper.GetEndpointBase(
-                        Settings.Default),
-                AuthEndpoint =
-                    Settings.Default
-                    .authenticationServer,
-                User = Settings.Default.username,
-                Password = decryptedPassword,
-            };
+                                   {
+                                       AddressUrl = Settings.Default.GbdSearchPath,
+                                       BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
+                                       AuthEndpoint = Settings.Default.authenticationServer,
+                                       User = Settings.Default.username,
+                                       Password = decryptedPassword,
+                                   };
 
             return netObj;
         }
@@ -1711,30 +1731,25 @@ namespace Gbdx.Gbd
             if (this.comms.GetAccessToken() == null)
             {
                 string decryptedPassword;
-                var success = Aes.Instance.Decrypt128(
-                    Settings.Default.password,
-                    out decryptedPassword);
+                var success = Aes.Instance.Decrypt128(Settings.Default.password, out decryptedPassword);
                 if (!success)
                 {
                     return;
                 }
 
                 var netObj = new NetObject
-                {
-                    AddressUrl =
-                        Settings.Default.GbdSearchPath,
-                    BaseUrl =
-                        GbdxHelper.GetEndpointBase(
-                            Settings.Default),
-                    AuthEndpoint =
-                        Settings.Default
-                        .authenticationServer,
-                    User = Settings.Default.username,
-                    Password = decryptedPassword,
-
-                    AuthUrl = string.IsNullOrEmpty(Settings.Default.AuthBase)?Settings.Default.DefaultAuthBase: Settings.Default.AuthBase,
-                    ApiKey = Settings.Default.apiKey,
-                };
+                                 {
+                                     AddressUrl = Settings.Default.GbdSearchPath,
+                                     BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
+                                     AuthEndpoint = Settings.Default.authenticationServer,
+                                     User = Settings.Default.username,
+                                     Password = decryptedPassword,
+                                     AuthUrl =
+                                         string.IsNullOrEmpty(Settings.Default.AuthBase)
+                                             ? Settings.Default.DefaultAuthBase
+                                             : Settings.Default.AuthBase,
+                                     ApiKey = Settings.Default.apiKey,
+                                 };
 
                 this.comms.AuthenticateNetworkObject(ref netObj);
             }
@@ -1768,7 +1783,7 @@ namespace Gbdx.Gbd
         /// </returns>
         private List<string> GetOrderIdsForRefresh()
         {
-            
+
             List<string> list = new List<string>();
             try
             {
@@ -1819,7 +1834,7 @@ namespace Gbdx.Gbd
                     var numTries = 0;
                     while (keepRunning)
                     {
-                        if (result.Data.salesOrderNumber == null && numTries <=5)
+                        if (result.Data.salesOrderNumber == null && numTries <= 5)
                         {
                             numTries++;
                             result = webClient.Execute<GbdOrder>(request);
@@ -2089,6 +2104,10 @@ namespace Gbdx.Gbd
         }
 
         #endregion
+
         #endregion
+
+        
+
     }
 }
