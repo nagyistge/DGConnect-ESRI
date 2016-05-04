@@ -46,12 +46,18 @@
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.projectSearchTextBox = new System.Windows.Forms.TextBox();
+            this.projectNameDataGridView = new System.Windows.Forms.DataGridView();
+            this.recipeStatusDataGridView = new System.Windows.Forms.DataGridView();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
             this.groupBox2.SuspendLayout();
             this.tableLayoutPanel3.SuspendLayout();
+            this.splitContainer1.Panel1.SuspendLayout();
+            this.splitContainer1.Panel2.SuspendLayout();
             this.splitContainer1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.projectNameDataGridView)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.recipeStatusDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
             // tableLayoutPanel1
@@ -281,6 +287,14 @@
             this.tableLayoutPanel3.SetColumnSpan(this.splitContainer1, 3);
             this.splitContainer1.Location = new System.Drawing.Point(3, 27);
             this.splitContainer1.Name = "splitContainer1";
+            // 
+            // splitContainer1.Panel1
+            // 
+            this.splitContainer1.Panel1.Controls.Add(this.projectNameDataGridView);
+            // 
+            // splitContainer1.Panel2
+            // 
+            this.splitContainer1.Panel2.Controls.Add(this.recipeStatusDataGridView);
             this.tableLayoutPanel3.SetRowSpan(this.splitContainer1, 3);
             this.splitContainer1.Size = new System.Drawing.Size(365, 278);
             this.splitContainer1.SplitterDistance = 126;
@@ -294,6 +308,33 @@
             this.projectSearchTextBox.Size = new System.Drawing.Size(124, 20);
             this.projectSearchTextBox.TabIndex = 4;
             // 
+            // projectNameDataGridView
+            // 
+            this.projectNameDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.projectNameDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.projectNameDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.projectNameDataGridView.Location = new System.Drawing.Point(3, 3);
+            this.projectNameDataGridView.Name = "projectNameDataGridView";
+            this.projectNameDataGridView.RowHeadersVisible = false;
+            this.projectNameDataGridView.Size = new System.Drawing.Size(120, 272);
+            this.projectNameDataGridView.TabIndex = 0;
+            // 
+            // recipeStatusDataGridView
+            // 
+            this.recipeStatusDataGridView.AllowUserToAddRows = false;
+            this.recipeStatusDataGridView.AllowUserToDeleteRows = false;
+            this.recipeStatusDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.recipeStatusDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.recipeStatusDataGridView.Location = new System.Drawing.Point(3, 3);
+            this.recipeStatusDataGridView.Name = "recipeStatusDataGridView";
+            this.recipeStatusDataGridView.ReadOnly = true;
+            this.recipeStatusDataGridView.Size = new System.Drawing.Size(228, 272);
+            this.recipeStatusDataGridView.TabIndex = 0;
+            // 
             // AnswerFactoryDockableWindow
             // 
             this.Controls.Add(this.tableLayoutPanel1);
@@ -306,7 +347,11 @@
             this.groupBox2.ResumeLayout(false);
             this.tableLayoutPanel3.ResumeLayout(false);
             this.tableLayoutPanel3.PerformLayout();
+            this.splitContainer1.Panel1.ResumeLayout(false);
+            this.splitContainer1.Panel2.ResumeLayout(false);
             this.splitContainer1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.projectNameDataGridView)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.recipeStatusDataGridView)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -331,6 +376,8 @@
         private System.Windows.Forms.Button resultRefrshButton;
         private System.Windows.Forms.SplitContainer splitContainer1;
         private System.Windows.Forms.TextBox projectSearchTextBox;
+        private System.Windows.Forms.DataGridView projectNameDataGridView;
+        private System.Windows.Forms.DataGridView recipeStatusDataGridView;
 
     }
 }

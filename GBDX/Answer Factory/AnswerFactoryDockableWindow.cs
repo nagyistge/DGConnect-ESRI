@@ -66,6 +66,10 @@ namespace Gbdx.Answer_Factory
 
         private IElement drawnElement = null;
 
+        //private IDictionary<string, string> ProjIdRepo;
+
+        private DataTable ProjIdRepo;
+
         public AnswerFactoryDockableWindow(object hook)
         {
             this.InitializeComponent();
@@ -73,7 +77,18 @@ namespace Gbdx.Answer_Factory
             this.GetToken();
             this.Hook = hook;
             this.selectionTypecomboBox.SelectedIndex = 0;
+
+            this.ProjIdRepo = CreateProjIdDataTable();
+            this.projectNameDataGridView.DataSource = this.ProjIdRepo;
+
+            var dataGridViewColumn = this.projectNameDataGridView.Columns["Id"];
+            if (dataGridViewColumn != null)
+            {
+                dataGridViewColumn.Visible = false;
+            }
         }
+
+
 
         /// <summary>
         /// Get Token to use with GBDX services
@@ -200,7 +215,7 @@ namespace Gbdx.Answer_Factory
             request.AddHeader("Content-Type", "application/json");
 
             this.CheckBaseUrl();
-            this.client.ExecuteAsync<List<Project2>>(
+            this.client.ExecuteAsync<List<ProjId>>(
                 request,
                 resp =>
                     {
@@ -208,7 +223,6 @@ namespace Gbdx.Answer_Factory
 
                         if (resp.Data != null && resp.StatusCode == HttpStatusCode.OK)
                         {
-                            this.existingProjects = resp.Data;
 
                             // Update the list of projects with an unknown status
                             this.Invoke((MethodInvoker)(() => { this.UpdateUiWithExistingProjects(); }));
@@ -280,57 +294,57 @@ namespace Gbdx.Answer_Factory
 
         private void UpdateUiWithExistingProjects()
         {
-            this.existingProjectsListView.Items.Clear();
-            foreach (var item in this.existingProjects)
-            {
-                foreach (var recipe in item.recipeConfigs)
-                {
-                    string[] arr = new string[4];
-                    arr[0] = item.name;
-                    arr[1] = recipe.recipeName;
-                    arr[2] = "Working";
-                    arr[3] = item.id;
-                    this.existingProjectsListView.Items.Add(new ListViewItem(arr));
-                }
-            }
+            //this.existingProjectsListView.Items.Clear();
+            //foreach (var item in this.existingProjects)
+            //{
+            //    foreach (var recipe in item.recipeConfigs)
+            //    {
+            //        string[] arr = new string[4];
+            //        arr[0] = item.name;
+            //        arr[1] = recipe.recipeName;
+            //        arr[2] = "Working";
+            //        arr[3] = item.id;
+            //        this.existingProjectsListView.Items.Add(new ListViewItem(arr));
+            //    }
+            //}
         }
 
         private void GetProjectRecipeStatus(string projectid)
         {
-            this.CheckBaseUrl();
+            //this.CheckBaseUrl();
 
-            var request =
-                new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectid));
-            request.AddHeader("Authorization", "Bearer " + this.token);
-            request.AddHeader("Content-Type", "application/json");
+            //var request =
+            //    new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectid));
+            //request.AddHeader("Authorization", "Bearer " + this.token);
+            //request.AddHeader("Content-Type", "application/json");
 
-            this.client.ExecuteAsync<List<ResultItem>>(
-                request,
-                resp =>
-                    {
-                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
-                        this.Invoke(
-                                (MethodInvoker)(() =>
-                                {
-                                    foreach (var item in resp.Data)
-                                    {
-                                        foreach (ListViewItem listItem in this.existingProjectsListView.Items)
-                                        {
-                                            var name = listItem.SubItems[0].Text;
-                                            var recipeName = listItem.SubItems[1].Text;
-                                            var id = listItem.SubItems[3].Text;
-                                            if (id == item.projectId)
-                                            {
-                                                if (string.Equals(item.status, "success", StringComparison.OrdinalIgnoreCase))
-                                                {
-                                                    listItem.SubItems[2].Text = "Complete";
-                                                }
-                                            }
-                                        }
-                                    }
-                                }));
+            //this.client.ExecuteAsync<List<ResultItem>>(
+            //    request,
+            //    resp =>
+            //        {
+            //            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+            //            this.Invoke(
+            //                    (MethodInvoker)(() =>
+            //                    {
+            //                        foreach (var item in resp.Data)
+            //                        {
+            //                            foreach (ListViewItem listItem in this.existingProjectsListView.Items)
+            //                            {
+            //                                var name = listItem.SubItems[0].Text;
+            //                                var recipeName = listItem.SubItems[1].Text;
+            //                                var id = listItem.SubItems[3].Text;
+            //                                if (id == item.projectId)
+            //                                {
+            //                                    if (string.Equals(item.status, "success", StringComparison.OrdinalIgnoreCase))
+            //                                    {
+            //                                        listItem.SubItems[2].Text = "Complete";
+            //                                    }
+            //                                }
+            //                            }
+            //                        }
+            //                    }));
                         
-                    });
+            //        });
         }
 
         private static string ConvertAoisToGeometryCollection(List<string> aois)
@@ -742,7 +756,25 @@ namespace Gbdx.Answer_Factory
         }
 
         #endregion
-        
+
+        #region User Interface Setup
+
+        private static DataTable CreateProjIdDataTable()
+        {
+            var dt = new DataTable();
+
+            dt.Columns.Add(new DataColumn("Name", typeof(string)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("Id", typeof(string)) { ReadOnly = true });
+            
+            var primary = new DataColumn[1];
+            primary[0] = dt.Columns["Id"];
+
+            dt.PrimaryKey = primary;
+
+            return dt;
+        }
+        #endregion
+
         /// <summary>
         /// Host object of the dockable window
         /// </summary>
@@ -833,31 +865,31 @@ namespace Gbdx.Answer_Factory
 
         private void showResultsButton_Click(object sender, EventArgs e)
         {
-            foreach (ListViewItem item in this.existingProjectsListView.SelectedItems)
-            {
-                var name = item.SubItems[0].Text;
-                var recipeName = item.SubItems[1].Text;
-                var id = item.SubItems[3].Text;
+            //foreach (ListViewItem item in this.existingProjectsListView.SelectedItems)
+            //{
+            //    var name = item.SubItems[0].Text;
+            //    var recipeName = item.SubItems[1].Text;
+            //    var id = item.SubItems[3].Text;
 
-                // linq query to get the project where the all the criteria match just as a double check
-                var query = from proj in this.existingProjects
-                            from recipe in proj.recipeConfigs
-                            where proj.id == id
-                            where proj.name == name
-                            where recipe.recipeName == recipeName
-                            select proj;
+            //    // linq query to get the project where the all the criteria match just as a double check
+            //    var query = from proj in this.existingProjects
+            //                from recipe in proj.recipeConfigs
+            //                where proj.id == id
+            //                where proj.name == name
+            //                where recipe.recipeName == recipeName
+            //                select proj;
 
-                var selectedItems = query as Project2[] ?? query.ToArray();
-                if (selectedItems.Any())
-                {
-                    this.GetResult(id, recipeName);
-                }
-                else
-                {
-                    MessageBox.Show("Error in selection.  Please try again.");
-                }
-                return;
-            }
+            //    var selectedItems = query as Project2[] ?? query.ToArray();
+            //    if (selectedItems.Any())
+            //    {
+            //        this.GetResult(id, recipeName);
+            //    }
+            //    else
+            //    {
+            //        MessageBox.Show("Error in selection.  Please try again.");
+            //    }
+            //    return;
+            //}
         }
 
         private void resultRefrshButton_Click(object sender, EventArgs e)

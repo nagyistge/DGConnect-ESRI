@@ -55,6 +55,7 @@
     <Compile Include="PagedData2.cs" />
     <Compile Include="Project.cs" />
     <Compile Include="Project2.cs" />
+    <Compile Include="ProjId.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Recipe.cs" />
     <Compile Include="RecipeConfig.cs" />
