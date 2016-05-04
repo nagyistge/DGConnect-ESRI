@@ -68,6 +68,8 @@ namespace Gbdx.Answer_Factory
 
         private DataTable ProjIdRepo;
 
+        private DataTable RecipeRepo;
+
         public AnswerFactoryDockableWindow(object hook)
         {
             this.InitializeComponent();
@@ -84,6 +86,10 @@ namespace Gbdx.Answer_Factory
             {
                 dataGridViewColumn.Visible = false;
             }
+            this.RecipeRepo = CreateRecipeInfoDataDatable();
+
+            this.recipeStatusDataGridView.DataSource = this.RecipeRepo;
+            //this.projectNameDataGridView.CellCl
         }
 
 
@@ -236,11 +242,6 @@ namespace Gbdx.Answer_Factory
                                     this.projectNameDataGridView.Refresh();
                                     this.projectNameDataGridView.PerformLayout();
                                 }));
-
-                            //foreach (var project in this.existingProjects)
-                            //{
-                            //    GetProjectRecipeStatus(project.id);
-                            //}
                         }
                     });
         }
@@ -302,59 +303,40 @@ namespace Gbdx.Answer_Factory
             }
         }
 
-        private void UpdateUiWithExistingProjects()
-        {
-            //this.existingProjectsListView.Items.Clear();
-            //foreach (var item in this.existingProjects)
-            //{
-            //    foreach (var recipe in item.recipeConfigs)
-            //    {
-            //        string[] arr = new string[4];
-            //        arr[0] = item.name;
-            //        arr[1] = recipe.recipeName;
-            //        arr[2] = "Working";
-            //        arr[3] = item.id;
-            //        this.existingProjectsListView.Items.Add(new ListViewItem(arr));
-            //    }
-            //}
-        }
 
         private void GetProjectRecipeStatus(string projectid)
         {
-            //this.CheckBaseUrl();
+            this.CheckBaseUrl();
 
-            //var request =
-            //    new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectid));
-            //request.AddHeader("Authorization", "Bearer " + this.token);
-            //request.AddHeader("Content-Type", "application/json");
+            var request =
+                new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectid));
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
 
-            //this.client.ExecuteAsync<List<ResultItem>>(
-            //    request,
-            //    resp =>
-            //        {
-            //            Jarvis.Logger.Info(resp.ResponseUri.ToString());
-            //            this.Invoke(
-            //                    (MethodInvoker)(() =>
-            //                    {
-            //                        foreach (var item in resp.Data)
-            //                        {
-            //                            foreach (ListViewItem listItem in this.existingProjectsListView.Items)
-            //                            {
-            //                                var name = listItem.SubItems[0].Text;
-            //                                var recipeName = listItem.SubItems[1].Text;
-            //                                var id = listItem.SubItems[3].Text;
-            //                                if (id == item.projectId)
-            //                                {
-            //                                    if (string.Equals(item.status, "success", StringComparison.OrdinalIgnoreCase))
-            //                                    {
-            //                                        listItem.SubItems[2].Text = "Complete";
-            //                                    }
-            //                                }
-            //                            }
-            //                        }
-            //                    }));
-                        
-            //        });
+            this.client.ExecuteAsync<List<ResultItem>>(
+                request,
+                resp =>
+                {
+                    Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                    if (resp.Data != null)
+                    {
+                        foreach (var item in resp.Data)
+                        {
+                            var newRow = this.RecipeRepo.NewRow();
+                            newRow["Recipe Name"] = item.recipeName;
+                            newRow["Status"] = item.status;
+                            this.RecipeRepo.Rows.Add(newRow);
+                        }
+                    }
+
+                    this.Invoke(
+                            (MethodInvoker)(() =>
+                            {
+                                this.recipeStatusDataGridView.Refresh();
+                                this.recipeStatusDataGridView.PerformLayout();
+                            }));
+
+                });
         }
 
         private static string ConvertAoisToGeometryCollection(List<string> aois)
@@ -783,6 +765,15 @@ namespace Gbdx.Answer_Factory
 
             return dt;
         }
+
+        private static DataTable CreateRecipeInfoDataDatable()
+        {
+            var dt = new DataTable();
+            dt.Columns.Add(new DataColumn("Recipe Name", typeof(string)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("Status", typeof(string)) { ReadOnly = true });
+
+            return dt;
+        }
         #endregion
 
         /// <summary>
@@ -973,9 +964,24 @@ namespace Gbdx.Answer_Factory
             ArcMap.Application.CurrentTool = this.PreviouslySelectedItem;
         }
 
-        private void existingProjectsListView_SelectedIndexChanged(object sender, EventArgs e)
+        private void projectNameDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            
+            Jarvis.Logger.Info("project clicked");
+
+            var dgv = (DataGridView)sender;
+
+            // Don't do anything if there are no rows.
+            if (dgv.Rows.Count <= 0)
+            {
+                return;
+            }
+
+            this.RecipeRepo.Clear();
+            this.recipeStatusDataGridView.Refresh();
+            this.recipeStatusDataGridView.PerformLayout();
+
+            var id = dgv.SelectedRows[0].Cells["Id"].Value.ToString();
+            this.GetProjectRecipeStatus(id);
         }
     }
 }

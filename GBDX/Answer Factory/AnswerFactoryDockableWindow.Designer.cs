@@ -329,22 +329,29 @@
             this.projectNameDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this.projectNameDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.projectNameDataGridView.Location = new System.Drawing.Point(3, 3);
+            this.projectNameDataGridView.MultiSelect = false;
             this.projectNameDataGridView.Name = "projectNameDataGridView";
+            this.projectNameDataGridView.ReadOnly = true;
             this.projectNameDataGridView.RowHeadersVisible = false;
+            this.projectNameDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.projectNameDataGridView.Size = new System.Drawing.Size(120, 272);
             this.projectNameDataGridView.TabIndex = 0;
+            this.projectNameDataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.projectNameDataGridView_CellClick);
             // 
             // recipeStatusDataGridView
             // 
             this.recipeStatusDataGridView.AllowUserToAddRows = false;
             this.recipeStatusDataGridView.AllowUserToDeleteRows = false;
+            this.recipeStatusDataGridView.AllowUserToResizeRows = false;
             this.recipeStatusDataGridView.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.recipeStatusDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.recipeStatusDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.recipeStatusDataGridView.Location = new System.Drawing.Point(3, 3);
             this.recipeStatusDataGridView.Name = "recipeStatusDataGridView";
             this.recipeStatusDataGridView.ReadOnly = true;
+            this.recipeStatusDataGridView.RowHeadersVisible = false;
             this.recipeStatusDataGridView.Size = new System.Drawing.Size(228, 272);
             this.recipeStatusDataGridView.TabIndex = 0;
             // 
