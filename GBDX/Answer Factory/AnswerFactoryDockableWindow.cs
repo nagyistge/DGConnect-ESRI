@@ -66,8 +66,6 @@ namespace Gbdx.Answer_Factory
 
         private IElement drawnElement = null;
 
-        //private IDictionary<string, string> ProjIdRepo;
-
         private DataTable ProjIdRepo;
 
         public AnswerFactoryDockableWindow(object hook)
@@ -224,13 +222,25 @@ namespace Gbdx.Answer_Factory
                         if (resp.Data != null && resp.StatusCode == HttpStatusCode.OK)
                         {
 
-                            // Update the list of projects with an unknown status
-                            this.Invoke((MethodInvoker)(() => { this.UpdateUiWithExistingProjects(); }));
-
-                            foreach (var project in this.existingProjects)
+                            foreach (var item in resp.Data)
                             {
-                                GetProjectRecipeStatus(project.id);
+                                var row = this.ProjIdRepo.NewRow();
+                                row["Project Name"] = item.name;
+                                row["Id"] = item.id;
+                                this.ProjIdRepo.Rows.Add(row);
                             }
+
+                            // Update the list of projects with an unknown status
+                            this.Invoke((MethodInvoker)(() =>
+                                {
+                                    this.projectNameDataGridView.Refresh();
+                                    this.projectNameDataGridView.PerformLayout();
+                                }));
+
+                            //foreach (var project in this.existingProjects)
+                            //{
+                            //    GetProjectRecipeStatus(project.id);
+                            //}
                         }
                     });
         }
@@ -763,7 +773,7 @@ namespace Gbdx.Answer_Factory
         {
             var dt = new DataTable();
 
-            dt.Columns.Add(new DataColumn("Name", typeof(string)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("Project Name", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Id", typeof(string)) { ReadOnly = true });
             
             var primary = new DataColumn[1];
