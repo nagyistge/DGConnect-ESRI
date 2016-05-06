@@ -70,6 +70,8 @@ namespace Gbdx.Answer_Factory
 
         private DataTable RecipeRepo;
 
+        private List<string> selectedAois;
+
         public AnswerFactoryDockableWindow(object hook)
         {
             this.InitializeComponent();
@@ -89,7 +91,8 @@ namespace Gbdx.Answer_Factory
             this.RecipeRepo = CreateRecipeInfoDataDatable();
 
             this.recipeStatusDataGridView.DataSource = this.RecipeRepo;
-            //this.projectNameDataGridView.CellCl
+            
+            this.selectedAois = new List<string>();
         }
 
 
@@ -246,7 +249,7 @@ namespace Gbdx.Answer_Factory
                     });
         }
 
-        private void GetResult(string id, string recipeName)
+        private void GetResult(string id, string recipeName, string projectName)
         {
             this.CheckBaseUrl();
 
@@ -265,35 +268,32 @@ namespace Gbdx.Answer_Factory
                 request,
                 resp =>
                     {
-                        ProcessResult(recipeName, resp, this.existingProjects, this.token, this.client);
+                        ProcessResult(projectName, recipeName, resp, this.selectedAois, this.token, this.client);
                     });
         }
 
         private void ProcessResult(
+            string projectName,
             string recipeName,
             IRestResponse<List<ResultItem>> resp,
-            List<Project2> existingProjects,
+            List<string> AoiList,
             string token,
             IRestClient client)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
             string layername = string.Empty;
+            string aoi = ConvertAoisToGeometryCollection(AoiList);
             if (resp.Data != null)
             {
-                var query = from a in resp.Data where a.recipeName == recipeName select a;
-
-
-                foreach (var item in query)
+                foreach (var item in resp.Data)
                 {
-                    var aoiQuery = from b in existingProjects where b.id == item.projectId select b;
-                    string aoi = string.Empty;
-                    foreach (var projectItem in aoiQuery)
+                    // if the recipe names don't match move on to the next
+                    if (!recipeName.Equals(item.recipeName, StringComparison.OrdinalIgnoreCase))
                     {
-                        aoi = ConvertAoisToGeometryCollection(projectItem.aois);
-                        layername = string.Format("{0}|{1}", projectItem.name, recipeName);
+                        continue;
                     }
-                     
-                    Jarvis.Logger.Info(item.properties.query_string);
+
+                    layername = string.Format("{0}|{1}", projectName, item.recipeName);
 
                     if(!string.IsNullOrEmpty(aoi) && !string.IsNullOrEmpty(layername))
                     {
@@ -304,12 +304,55 @@ namespace Gbdx.Answer_Factory
         }
 
 
-        private void GetProjectRecipeStatus(string projectid)
+        private void GetProjectRecipes(string projectid)
+        {
+            this.CheckBaseUrl();
+            
+            // Clear out the selected AOIS from a previous project/recipe query
+            this.selectedAois.Clear();
+
+            var request =
+                new RestRequest(string.Format("/answer-factory-project-service/api/project/{0}", projectid));
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+
+            this.client.ExecuteAsync<List<Project2>>(
+                request,
+                resp =>
+                {
+                    Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+                    if (resp.Data != null)
+                    {
+                        
+                        foreach (var item in resp.Data)
+                        {
+                            this.selectedAois.AddRange(item.aois);
+                            foreach (var recipe in item.recipeConfigs)
+                            {
+                                var newRow = this.RecipeRepo.NewRow();
+                                newRow["Recipe Name"] = recipe.recipeName;
+                                newRow["Status"] = "Working";
+                                this.RecipeRepo.Rows.Add(newRow);
+                            }
+                        }
+                    }
+                    this.Invoke(
+                            (MethodInvoker)(() =>
+                            {
+                                this.recipeStatusDataGridView.Refresh();
+                                this.recipeStatusDataGridView.PerformLayout();
+                            }));
+                    this.GetRecipeStatus(projectid);
+                });
+        }
+
+        private void GetRecipeStatus(string projectId)
         {
             this.CheckBaseUrl();
 
             var request =
-                new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectid));
+                new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectId));
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
 
@@ -322,10 +365,13 @@ namespace Gbdx.Answer_Factory
                     {
                         foreach (var item in resp.Data)
                         {
-                            var newRow = this.RecipeRepo.NewRow();
-                            newRow["Recipe Name"] = item.recipeName;
-                            newRow["Status"] = item.status;
-                            this.RecipeRepo.Rows.Add(newRow);
+                            var query = from row in this.RecipeRepo.AsEnumerable()
+                                        where (string)row["Recipe Name"] == item.recipeName
+                                        select row;
+                            foreach (DataRow queryItem in query)
+                            {
+                                queryItem["Status"] = item.status;
+                            }
                         }
                     }
 
@@ -769,8 +815,8 @@ namespace Gbdx.Answer_Factory
         private static DataTable CreateRecipeInfoDataDatable()
         {
             var dt = new DataTable();
-            dt.Columns.Add(new DataColumn("Recipe Name", typeof(string)) { ReadOnly = true });
-            dt.Columns.Add(new DataColumn("Status", typeof(string)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("Recipe Name", typeof(string)) { ReadOnly = false });
+            dt.Columns.Add(new DataColumn("Status", typeof(string)) { ReadOnly = false });
 
             return dt;
         }
@@ -866,31 +912,17 @@ namespace Gbdx.Answer_Factory
 
         private void showResultsButton_Click(object sender, EventArgs e)
         {
-            //foreach (ListViewItem item in this.existingProjectsListView.SelectedItems)
-            //{
-            //    var name = item.SubItems[0].Text;
-            //    var recipeName = item.SubItems[1].Text;
-            //    var id = item.SubItems[3].Text;
 
-            //    // linq query to get the project where the all the criteria match just as a double check
-            //    var query = from proj in this.existingProjects
-            //                from recipe in proj.recipeConfigs
-            //                where proj.id == id
-            //                where proj.name == name
-            //                where recipe.recipeName == recipeName
-            //                select proj;
+            var projectId = this.projectNameDataGridView.SelectedRows[0].Cells["Id"].Value.ToString();
+            var recipeName = this.recipeStatusDataGridView.SelectedRows[0].Cells["Recipe Name"].Value.ToString();
+            var projectName = this.projectNameDataGridView.SelectedRows[0].Cells["Project Name"].Value.ToString();
+            if (string.IsNullOrEmpty(projectId) || string.IsNullOrEmpty(recipeName))
+            {
+                MessageBox.Show("Selection Error");
+                return;
+            }
 
-            //    var selectedItems = query as Project2[] ?? query.ToArray();
-            //    if (selectedItems.Any())
-            //    {
-            //        this.GetResult(id, recipeName);
-            //    }
-            //    else
-            //    {
-            //        MessageBox.Show("Error in selection.  Please try again.");
-            //    }
-            //    return;
-            //}
+            this.GetResult(projectId, recipeName, projectName);
         }
 
         private void resultRefrshButton_Click(object sender, EventArgs e)
@@ -966,8 +998,6 @@ namespace Gbdx.Answer_Factory
 
         private void projectNameDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            Jarvis.Logger.Info("project clicked");
-
             var dgv = (DataGridView)sender;
 
             // Don't do anything if there are no rows.
@@ -981,7 +1011,7 @@ namespace Gbdx.Answer_Factory
             this.recipeStatusDataGridView.PerformLayout();
 
             var id = dgv.SelectedRows[0].Cells["Id"].Value.ToString();
-            this.GetProjectRecipeStatus(id);
+            this.GetProjectRecipes(id);
         }
     }
 }

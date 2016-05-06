@@ -6,6 +6,9 @@
         public object value { get; set; }
         public string type { get; set; }
 
+        public RecipeConfigParameter()
+        {}
+
         public RecipeConfigParameter(string name, object value, string type)
         {
             this.name = name;
