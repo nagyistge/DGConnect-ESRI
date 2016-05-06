@@ -91,7 +91,21 @@ namespace Gbdx.Answer_Factory
             this.RecipeRepo = CreateRecipeInfoDataDatable();
 
             this.recipeStatusDataGridView.DataSource = this.RecipeRepo;
-            
+
+            var recipeGridDataCol0 = this.recipeStatusDataGridView.Columns["Recipe Name"];
+            if (recipeGridDataCol0 != null)
+            {
+                recipeGridDataCol0.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+            }
+
+
+            var recipeGridDataCol1 = this.recipeStatusDataGridView.Columns["Status"];
+            if (recipeGridDataCol1 != null)
+            {
+                recipeGridDataCol1.AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+            }
+
+
             this.selectedAois = new List<string>();
         }
 
@@ -912,17 +926,29 @@ namespace Gbdx.Answer_Factory
 
         private void showResultsButton_Click(object sender, EventArgs e)
         {
-
-            var projectId = this.projectNameDataGridView.SelectedRows[0].Cells["Id"].Value.ToString();
-            var recipeName = this.recipeStatusDataGridView.SelectedRows[0].Cells["Recipe Name"].Value.ToString();
-            var projectName = this.projectNameDataGridView.SelectedRows[0].Cells["Project Name"].Value.ToString();
-            if (string.IsNullOrEmpty(projectId) || string.IsNullOrEmpty(recipeName))
+            try
             {
-                MessageBox.Show("Selection Error");
-                return;
-            }
+                if (this.projectNameDataGridView.SelectedRows.Count <= 0 || this.recipeStatusDataGridView.SelectedRows.Count <=0)
+                {
+                    MessageBox.Show("Please select a project and recipe");
+                    return;
+                }
+                var projectId = this.projectNameDataGridView.SelectedRows[0].Cells["Id"].Value;
+                var recipeName = this.recipeStatusDataGridView.SelectedRows[0].Cells["Recipe Name"].Value;
+                var projectName = this.projectNameDataGridView.SelectedRows[0].Cells["Project Name"].Value;
 
-            this.GetResult(projectId, recipeName, projectName);
+                if (projectId == null || recipeName == null || projectName == null)
+                {
+                    MessageBox.Show("Selection Error");
+                    return;
+                }
+
+                this.GetResult(projectId.ToString(), recipeName.ToString(), projectName.ToString());
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
         }
 
         private void resultRefrshButton_Click(object sender, EventArgs e)
