@@ -235,6 +235,9 @@ namespace Gbdx.Answer_Factory
 
         private void GetExistingProjects()
         {
+            this.ProjIdRepo.Clear();
+            this.RecipeRepo.Clear();
+
             var request = new RestRequest("/answer-factory-project-service/api/project", Method.GET);
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
