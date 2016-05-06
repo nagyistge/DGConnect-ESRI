@@ -42,6 +42,7 @@ namespace Gbdx.Answer_Factory
     using FileStream = System.IO.FileStream;
     using ListViewItem = System.Windows.Forms.ListViewItem;
     using Path = System.IO.Path;
+    using TextBox = System.Windows.Forms.TextBox;
     using UserControl = System.Windows.Forms.UserControl;
 
     /// <summary>
@@ -68,6 +69,8 @@ namespace Gbdx.Answer_Factory
 
         private DataTable ProjIdRepo;
 
+        private DataView projectDataView;
+
         private DataTable RecipeRepo;
 
         private List<string> selectedAois;
@@ -81,7 +84,8 @@ namespace Gbdx.Answer_Factory
             this.selectionTypecomboBox.SelectedIndex = 0;
 
             this.ProjIdRepo = CreateProjIdDataTable();
-            this.projectNameDataGridView.DataSource = this.ProjIdRepo;
+            this.projectDataView = new DataView(this.ProjIdRepo);
+            this.projectNameDataGridView.DataSource = this.projectDataView;
 
             var dataGridViewColumn = this.projectNameDataGridView.Columns["Id"];
             if (dataGridViewColumn != null)
@@ -1038,6 +1042,53 @@ namespace Gbdx.Answer_Factory
 
             var id = dgv.SelectedRows[0].Cells["Id"].Value.ToString();
             this.GetProjectRecipes(id);
+        }
+
+        private void projectSearchTextBox_TextChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(this.projectSearchTextBox.Text) || this.projectSearchTextBox.Text == "Type some text here to filter projects...")
+            {
+                this.projectDataView.RowFilter = "";
+            }
+            else
+            {
+                var filterStr = string.Format("[Project Name] LIKE '{0}*'", this.projectSearchTextBox.Text);
+                this.projectDataView.RowFilter = filterStr;
+            }
+            this.projectNameDataGridView.Refresh();
+        }
+
+        public void SearchBoxGotFocus(object sender, EventArgs e)
+        {
+            var tb = (TextBox)sender;
+
+            if (tb.Text == "Type some text here to filter projects...")
+            {
+                tb.Text = string.Empty;
+                tb.ForeColor = Color.Black;
+            }
+        }
+
+        public void SearchBoxLostFocus(object sender, EventArgs e)
+        {
+            var tb = (TextBox)sender;
+            if (tb.Text == string.Empty)
+            {
+                tb.Text = "Type some text here to filter projects...";
+                tb.ForeColor = Color.LightGray;
+            }
+        }
+
+        private void AnswerFactoryDockableWindow_Load(object sender, EventArgs e)
+        {
+            this.ActiveControl = this.label1;
+            this.projectSearchTextBox.GotFocus += this.SearchBoxGotFocus;
+            this.projectSearchTextBox.LostFocus += this.SearchBoxLostFocus;
+        }
+
+        private void AnswerFactoryDockableWindow_VisibleChanged(object sender, EventArgs e)
+        {
+            this.ActiveControl = this.label1;
         }
     }
 }
