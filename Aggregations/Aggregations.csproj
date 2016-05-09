@@ -33,27 +33,13 @@
     <Reference Include="ESRI.ArcGIS.Carto, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
-    <Reference Include="ESRI.ArcGIS.Geodatabase, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
     <Reference Include="ESRI.ArcGIS.Geometry, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
       <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="ESRI.ArcGIS.System, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </Reference>
-    <Reference Include="RestSharp, Version=105.2.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\RestSharp.105.2.3\lib\net35\RestSharp.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aggregation.cs" />
@@ -71,10 +57,6 @@
     <Compile Include="Term.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GBDXSettings\GBDXSettings.csproj">
-      <Project>{f96e1da5-a0cd-4569-8727-8fb3c2935731}</Project>
-      <Name>GBDXSettings</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GbdxTools\GbdxTools.csproj">
       <Project>{95b5413e-160a-4afb-8b0a-b0df1b1c093b}</Project>
       <Name>GbdxTools</Name>
@@ -82,10 +64,6 @@
     <ProjectReference Include="..\Logging\Logging.csproj">
       <Project>{f64278bf-afd4-4304-815f-3e5130d8f9e8}</Project>
       <Name>Logging</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\NetworkConnections\NetworkConnections.csproj">
-      <Project>{f3bb8b18-b4e2-42d1-8e46-f09c13f41465}</Project>
-      <Name>NetworkConnections</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
