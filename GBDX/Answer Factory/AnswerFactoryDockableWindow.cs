@@ -259,13 +259,15 @@ namespace Gbdx.Answer_Factory
                                 row["Id"] = item.id;
                                 this.ProjIdRepo.Rows.Add(row);
                             }
+                            this.projectNameDataGridView.BeginInvoke(new Action(this.projectNameDataGridView.Refresh));
+                            this.projectNameDataGridView.BeginInvoke(new Action(this.projectNameDataGridView.PerformLayout));
 
-                            // Update the list of projects with an unknown status
-                            this.Invoke((MethodInvoker)(() =>
-                                {
-                                    this.projectNameDataGridView.Refresh();
-                                    this.projectNameDataGridView.PerformLayout();
-                                }));
+                            //// Update the list of projects with an unknown status
+                            //this.Invoke((MethodInvoker)(() =>
+                            //    {
+                            //        this.projectNameDataGridView.invoRefresh();
+                            //        this.projectNameDataGridView.PerformLayout();
+                            //    }));
                         }
                     });
         }
