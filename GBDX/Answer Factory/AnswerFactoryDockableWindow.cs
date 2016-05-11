@@ -156,7 +156,6 @@ namespace Gbdx.Answer_Factory
                             this.token = resp.Data.access_token;
                             this.GetRecipes();
                             this.GetProjects(this.token);
-                            //this.GetExistingProjects();
                         }
                         else
                         {
