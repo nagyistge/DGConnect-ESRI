@@ -36,7 +36,7 @@
             this.acquiredDateLabel = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
+            this.catalogIdSearchTextBox = new System.Windows.Forms.TextBox();
             this.tableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.toDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.label6 = new System.Windows.Forms.Label();
@@ -45,6 +45,8 @@
             this.cloudCoverageComboBox = new System.Windows.Forms.ComboBox();
             this.nadirAngleComboBox = new System.Windows.Forms.ComboBox();
             this.sunElevationComboBox = new System.Windows.Forms.ComboBox();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label2 = new System.Windows.Forms.Label();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.thumbnailPictureBox = new System.Windows.Forms.PictureBox();
@@ -72,6 +74,9 @@
             // 
             // tableLayoutPanel1
             // 
+            this.tableLayoutPanel1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel1.CellBorderStyle = System.Windows.Forms.TableLayoutPanelCellBorderStyle.OutsetPartial;
             this.tableLayoutPanel1.ColumnCount = 2;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 129.6F));
@@ -84,21 +89,24 @@
             this.tableLayoutPanel1.Controls.Add(this.acquiredDateLabel, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.label1, 0, 2);
             this.tableLayoutPanel1.Controls.Add(this.label3, 0, 4);
-            this.tableLayoutPanel1.Controls.Add(this.label4, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.catalogIdSearchTextBox, 1, 6);
             this.tableLayoutPanel1.Controls.Add(this.tableLayoutPanel2, 1, 1);
             this.tableLayoutPanel1.Controls.Add(this.cloudCoverageComboBox, 1, 3);
             this.tableLayoutPanel1.Controls.Add(this.nadirAngleComboBox, 1, 4);
             this.tableLayoutPanel1.Controls.Add(this.sunElevationComboBox, 1, 5);
+            this.tableLayoutPanel1.Controls.Add(this.label4, 0, 5);
+            this.tableLayoutPanel1.Controls.Add(this.label2, 0, 6);
             this.tableLayoutPanel1.Location = new System.Drawing.Point(3, 3);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
-            this.tableLayoutPanel1.RowCount = 6;
+            this.tableLayoutPanel1.RowCount = 7;
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 145F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 43F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 45F));
-            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 51F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(274, 371);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 47F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(278, 391);
             this.tableLayoutPanel1.TabIndex = 0;
             // 
             // panResolutionComboBox
@@ -118,9 +126,9 @@
             "1.1",
             "1.2",
             "1.3 (Lowest Resolution)"});
-            this.panResolutionComboBox.Location = new System.Drawing.Point(139, 192);
+            this.panResolutionComboBox.Location = new System.Drawing.Point(139, 194);
             this.panResolutionComboBox.Name = "panResolutionComboBox";
-            this.panResolutionComboBox.Size = new System.Drawing.Size(129, 24);
+            this.panResolutionComboBox.Size = new System.Drawing.Size(133, 21);
             this.panResolutionComboBox.TabIndex = 10;
             this.panResolutionComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -128,9 +136,9 @@
             // 
             this.label7.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(29, 233);
+            this.label7.Location = new System.Drawing.Point(15, 244);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(77, 34);
+            this.label7.Size = new System.Drawing.Size(106, 13);
             this.label7.TabIndex = 0;
             this.label7.Text = "Max Cloud Coverage";
             // 
@@ -138,9 +146,9 @@
             // 
             this.satLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.satLabel.AutoSize = true;
-            this.satLabel.Location = new System.Drawing.Point(41, 9);
+            this.satLabel.Location = new System.Drawing.Point(48, 11);
             this.satLabel.Name = "satLabel";
-            this.satLabel.Size = new System.Drawing.Size(53, 17);
+            this.satLabel.Size = new System.Drawing.Size(40, 13);
             this.satLabel.TabIndex = 0;
             this.satLabel.Text = "Sensor";
             // 
@@ -155,9 +163,9 @@
             "WorldView-3",
             "GeoEye-1",
             "QuickBird"});
-            this.sensorComboBox.Location = new System.Drawing.Point(139, 6);
+            this.sensorComboBox.Location = new System.Drawing.Point(139, 7);
             this.sensorComboBox.Name = "sensorComboBox";
-            this.sensorComboBox.Size = new System.Drawing.Size(129, 24);
+            this.sensorComboBox.Size = new System.Drawing.Size(133, 21);
             this.sensorComboBox.TabIndex = 1;
             this.sensorComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -165,9 +173,9 @@
             // 
             this.acquiredDateLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.acquiredDateLabel.AutoSize = true;
-            this.acquiredDateLabel.Location = new System.Drawing.Point(13, 100);
+            this.acquiredDateLabel.Location = new System.Drawing.Point(26, 102);
             this.acquiredDateLabel.Name = "acquiredDateLabel";
-            this.acquiredDateLabel.Size = new System.Drawing.Size(110, 17);
+            this.acquiredDateLabel.Size = new System.Drawing.Size(84, 13);
             this.acquiredDateLabel.TabIndex = 2;
             this.acquiredDateLabel.Text = "Acquisition Date";
             // 
@@ -175,9 +183,9 @@
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(16, 196);
+            this.label1.Location = new System.Drawing.Point(28, 198);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(104, 17);
+            this.label1.Size = new System.Drawing.Size(79, 13);
             this.label1.TabIndex = 3;
             this.label1.Text = "Pan Resolution";
             // 
@@ -185,21 +193,20 @@
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(15, 289);
+            this.label3.Location = new System.Drawing.Point(28, 291);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(105, 17);
+            this.label3.Size = new System.Drawing.Size(79, 13);
             this.label3.TabIndex = 5;
             this.label3.Text = "Off Nadir Angle";
             // 
-            // label4
+            // catalogIdSearchTextBox
             // 
-            this.label4.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(20, 340);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(95, 17);
-            this.label4.TabIndex = 6;
-            this.label4.Text = "Sun Elevation";
+            this.catalogIdSearchTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.catalogIdSearchTextBox.Location = new System.Drawing.Point(139, 363);
+            this.catalogIdSearchTextBox.Name = "catalogIdSearchTextBox";
+            this.catalogIdSearchTextBox.Size = new System.Drawing.Size(133, 20);
+            this.catalogIdSearchTextBox.TabIndex = 7;
+            this.catalogIdSearchTextBox.TextChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
             // tableLayoutPanel2
             // 
@@ -218,7 +225,7 @@
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 40F));
-            this.tableLayoutPanel2.Size = new System.Drawing.Size(129, 126);
+            this.tableLayoutPanel2.Size = new System.Drawing.Size(133, 126);
             this.tableLayoutPanel2.TabIndex = 7;
             // 
             // toDateTimePicker
@@ -230,7 +237,7 @@
             this.toDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
             this.toDateTimePicker.Location = new System.Drawing.Point(3, 103);
             this.toDateTimePicker.Name = "toDateTimePicker";
-            this.toDateTimePicker.Size = new System.Drawing.Size(123, 22);
+            this.toDateTimePicker.Size = new System.Drawing.Size(127, 20);
             this.toDateTimePicker.TabIndex = 1;
             this.toDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -238,9 +245,9 @@
             // 
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(52, 76);
+            this.label6.Location = new System.Drawing.Point(56, 78);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(25, 17);
+            this.label6.Size = new System.Drawing.Size(20, 13);
             this.label6.TabIndex = 0;
             this.label6.Text = "To";
             // 
@@ -254,7 +261,7 @@
             this.fromDateTimePicker.ImeMode = System.Windows.Forms.ImeMode.Disable;
             this.fromDateTimePicker.Location = new System.Drawing.Point(3, 33);
             this.fromDateTimePicker.Name = "fromDateTimePicker";
-            this.fromDateTimePicker.Size = new System.Drawing.Size(123, 22);
+            this.fromDateTimePicker.Size = new System.Drawing.Size(127, 20);
             this.fromDateTimePicker.TabIndex = 1;
             this.fromDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -262,9 +269,9 @@
             // 
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(44, 6);
+            this.label5.Location = new System.Drawing.Point(51, 8);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(40, 17);
+            this.label5.Size = new System.Drawing.Size(30, 13);
             this.label5.TabIndex = 0;
             this.label5.Text = "From";
             // 
@@ -285,9 +292,9 @@
             "80",
             "90",
             "100"});
-            this.cloudCoverageComboBox.Location = new System.Drawing.Point(139, 238);
+            this.cloudCoverageComboBox.Location = new System.Drawing.Point(139, 240);
             this.cloudCoverageComboBox.Name = "cloudCoverageComboBox";
-            this.cloudCoverageComboBox.Size = new System.Drawing.Size(129, 24);
+            this.cloudCoverageComboBox.Size = new System.Drawing.Size(133, 21);
             this.cloudCoverageComboBox.TabIndex = 1;
             this.cloudCoverageComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -307,9 +314,9 @@
             "70",
             "80",
             "90"});
-            this.nadirAngleComboBox.Location = new System.Drawing.Point(139, 285);
+            this.nadirAngleComboBox.Location = new System.Drawing.Point(139, 287);
             this.nadirAngleComboBox.Name = "nadirAngleComboBox";
-            this.nadirAngleComboBox.Size = new System.Drawing.Size(129, 24);
+            this.nadirAngleComboBox.Size = new System.Drawing.Size(133, 21);
             this.nadirAngleComboBox.TabIndex = 8;
             this.nadirAngleComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -329,11 +336,31 @@
             "70",
             "80",
             "90"});
-            this.sunElevationComboBox.Location = new System.Drawing.Point(139, 336);
+            this.sunElevationComboBox.Location = new System.Drawing.Point(139, 326);
             this.sunElevationComboBox.Name = "sunElevationComboBox";
-            this.sunElevationComboBox.Size = new System.Drawing.Size(129, 24);
+            this.sunElevationComboBox.Size = new System.Drawing.Size(133, 21);
             this.sunElevationComboBox.TabIndex = 9;
             this.sunElevationComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
+            // 
+            // label4
+            // 
+            this.label4.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(31, 328);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(73, 13);
+            this.label4.TabIndex = 6;
+            this.label4.Text = "Sun Elevation";
+            // 
+            // label2
+            // 
+            this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(21, 367);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(94, 13);
+            this.label2.TabIndex = 11;
+            this.label2.Text = "Catalog ID Search";
             // 
             // tableLayoutPanel3
             // 
@@ -352,12 +379,13 @@
             this.tableLayoutPanel3.Controls.Add(this.totalItemsLabel, 1, 2);
             this.tableLayoutPanel3.Location = new System.Drawing.Point(6, 6);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
-            this.tableLayoutPanel3.RowCount = 4;
-            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 377F));
+            this.tableLayoutPanel3.RowCount = 5;
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 397F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 41F));
-            this.tableLayoutPanel3.Size = new System.Drawing.Size(571, 784);
+            this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel3.Size = new System.Drawing.Size(571, 787);
             this.tableLayoutPanel3.TabIndex = 1;
             // 
             // dataGridView1
@@ -370,13 +398,13 @@
             this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.tableLayoutPanel3.SetColumnSpan(this.dataGridView1, 2);
-            this.dataGridView1.Location = new System.Drawing.Point(3, 380);
+            this.dataGridView1.Location = new System.Drawing.Point(3, 400);
             this.dataGridView1.MultiSelect = false;
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowTemplate.Height = 24;
             this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dataGridView1.ShowEditingIcon = false;
-            this.dataGridView1.Size = new System.Drawing.Size(565, 324);
+            this.dataGridView1.Size = new System.Drawing.Size(565, 287);
             this.dataGridView1.TabIndex = 1;
             this.dataGridView1.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView1CellMouseEnter);
             // 
@@ -387,14 +415,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.thumbnailPictureBox.Location = new System.Drawing.Point(287, 3);
             this.thumbnailPictureBox.Name = "thumbnailPictureBox";
-            this.thumbnailPictureBox.Size = new System.Drawing.Size(281, 371);
+            this.thumbnailPictureBox.Size = new System.Drawing.Size(281, 391);
             this.thumbnailPictureBox.TabIndex = 2;
             this.thumbnailPictureBox.TabStop = false;
             // 
             // exportButton
             // 
             this.exportButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.exportButton.Location = new System.Drawing.Point(469, 751);
+            this.exportButton.Location = new System.Drawing.Point(469, 734);
             this.exportButton.Name = "exportButton";
             this.exportButton.Size = new System.Drawing.Size(99, 25);
             this.exportButton.TabIndex = 3;
@@ -405,7 +433,7 @@
             // selectButton
             // 
             this.selectButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.selectButton.Location = new System.Drawing.Point(3, 751);
+            this.selectButton.Location = new System.Drawing.Point(3, 734);
             this.selectButton.Name = "selectButton";
             this.selectButton.Size = new System.Drawing.Size(94, 24);
             this.selectButton.TabIndex = 4;
@@ -417,9 +445,9 @@
             // 
             this.selectedItemsLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.selectedItemsLabel.AutoSize = true;
-            this.selectedItemsLabel.Location = new System.Drawing.Point(3, 716);
+            this.selectedItemsLabel.Location = new System.Drawing.Point(3, 701);
             this.selectedItemsLabel.Name = "selectedItemsLabel";
-            this.selectedItemsLabel.Size = new System.Drawing.Size(108, 17);
+            this.selectedItemsLabel.Size = new System.Drawing.Size(83, 13);
             this.selectedItemsLabel.TabIndex = 5;
             this.selectedItemsLabel.Text = "Selected Items: ";
             // 
@@ -427,9 +455,9 @@
             // 
             this.totalItemsLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.totalItemsLabel.AutoSize = true;
-            this.totalItemsLabel.Location = new System.Drawing.Point(287, 716);
+            this.totalItemsLabel.Location = new System.Drawing.Point(287, 701);
             this.totalItemsLabel.Name = "totalItemsLabel";
-            this.totalItemsLabel.Size = new System.Drawing.Size(85, 17);
+            this.totalItemsLabel.Size = new System.Drawing.Size(65, 13);
             this.totalItemsLabel.TabIndex = 6;
             this.totalItemsLabel.Text = "Total Items: ";
             // 
@@ -449,10 +477,10 @@
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.tableLayoutPanel3);
-            this.tabPage1.Location = new System.Drawing.Point(4, 25);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(583, 796);
+            this.tabPage1.Size = new System.Drawing.Size(583, 799);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Search";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -460,10 +488,10 @@
             // statusPage
             // 
             this.statusPage.Controls.Add(this.tableLayoutPanel4);
-            this.statusPage.Location = new System.Drawing.Point(4, 25);
+            this.statusPage.Location = new System.Drawing.Point(4, 22);
             this.statusPage.Name = "statusPage";
             this.statusPage.Padding = new System.Windows.Forms.Padding(3);
-            this.statusPage.Size = new System.Drawing.Size(583, 796);
+            this.statusPage.Size = new System.Drawing.Size(583, 799);
             this.statusPage.TabIndex = 1;
             this.statusPage.Text = "Order Status";
             this.statusPage.UseVisualStyleBackColor = true;
@@ -483,7 +511,7 @@
             this.tableLayoutPanel4.RowCount = 2;
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 95.16908F));
             this.tableLayoutPanel4.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4.830918F));
-            this.tableLayoutPanel4.Size = new System.Drawing.Size(551, 784);
+            this.tableLayoutPanel4.Size = new System.Drawing.Size(551, 787);
             this.tableLayoutPanel4.TabIndex = 0;
             // 
             // orderDataGridView
@@ -500,13 +528,13 @@
             this.orderDataGridView.RowTemplate.Height = 24;
             this.orderDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.orderDataGridView.ShowEditingIcon = false;
-            this.orderDataGridView.Size = new System.Drawing.Size(545, 740);
+            this.orderDataGridView.Size = new System.Drawing.Size(545, 742);
             this.orderDataGridView.TabIndex = 0;
             // 
             // refreshButton
             // 
             this.refreshButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.refreshButton.Location = new System.Drawing.Point(473, 753);
+            this.refreshButton.Location = new System.Drawing.Point(473, 756);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(75, 23);
             this.refreshButton.TabIndex = 1;
@@ -568,6 +596,8 @@
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel4;
         private System.Windows.Forms.DataGridView orderDataGridView;
         private System.Windows.Forms.Button refreshButton;
+        private System.Windows.Forms.TextBox catalogIdSearchTextBox;
+        private System.Windows.Forms.Label label2;
 
     }
 }
