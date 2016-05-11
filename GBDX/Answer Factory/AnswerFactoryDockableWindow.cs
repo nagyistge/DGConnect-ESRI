@@ -75,6 +75,12 @@ namespace Gbdx.Answer_Factory
 
         private List<string> selectedAois;
 
+        private delegate void ProjectListDelegate(List<ProjId> projects);
+
+        private delegate void RecipeListDelegate(List<Project2> results);
+
+        private delegate void ResultItemListDelegate(List<ResultItem> results);
+
         public AnswerFactoryDockableWindow(object hook)
         {
             this.InitializeComponent();
@@ -138,8 +144,7 @@ namespace Gbdx.Answer_Factory
             request.AddParameter("grant_type", "password");
             request.AddParameter("username", Settings.Default.username);
             request.AddParameter("password", password);
-
-            //var response = restClient.Execute<AccessToken>(request);
+            
             restClient.ExecuteAsync<AccessToken>(
                 request,
                 resp =>
@@ -150,7 +155,8 @@ namespace Gbdx.Answer_Factory
                         {
                             this.token = resp.Data.access_token;
                             this.GetRecipes();
-                            this.GetExistingProjects();
+                            this.GetProjects(this.token);
+                            //this.GetExistingProjects();
                         }
                         else
                         {
@@ -233,43 +239,33 @@ namespace Gbdx.Answer_Factory
             return null;
         }
 
-        private void GetExistingProjects()
+        private void GetProjects(string authToken)
         {
-            this.ProjIdRepo.Clear();
-            this.RecipeRepo.Clear();
-
+            var restClient = new RestClient(Settings.Default.baseUrl);
             var request = new RestRequest("/answer-factory-project-service/api/project", Method.GET);
-            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Authorization", "Bearer " + authToken);
             request.AddHeader("Content-Type", "application/json");
 
-            this.CheckBaseUrl();
-            this.client.ExecuteAsync<List<ProjId>>(
-                request,
-                resp =>
-                    {
-                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
+            restClient.ExecuteAsync<List<ProjId>>(request, resp =>
+            {
+                Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-                        if (resp.Data != null && resp.StatusCode == HttpStatusCode.OK)
-                        {
+                if (resp.Data != null && resp.StatusCode == HttpStatusCode.OK)
+                {
+                    this.Invoke(new ProjectListDelegate(this.UpdateProjectsUi), resp.Data);
+                }
+            });
+        }
 
-                            foreach (var item in resp.Data)
-                            {
-                                var row = this.ProjIdRepo.NewRow();
-                                row["Project Name"] = item.name;
-                                row["Id"] = item.id;
-                                this.ProjIdRepo.Rows.Add(row);
-                            }
-                            this.projectNameDataGridView.BeginInvoke(new Action(this.projectNameDataGridView.Refresh));
-                            this.projectNameDataGridView.BeginInvoke(new Action(this.projectNameDataGridView.PerformLayout));
-
-                            //// Update the list of projects with an unknown status
-                            //this.Invoke((MethodInvoker)(() =>
-                            //    {
-                            //        this.projectNameDataGridView.invoRefresh();
-                            //        this.projectNameDataGridView.PerformLayout();
-                            //    }));
-                        }
-                    });
+        private void UpdateProjectsUi(List<ProjId> projects)
+        {
+            foreach (var item in projects)
+            {
+                var row = this.ProjIdRepo.NewRow();
+                row["Project Name"] = item.name;
+                row["Id"] = item.id;
+                this.ProjIdRepo.Rows.Add(row);
+            }
         }
 
         private void GetResult(string id, string recipeName, string projectName)
@@ -326,49 +322,80 @@ namespace Gbdx.Answer_Factory
             }
         }
 
-
-        private void GetProjectRecipes(string projectid)
+        private void GetRecipes(string authToken, string projectId)
         {
-            this.CheckBaseUrl();
-            
-            // Clear out the selected AOIS from a previous project/recipe query
-            this.selectedAois.Clear();
-
-            var request =
-                new RestRequest(string.Format("/answer-factory-project-service/api/project/{0}", projectid));
-            request.AddHeader("Authorization", "Bearer " + this.token);
+            var restClient = new RestClient(Settings.Default.baseUrl);
+            var request = new RestRequest(string.Format("/answer-factory-project-service/api/project/{0}", projectId));
+            request.AddHeader("Authorization", "Bearer " + authToken);
             request.AddHeader("Content-Type", "application/json");
 
-            this.client.ExecuteAsync<List<Project2>>(
-                request,
-                resp =>
+            restClient.ExecuteAsync<List<Project2>>(request, resp =>
+            {
+                Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                if (resp.Data != null)
                 {
-                    Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                    this.Invoke(new RecipeListDelegate(this.UpdateUiWithRecipes), resp.Data);
+                }
+            });
 
-                    if (resp.Data != null)
-                    {
-                        
-                        foreach (var item in resp.Data)
-                        {
-                            this.selectedAois.AddRange(item.aois);
-                            foreach (var recipe in item.recipeConfigs)
-                            {
-                                var newRow = this.RecipeRepo.NewRow();
-                                newRow["Recipe Name"] = recipe.recipeName;
-                                newRow["Status"] = "Working";
-                                this.RecipeRepo.Rows.Add(newRow);
-                            }
-                        }
-                    }
-                    this.Invoke(
-                            (MethodInvoker)(() =>
-                            {
-                                this.recipeStatusDataGridView.Refresh();
-                                this.recipeStatusDataGridView.PerformLayout();
-                            }));
-                    this.GetRecipeStatus(projectid);
-                });
         }
+
+        private void UpdateUiWithRecipes(List<Project2> results)
+        {
+            foreach (var item in results)
+            {
+                this.selectedAois.AddRange(item.aois);
+                foreach (var recipe in item.recipeConfigs)
+                {
+                    var newRow = this.RecipeRepo.NewRow();
+                    newRow["Recipe Name"] = recipe.recipeName;
+                    newRow["Status"] = "Working";
+                    this.RecipeRepo.Rows.Add(newRow);
+                }
+                this.GetRecipeStatus(this.token, item.id);
+            }
+            
+            this.recipeStatusDataGridView.Refresh();
+            this.recipeStatusDataGridView.PerformLayout();
+
+            
+        }
+
+        private void GetRecipeStatus(string authToken, string projectId)
+        {
+            var restClient = new RestClient(Settings.Default.baseUrl);
+            var request =
+                new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectId));
+            request.AddHeader("Authorization", "Bearer " + authToken);
+            request.AddHeader("Content-Type", "application/json");
+
+            restClient.ExecuteAsync<List<ResultItem>>(request, resp =>
+            {
+                Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                if (resp.Data != null)
+                {
+                    this.Invoke(new ResultItemListDelegate(this.UpdateRecipeUiStatus), resp.Data);
+                }
+            });
+        }
+
+        private void UpdateRecipeUiStatus(List<ResultItem> results)
+        {
+            foreach (var item in results)
+            {
+                var query = from row in this.RecipeRepo.AsEnumerable()
+                            where (string)row["Recipe Name"] == item.recipeName
+                            select row;
+                foreach (DataRow queryItem in query)
+                {
+                    queryItem["Status"] = item.status;
+                }
+            }
+
+            this.recipeStatusDataGridView.Refresh();
+            this.recipeStatusDataGridView.PerformLayout();
+        }
+
 
         private void GetRecipeStatus(string projectId)
         {
@@ -924,8 +951,11 @@ namespace Gbdx.Answer_Factory
 
                 this.projectNameTextbox.Clear();
                 this.availableRecipesCombobox.SelectedIndex = -1;
+                
+                this.ProjIdRepo.Clear();
+                this.RecipeRepo.Clear();
 
-                this.GetExistingProjects();
+                this.GetProjects(this.token);
             }
             catch (Exception error)
             {
@@ -962,7 +992,10 @@ namespace Gbdx.Answer_Factory
 
         private void resultRefrshButton_Click(object sender, EventArgs e)
         {
-            this.GetExistingProjects();
+
+            this.ProjIdRepo.Clear();
+            this.RecipeRepo.Clear();
+            this.GetProjects(this.token);
         }
 
         private void resetButton_Click(object sender, EventArgs e)
@@ -1046,7 +1079,7 @@ namespace Gbdx.Answer_Factory
             this.recipeStatusDataGridView.PerformLayout();
 
             var id = dgv.SelectedRows[0].Cells["Id"].Value.ToString();
-            this.GetProjectRecipes(id);
+            this.GetRecipes(this.token, id);
         }
 
         private void projectSearchTextBox_TextChanged(object sender, EventArgs e)
