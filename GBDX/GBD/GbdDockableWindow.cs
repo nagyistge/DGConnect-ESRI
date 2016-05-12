@@ -448,50 +448,52 @@ namespace Gbdx.Gbd
         /// </param>
         private void UpdateDataTable(DataTable dataTobeAdded, Dictionary<string, Properties> responses)
         {
-            // Only update the table if we are still allowed to do work.
-            if (!this.okToWork)
-            {
-                return;
-            }
-            // need to check the newly added data for duplicates and remove them
-            var index = this.dataGridView1.FirstDisplayedScrollingRowIndex;
-            var horizIndex = this.dataGridView1.FirstDisplayedScrollingColumnIndex;
-            this.localDatatable.Merge(dataTobeAdded, true);
-
-            // Add the new responses to the others.
-            this.allResults = this.allResults.Concat(responses)
-                .GroupBy(d => d.Key)
-                .ToDictionary(d => d.Key, d => d.First().Value);
-
-            if (this.displayAllPolgons)
-            {
-                this.SetAllCheckBoxes(this.displayAllPolgons, this.dataGridView1);
-            }
-
-            this.DrawViewablePolygons();
-
             try
             {
+                // Only update the table if we are still allowed to do work.
+                if (!this.okToWork)
+                {
+                    return;
+                }
+                // need to check the newly added data for duplicates and remove them
+                var index = this.dataGridView1.FirstDisplayedScrollingRowIndex;
+                var horizIndex = this.dataGridView1.FirstDisplayedScrollingColumnIndex;
+
+                this.localDatatable.Merge(dataTobeAdded, true);
+
+                // Add the new responses to the others.
+                this.allResults = this.allResults.Concat(responses)
+                    .GroupBy(d => d.Key)
+                    .ToDictionary(d => d.Key, d => d.First().Value);
+
+                if (this.displayAllPolgons)
+                {
+                    this.SetAllCheckBoxes(this.displayAllPolgons, this.dataGridView1);
+                }
+
+                this.DrawViewablePolygons();
+
                 this.dataGridView1.FirstDisplayedScrollingRowIndex = index;
                 this.dataGridView1.FirstDisplayedScrollingColumnIndex = horizIndex;
-            }
-            catch
-            {
-            }
 
-            var dataGridViewColumn = this.dataGridView1.Columns["Selected"];
-            if (dataGridViewColumn != null)
-            {
-                var chkBox = (DataGridViewCheckBoxHeaderCell)dataGridViewColumn.HeaderCell;
-
-                if (chkBox.isChecked)
+                var dataGridViewColumn = this.dataGridView1.Columns["Selected"];
+                if (dataGridViewColumn != null)
                 {
-                    this.SetAllCheckBoxes(chkBox.isChecked, this.dataGridView1);
-                    this.DrawCheckedPolygons();
-                }
-            }
+                    var chkBox = (DataGridViewCheckBoxHeaderCell) dataGridViewColumn.HeaderCell;
 
-            this.UpdateSelectedAndTotalLabels();
+                    if (chkBox.isChecked)
+                    {
+                        this.SetAllCheckBoxes(chkBox.isChecked, this.dataGridView1);
+                        this.DrawCheckedPolygons();
+                    }
+                }
+
+                this.UpdateSelectedAndTotalLabels();
+            }
+            catch (Exception e)
+            {
+                Jarvis.Logger.Error(e);
+            }
         }
 
         /// <summary>
@@ -797,27 +799,27 @@ namespace Gbdx.Gbd
         /// </param>
         private void GetGbdData(List<GbdPolygon> polygons)
         {
-
-            // Add the polygons to the work queue
-            foreach (var item in polygons)
-            {
-                this.workQueue.Enqueue(item);
-            }
-
-            // Setup the threads.  Make sure if they are already running they are shut down and other 
-            // good citizen type stuff.
-            this.SetupThreads();
-
             // Set control variable to true prior to kicking off work.
             this.okToWork = true;
 
-            // kickoff the worker threads.
-            //this.worker1Thread.Start();
-            //this.worker2Thread.Start();
-            //this.worker3Thread.Start();
-            //this.worker4Thread.Start();
+            var restClient = new RestClient("https://geobigdata.io");
 
-            this.GetGbdData();
+            foreach (var polygon in polygons)
+            {
+                var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
+                request.AddHeader("Authorization", "Bearer " + this.token);
+                request.AddHeader("Content-Type", "application/json");
+
+                var searchObject = new GbdSearchObject {searchAreaWkt = polygon.ToString()};
+                searchObject.types.Add("Acquisition");
+
+                var serializedString = JsonConvert.SerializeObject(searchObject);
+
+                request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
+
+                restClient.ExecuteAsync<List<GbdResponse>>(
+                    request, this.ProcessGbdSearchResult);
+            }
         }
 
         /// <summary>
@@ -863,30 +865,6 @@ namespace Gbdx.Gbd
                 {
                     targetThread.Abort();
                 }
-            }
-        }
-
-        private void GetGbdData()
-        {
-            var restClient = new RestClient("https://geobigdata.io");
-
-            while (this.workQueue.Count > 0)
-            {
-                var polygon = (GbdPolygon) this.workQueue.Dequeue();
-
-                var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
-                request.AddHeader("Authorization", "Bearer " + this.token);
-                request.AddHeader("Content-Type", "application/json");
-
-                var searchObject = new GbdSearchObject{searchAreaWkt = polygon.ToString()};
-                searchObject.types.Add("Acquisition");
-
-                var serializedString = JsonConvert.SerializeObject(searchObject);
-
-                request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
-
-                restClient.ExecuteAsync<List<GbdResponse>>(
-                    request, this.ProcessGbdSearchResult);
             }
         }
 
