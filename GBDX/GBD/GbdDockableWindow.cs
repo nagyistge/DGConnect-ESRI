@@ -13,6 +13,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Windows.Forms.VisualStyles;
 using GbdxTools;
 
 using Logging;
@@ -216,29 +217,7 @@ namespace Gbdx.Gbd
 
         #endregion
 
-        private static string GetAccessToken(string apiKey, string username, string password)
-        {
-            string tok = string.Empty;
-
-            var restClient = new RestClient("https://geobigdata.io");
-            var request = new RestRequest(Settings.Default.authenticationServer, Method.POST);
-            request.AddHeader("Authorization", string.Format("Basic {0}", apiKey));
-            request.AddParameter("grant_type", "password");
-            request.AddParameter("username", username);
-            request.AddParameter("password", password);
-
-            var response = restClient.Execute<AccessToken>(request);
-
-            Jarvis.Logger.Info(response.ResponseUri.ToString());
-
-            if (response.Data != null)
-            {
-                tok = response.Data.access_token;
-            }
-
-            return tok;
-        }
-
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="GbdDockableWindow"/> class.
         /// </summary>
@@ -274,6 +253,9 @@ namespace Gbdx.Gbd
             GbdRelay.Instance.AoiHasBeenDrawn += this.InstanceAoiHasBeenDrawn;
 
             this.localDatatable = this.CreateDataTable();
+
+            this.dataGridView1.RowsAdded += DataGridView1_RowsAdded;
+
             this.workQueue = Queue.Synchronized(new Queue());
             this.dataView = new DataView(this.localDatatable);
 
@@ -284,6 +266,17 @@ namespace Gbdx.Gbd
 
             this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewColumnHeaderStyle;
 
+            var dataGridViewColumn = this.dataGridView1.Columns["Pan"];
+            if (dataGridViewColumn != null)
+            {
+                dataGridViewColumn.CellTemplate = new DataGridViewDisableCheckBoxCell();
+            }
+
+            var dataGridViewColumnMs = this.dataGridView1.Columns["MS"];
+            if (dataGridViewColumnMs != null)
+            {
+                dataGridViewColumnMs.CellTemplate = new DataGridViewDisableCheckBoxCell();
+            }
             // Set the current DateTime to last year
             this.fromDateTimePicker.Value = DateTime.Now.AddMonths(-1);
             this.startTime = DateTime.Now.AddMonths(-1);
@@ -342,6 +335,27 @@ namespace Gbdx.Gbd
                 this.gbdOrderList = this.LoadGbdOrdersFromFile(this.filePath);
                 UpdateOrderTable(this.gbdOrderList, ref this.orderTable);
             }
+        }
+
+        private void DataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        {
+            var row = this.dataGridView1.Rows[e.RowIndex];
+            string idahoId = string.Empty;
+            try
+            {
+                idahoId = row.Cells["IDAHO ID"].Value.ToString();
+            }
+            catch
+            {
+                idahoId = string.Empty;
+            }
+
+            if (idahoId.Equals(string.Empty))
+            {
+                var panCell = (DataGridViewDisableCheckBoxCell) row.Cells["Pan"];
+                panCell.Enabled = false;
+            }
+
         }
 
         /// <summary>
@@ -505,12 +519,12 @@ namespace Gbdx.Gbd
             this.allResults = new Dictionary<string, Properties>();
             this.workQueue.Clear();
 
-            // Check the threads.  if they are running lets shut them down.
-            this.ThreadLifeCheck(this.worker1Thread);
-            this.ThreadLifeCheck(this.worker2Thread);
-            this.ThreadLifeCheck(this.worker3Thread);
-            this.ThreadLifeCheck(this.worker4Thread);
-            this.ThreadLifeCheck(this.statusUpdateThread);
+            //// Check the threads.  if they are running lets shut them down.
+            //this.ThreadLifeCheck(this.worker1Thread);
+            //this.ThreadLifeCheck(this.worker2Thread);
+            //this.ThreadLifeCheck(this.worker3Thread);
+            //this.ThreadLifeCheck(this.worker4Thread);
+            //this.ThreadLifeCheck(this.statusUpdateThread);
 
             this.localDatatable.Clear();
             this.allResults.Clear();
@@ -2206,28 +2220,31 @@ namespace Gbdx.Gbd
 
         #endregion
 
-        private void dataGridView1_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
-        {
-            var idahoId = dataGridView1.Rows[e.RowIndex].Cells["IDAHO ID"].Value.ToString();
-
-            if (idahoId.Equals(string.Empty))
-            {
-                //DataGridViewCell cell = dataGridView1.Rows[e.RowIndex].Cells["Pan"];
-                //DataGridViewCheckBoxCell chkCell = cell as DataGridViewCheckBoxCell;
-                //chkCell.Value = false;
-                //chkCell.FlatStyle = FlatStyle.Flat;
-                //chkCell.Style.ForeColor = Color.DarkGray;
-                //cell.ReadOnly = true;
-
-                this.dataGridView1.Rows[e.RowIndex].Cells["Pan"].Style.BackColor = Color.LightGray;
-                this.dataGridView1.Rows[e.RowIndex].Cells["Pan"].ReadOnly = true;
-
-            }
-        }
 
         #endregion
 
-        
+        private static string GetAccessToken(string apiKey, string username, string password)
+        {
+            string tok = string.Empty;
+
+            var restClient = new RestClient("https://geobigdata.io");
+            var request = new RestRequest(Settings.Default.authenticationServer, Method.POST);
+            request.AddHeader("Authorization", string.Format("Basic {0}", apiKey));
+            request.AddParameter("grant_type", "password");
+            request.AddParameter("username", username);
+            request.AddParameter("password", password);
+
+            var response = restClient.Execute<AccessToken>(request);
+
+            Jarvis.Logger.Info(response.ResponseUri.ToString());
+
+            if (response.Data != null)
+            {
+                tok = response.Data.access_token;
+            }
+
+            return tok;
+        }
 
     }
 }
