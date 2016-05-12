@@ -212,7 +212,32 @@ namespace Gbdx.Gbd
         /// </summary>
         private List<GbdOrder> gbdOrderList;
 
+        private string token;
+
         #endregion
+
+        private static string GetAccessToken(string apiKey, string username, string password)
+        {
+            string tok = string.Empty;
+
+            var restClient = new RestClient("https://geobigdata.io");
+            var request = new RestRequest(Settings.Default.authenticationServer, Method.POST);
+            request.AddHeader("Authorization", string.Format("Basic {0}", apiKey));
+            request.AddParameter("grant_type", "password");
+            request.AddParameter("username", username);
+            request.AddParameter("password", password);
+
+            var response = restClient.Execute<AccessToken>(request);
+
+            Jarvis.Logger.Info(response.ResponseUri.ToString());
+
+            if (response.Data != null)
+            {
+                tok = response.Data.access_token;
+            }
+
+            return tok;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GbdDockableWindow"/> class.
@@ -229,10 +254,19 @@ namespace Gbdx.Gbd
                 return;
             }
 
+            string pass;
+            var result = Aes.Instance.Decrypt128(Settings.Default.password, out pass);
+            if (result)
+            {
+                this.token = GetAccessToken(Settings.Default.apiKey, Settings.Default.username, pass);
+            }
+            else
+            {
+                MessageBox.Show("Problem decrypting password");
+            }
+
             // Initialize GBD Communications and authorize with GBD authentication.
             this.comms = new GbdxComms(Jarvis.LogFile, false);
-
-            this.logWriter = new Logger(Jarvis.LogFile, false);
 
             this.InitializeComponent();
             this.VisibleChanged += this.GbdDockableWindowVisibleChanged;
@@ -366,7 +400,8 @@ namespace Gbdx.Gbd
         {
             var dt = new DataTable();
             dt.Columns.Add(new DataColumn("Selected", typeof(bool)) { ReadOnly = false, DefaultValue = false });
-            dt.Columns.Add(new DataColumn("View", typeof(bool)) { ReadOnly = false, DefaultValue = false });
+            dt.Columns.Add(new DataColumn("Pan", typeof(bool)) { ReadOnly = false, DefaultValue = false, });
+            dt.Columns.Add(new DataColumn("MS", typeof(bool)) { ReadOnly = false, DefaultValue = false });
             dt.Columns.Add(new DataColumn("Catalog ID", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Sensor", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Acquired", typeof(DateTime)) { ReadOnly = true });
@@ -374,6 +409,7 @@ namespace Gbdx.Gbd
             dt.Columns.Add(new DataColumn("Off Nadir Angle", typeof(double)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Sun Elevation", typeof(double)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Pan Resolution", typeof(double)) { ReadOnly = true });
+            dt.Columns.Add(new DataColumn("IDAHO ID", typeof(string)) { ReadOnly = true, DefaultValue = string.Empty});
 
             var primary = new DataColumn[1];
             primary[0] = dt.Columns["Catalog ID"];
@@ -412,6 +448,11 @@ namespace Gbdx.Gbd
         /// </param>
         private void UpdateDataTable(DataTable dataTobeAdded, Dictionary<string, Properties> responses)
         {
+            // Only update the table if we are still allowed to do work.
+            if (!this.okToWork)
+            {
+                return;
+            }
             // need to check the newly added data for duplicates and remove them
             var index = this.dataGridView1.FirstDisplayedScrollingRowIndex;
             var horizIndex = this.dataGridView1.FirstDisplayedScrollingColumnIndex;
@@ -744,16 +785,6 @@ namespace Gbdx.Gbd
             return stringBuilder.ToString();
         }
         
-        /// <summary>
-        /// Event handler for filtering results based on catalogID
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void CatalogIdSearchTextBoxTextChanged(object sender, EventArgs e)
-        {
-            this.FilterSetup();
-        }
-
         #endregion
 
         #region Thread Methods
@@ -781,10 +812,12 @@ namespace Gbdx.Gbd
             this.okToWork = true;
 
             // kickoff the worker threads.
-            this.worker1Thread.Start();
-            this.worker2Thread.Start();
-            this.worker3Thread.Start();
-            this.worker4Thread.Start();
+            //this.worker1Thread.Start();
+            //this.worker2Thread.Start();
+            //this.worker3Thread.Start();
+            //this.worker4Thread.Start();
+
+            this.GetGbdData();
         }
 
         /// <summary>
@@ -833,6 +866,90 @@ namespace Gbdx.Gbd
             }
         }
 
+        private void GetGbdData()
+        {
+            var restClient = new RestClient("https://geobigdata.io");
+
+            while (this.workQueue.Count > 0)
+            {
+                var polygon = (GbdPolygon) this.workQueue.Dequeue();
+
+                var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
+                request.AddHeader("Authorization", "Bearer " + this.token);
+                request.AddHeader("Content-Type", "application/json");
+
+                var searchObject = new GbdSearchObject{searchAreaWkt = polygon.ToString()};
+                searchObject.types.Add("Acquisition");
+
+                var serializedString = JsonConvert.SerializeObject(searchObject);
+
+                request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
+
+                restClient.ExecuteAsync<List<GbdResponse>>(
+                    request, this.ProcessGbdSearchResult);
+            }
+        }
+
+        private void ProcessGbdSearchResult(IRestResponse<List<GbdResponse>> resp)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            if (resp.Data != null)
+            {
+                // Create data table in the thread to be mereged later
+                var dt = this.CreateDataTable();
+                var responses = new Dictionary<string, Properties>();
+
+                // go through all the results and add valid rows to the temporary table.
+                foreach (var gbdResponse in resp.Data)
+                {
+                    if (gbdResponse.results == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var item in gbdResponse.results)
+                    {
+                        try
+                        {
+                            // Currently if we don't have a catalog ID for the item let's omit it from the results.
+                            if (string.IsNullOrEmpty(item.properties.catalogID))
+                            {
+                                continue;
+                            }
+
+                            item.properties.Points = GbdJarvis.GetPointsFromWkt(item.properties.footprintWkt);
+
+                            // If the dictionary doesn't have the response lets add it.
+                            if (!responses.ContainsKey(item.properties.catalogID))
+                            {
+                                responses.Add(item.properties.catalogID, item.properties);
+                            }
+
+                            // setup new row for datatable complete with VALUES!
+                            var row = dt.NewRow();
+                            row["Catalog ID"] = item.properties.catalogID;
+                            row["Sensor"] = item.properties.sensorPlatformName;
+                            row["Acquired"] = Convert.ToDateTime(item.properties.timestamp);
+                            row["Cloud Cover"] = Convert.ToDouble(item.properties.cloudCover);
+                            row["Off Nadir Angle"] = Convert.ToDouble(item.properties.offNadirAngle);
+                            row["Sun Elevation"] = Convert.ToDouble(item.properties.sunElevation);
+                            row["Pan Resolution"] = Convert.ToDouble(item.properties.panResolution);
+
+                            dt.Rows.Add(row);
+                        }
+                        catch (Exception error)
+                        {
+                            Jarvis.Logger.Error(error);
+                        }
+                    }
+                }
+
+                // Now all the work has been completed so lets do a callback to the main thread to merge it with the existing results.
+                this.Invoke(new DataTableDone(this.UpdateDataTable), dt, responses);
+            }
+        }
+
         /// <summary>
         /// The thread work.
         /// </summary>
@@ -845,7 +962,7 @@ namespace Gbdx.Gbd
                     // while ok to work variable is true and we have work to do RUN!
 
                     // perform a thread safe call to dequeue a worker from the queue.
-                    var polygon = (GbdPolygon)Queue.Synchronized(this.workQueue).Dequeue();
+                    var polygon = (GbdPolygon) Queue.Synchronized(this.workQueue).Dequeue();
 
                     // Dictionary to hold the Properties
                     var responses = new Dictionary<string, Properties>();
@@ -2110,6 +2227,25 @@ namespace Gbdx.Gbd
         }
 
         #endregion
+
+        private void dataGridView1_RowPostPaint(object sender, DataGridViewRowPostPaintEventArgs e)
+        {
+            var idahoId = dataGridView1.Rows[e.RowIndex].Cells["IDAHO ID"].Value.ToString();
+
+            if (idahoId.Equals(string.Empty))
+            {
+                //DataGridViewCell cell = dataGridView1.Rows[e.RowIndex].Cells["Pan"];
+                //DataGridViewCheckBoxCell chkCell = cell as DataGridViewCheckBoxCell;
+                //chkCell.Value = false;
+                //chkCell.FlatStyle = FlatStyle.Flat;
+                //chkCell.Style.ForeColor = Color.DarkGray;
+                //cell.ReadOnly = true;
+
+                this.dataGridView1.Rows[e.RowIndex].Cells["Pan"].Style.BackColor = Color.LightGray;
+                this.dataGridView1.Rows[e.RowIndex].Cells["Pan"].ReadOnly = true;
+
+            }
+        }
 
         #endregion
 
