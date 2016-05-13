@@ -836,6 +836,28 @@ namespace Gbdx.Gbd
             }
         }
 
+        private void GetIdahoIds(List<GbdPolygon> polygons, string authToken)
+        {
+            var restClient = new RestClient("https://geobigdata.io");
+
+            foreach (var polygon in polygons)
+            {
+                var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
+                request.AddHeader("Authorization", "Bearer " + authToken);
+                request.AddHeader("Content-Type", "application/json");
+
+                var searchObject = new GbdSearchObject {searchAreaWkt = polygon.ToString()};
+                searchObject.types.Add("IDAHOImage");
+
+                var serializedString = JsonConvert.SerializeObject(searchObject);
+
+                request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
+
+                //restClient.ExecuteAsync()
+
+            }
+        }
+
         /// <summary>
         /// The setup threads.
         /// </summary>
