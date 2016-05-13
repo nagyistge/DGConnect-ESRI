@@ -51,7 +51,6 @@
     <Compile Include="DataGridViewCheckBoxHeaderCellEventArgs.cs" />
     <Compile Include="Gbd.Catalog.Response\Acquisition.cs" />
     <Compile Include="Gbd.Catalog.Response\GbdResponse.cs" />
-    <Compile Include="Gbd.Catalog.Response\IdahoImageSearchResponse.cs" />
     <Compile Include="Gbd.Catalog.Response\Include.cs" />
     <Compile Include="Gbd.Catalog.Response\InEdges.cs" />
     <Compile Include="Gbd.Catalog.Response\OrderedAsPartOf.cs" />

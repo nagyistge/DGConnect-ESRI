@@ -853,8 +853,31 @@ namespace Gbdx.Gbd
 
                 request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
 
-                //restClient.ExecuteAsync()
+                restClient.ExecuteAsync<List<GbdResponse>>(
+                    request,
+                    resp =>
+                        {
+                            Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
+
+                        });
+
+            }
+        }
+
+        private void IdahoImageTableUpdate(List<GbdResponse> responses)
+        {
+            foreach (var resp in responses)
+            {
+                var results = resp.results;
+
+                if (results != null)
+                {
+                    foreach (var result in results)
+                    {
+                        //result.properties.nativeTileFileFormat
+                    }
+                }
             }
         }
 
