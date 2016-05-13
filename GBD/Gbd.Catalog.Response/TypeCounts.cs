@@ -37,6 +37,8 @@ namespace GBD
         /// <summary>
         /// Gets or sets the landsat acquisition.
         /// </summary>
-        public int LandsatAcquisition { get; set; } 
+        public int LandsatAcquisition { get; set; }
+        
+        public int IDAHOImage { get; set; }
     }
 }

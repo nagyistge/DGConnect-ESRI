@@ -28,7 +28,7 @@ namespace GBD
     /// The properties.
     /// </summary>
     [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Reviewed.")]
-    public class Properties
+    public partial class Properties
     {
         /// <summary>
         /// Gets or sets the pan resolution.
@@ -129,5 +129,36 @@ namespace GBD
         /// Gets or sets the points.
         /// </summary>
         public List<GbdPoint> Points { get; set; }
+
+        public string numXTiles { get; set; }
+        public string tilePartition { get; set; }
+        public string profileName { get; set; }
+        public string acquisitionDate { get; set; }
+        public string pniirs { get; set; }
+        public string tileYOffset { get; set; }
+        public string nativeTileFileFormat { get; set; }
+        public string imageBoundsWGS84 { get; set; }
+        public string colorInterpretation { get; set; }
+        public string vendorDatasetIdentifier1 { get; set; }
+        public string vendorDatasetIdentifier2 { get; set; }
+        public string vendorDatasetIdentifier3 { get; set; }
+        public string vendorDatasetIdentifier4 { get; set; }
+        public string tileXSize { get; set; }
+        public string imageWidth { get; set; }
+        public string imageId { get; set; }
+        public string sensorName { get; set; }
+        public string groundSampleDistanceMeters { get; set; }
+        public string dataType { get; set; }
+        public string tileYSize { get; set; }
+        public string tileXOffset { get; set; }
+        public string tileBucketName { get; set; }
+        public string version { get; set; }
+        public string imageHeight { get; set; }
+        public string numBands { get; set; }
+        public string satAzimuth { get; set; }
+        public string vendorDatasetIdentifier { get; set; }
+        public string numYTiles { get; set; }
+        public string satElevation { get; set; }
+        public string imageBucketName { get; set; }
     }
 }
