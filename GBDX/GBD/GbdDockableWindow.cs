@@ -844,7 +844,7 @@ namespace Gbdx.Gbd
                 request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
 
                 restClient.ExecuteAsync<List<GbdResponse>>(
-                    request, this.ProcessGbdSearchResult);
+                    request, resp => this.ProcessGbdSearchResult(resp,polygons, this.token));
             }
         }
 
@@ -905,13 +905,16 @@ namespace Gbdx.Gbd
                         continue;
                     }
 
-                    row["IDAHO ID"] = idahoId;
-
-                    int rowIndex = -1;
                     var dataGridRow =
                         this.dataGridView1.Rows
                             .Cast<DataGridViewRow>()
                             .First(r => r.Cells["Catalog ID"].Value.ToString().Equals(gbdId));
+
+                    SetImageryCheckbox("PAN ID", "PAN", dataGridRow);
+                    SetImageryCheckbox("MS ID", "MS", dataGridRow);
+                
+
+
 
 
 
@@ -965,7 +968,7 @@ namespace Gbdx.Gbd
             }
         }
 
-        private void ProcessGbdSearchResult(IRestResponse<List<GbdResponse>> resp)
+        private void ProcessGbdSearchResult(IRestResponse<List<GbdResponse>> resp, List<GbdPolygon> polygons, string authToken)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
