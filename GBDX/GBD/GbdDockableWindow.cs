@@ -340,22 +340,33 @@ namespace Gbdx.Gbd
         private void DataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
         {
             var row = this.dataGridView1.Rows[e.RowIndex];
-            string idahoId = string.Empty;
+
+            SetImageryCheckbox("PAN ID", "PAN", row);
+            SetImageryCheckbox("MS ID", "MS", row);
+        }
+
+
+        private void SetImageryCheckbox(string idName, string checkboxName, DataGridViewRow row)
+        {
             try
             {
-                idahoId = row.Cells["IDAHO ID"].Value.ToString();
-            }
-            catch
-            {
-                idahoId = string.Empty;
-            }
+                var id = row.Cells[idName].Value.ToString();
+                var cell = (DataGridViewDisableCheckBoxCell)row.Cells[checkboxName];
+                
+                if (!string.IsNullOrEmpty(id))
+                {
+                    cell.Enabled = true;
+                }
+                else
+                {
+                    cell.Enabled = false;
+                }
 
-            if (idahoId.Equals(string.Empty))
-            {
-                var panCell = (DataGridViewDisableCheckBoxCell) row.Cells["Pan"];
-                panCell.Enabled = false;
             }
-
+            catch (Exception e)
+            {
+                Jarvis.Logger.Error(e);
+            }
         }
 
         /// <summary>
@@ -414,7 +425,7 @@ namespace Gbdx.Gbd
         {
             var dt = new DataTable();
             dt.Columns.Add(new DataColumn("Selected", typeof(bool)) { ReadOnly = false, DefaultValue = false });
-            dt.Columns.Add(new DataColumn("Pan", typeof(bool)) { ReadOnly = false, DefaultValue = false, });
+            dt.Columns.Add(new DataColumn("PAN", typeof(bool)) { ReadOnly = false, DefaultValue = false, });
             dt.Columns.Add(new DataColumn("MS", typeof(bool)) { ReadOnly = false, DefaultValue = false });
             dt.Columns.Add(new DataColumn("Catalog ID", typeof(string)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Sensor", typeof(string)) { ReadOnly = true });
@@ -423,7 +434,8 @@ namespace Gbdx.Gbd
             dt.Columns.Add(new DataColumn("Off Nadir Angle", typeof(double)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Sun Elevation", typeof(double)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Pan Resolution", typeof(double)) { ReadOnly = true });
-            dt.Columns.Add(new DataColumn("IDAHO ID", typeof(string)) { ReadOnly = true, DefaultValue = string.Empty});
+            dt.Columns.Add(new DataColumn("PAN ID", typeof(string)) { ReadOnly = true, DefaultValue = string.Empty});
+            dt.Columns.Add(new DataColumn("MS ID", typeof(string)) { ReadOnly = true, DefaultValue = string.Empty });
 
             var primary = new DataColumn[1];
             primary[0] = dt.Columns["Catalog ID"];
@@ -871,12 +883,38 @@ namespace Gbdx.Gbd
             {
                 var results = resp.results;
 
-                if (results != null)
+                if (results == null)
                 {
-                    foreach (var result in results)
+                    continue;
+                }
+
+                foreach (var result in results)
+                {
+                    var gbdId = result.properties.vendorDatasetIdentifier3;
+                    var idahoId = result.properties.imageId;
+                    // if there isn't an id don't continue
+                    if (string.IsNullOrEmpty(gbdId) || string.IsNullOrEmpty(idahoId))
                     {
-                        //result.properties.nativeTileFileFormat
+                        continue;
                     }
+                    DataRow row = this.localDatatable.Rows.Find(gbdId);
+
+                    // if the row is null... don't continue
+                    if (row == null)
+                    {
+                        continue;
+                    }
+
+                    row["IDAHO ID"] = idahoId;
+
+                    int rowIndex = -1;
+                    var dataGridRow =
+                        this.dataGridView1.Rows
+                            .Cast<DataGridViewRow>()
+                            .First(r => r.Cells["Catalog ID"].Value.ToString().Equals(gbdId));
+
+
+
                 }
             }
         }
