@@ -46,6 +46,7 @@ namespace Gbdx.Gbd
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Framework;
     using ESRI.ArcGIS.Geometry;
+    using ESRI.ArcGIS.GISClient;
 
     using GBD;
 
@@ -254,7 +255,8 @@ namespace Gbdx.Gbd
 
             this.localDatatable = this.CreateDataTable();
 
-            this.dataGridView1.RowsAdded += DataGridView1_RowsAdded;
+            this.dataGridView1.CellFormatting += DataGridView1_CellFormatting;
+            this.dataGridView1.CellContentClick += DataGridView1_CellContentClick;
 
             this.workQueue = Queue.Synchronized(new Queue());
             this.dataView = new DataView(this.localDatatable);
@@ -335,16 +337,121 @@ namespace Gbdx.Gbd
                 this.gbdOrderList = this.LoadGbdOrdersFromFile(this.filePath);
                 UpdateOrderTable(this.gbdOrderList, ref this.orderTable);
             }
+
+            this.MouseLeave += GbdDockableWindow_MouseLeave;
+            this.dataGridView1.MouseLeave += GbdDockableWindow_MouseLeave;
         }
 
-        private void DataGridView1_RowsAdded(object sender, DataGridViewRowsAddedEventArgs e)
+        private void GbdDockableWindow_MouseLeave(object sender, EventArgs e)
         {
-            var row = this.dataGridView1.Rows[e.RowIndex];
-
-            SetImageryCheckbox("PAN ID", "PAN", row);
-            SetImageryCheckbox("MS ID", "MS", row);
+            var graphicsContainer = (IGraphicsContainer)ArcMap.Document.ActiveView.FocusMap;
+            if (graphicsContainer != null)
+            {
+                graphicsContainer.DeleteAllElements();
+                this.DrawAoi(graphicsContainer);
+                ArcMap.Document.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, null);
+            }
         }
 
+        private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            var dgColumn = this.dataGridView1.Columns[e.ColumnIndex];
+
+            if (dgColumn.Name == "PAN" || dgColumn.Name == "MS")
+            {
+                var row = this.dataGridView1.Rows[e.RowIndex];
+                string idahoId = string.Empty;
+
+                // Get the proper ID number associated
+                if (dgColumn.Name == "PAN")
+                {
+                    idahoId = row.Cells["PAN ID"].Value.ToString();
+                }
+                else if (dgColumn.Name == "MS")
+                {
+                    idahoId = row.Cells["MS ID"].Value.ToString();
+                }
+                
+                Jarvis.Logger.Info(idahoId);
+                AddIdahoWMS(idahoId);
+            }
+        }
+
+        private void AddIdahoWMS(string idahoId)
+        {
+            try
+            {
+                var wmsMapLayer = new WMSMapLayerClass();
+                //create and configure wms connection name, this is used to store the connection properties
+                IWMSConnectionName pConnName = new WMSConnectionNameClass();
+                IPropertySet propSet = new PropertySetClass();
+                propSet.SetProperty("URL", string.Format("http://idahodev.geobigdata.io/v1/wms/idaho-images/{0}/{1}/mapserv?", idahoId, this.token));
+                pConnName.ConnectionProperties = propSet;
+
+                //uses the name information to connect to the service
+                IDataLayer dataLayer = (IDataLayer)wmsMapLayer;
+
+                try
+                {
+                    dataLayer.Connect((IName)pConnName);
+                }
+                catch (Exception e)
+                {
+                    Jarvis.Logger.Error("Problems connecting to WMS: " + e.Message);
+                }
+
+                IWMSServiceDescription serviceDesc = wmsMapLayer.IWMSGroupLayer_WMSServiceDescription;
+            
+                ILayer newLayer = null;
+                ILayer wmsLayer = null;
+                for (int i = 0; (i <= (serviceDesc.LayerDescriptionCount - 1)); i++)
+                {
+                    IWMSLayerDescription layerDesc;
+                    layerDesc = serviceDesc.get_LayerDescription(i);
+                    Jarvis.Logger.Info("Layer Description Count == "+layerDesc.LayerDescriptionCount);
+                    if ((layerDesc.LayerDescriptionCount == 0))
+                    {
+                        IWMSLayer newWMSLayer;
+                    newWMSLayer = wmsMapLayer.CreateWMSLayer(layerDesc);
+                    newLayer = (ILayer)newWMSLayer;
+                        //ArcMap.Document.AddLayer(newLayer);
+                    }
+                    else
+                    {
+                        IWMSGroupLayer grpLayer;
+                        grpLayer = wmsMapLayer.CreateWMSGroupLayers(layerDesc);
+                        for (int j = 0; (j <= (grpLayer.Count - 1)); j++)
+                        {
+                            newLayer = (ILayer)grpLayer.get_Layer(j);
+                            wmsMapLayer.InsertLayer(newLayer, 0); //INSERT POSITION 0, THE VERY TOP LAYER
+                            wmsLayer = (ILayer)wmsMapLayer;
+                            wmsMapLayer.Name = serviceDesc.WMSTitle;
+                        }
+                    }
+                }
+                ArcMap.Document.AddLayer(wmsLayer);
+            }
+            catch (Exception e)
+            {
+                Jarvis.Logger.Error(e);
+            }
+        }
+
+        /// <summary>
+        /// Everytime the cells format the imagery checkbox will update as well to ensure the row stays in sync correctly.  Event Handling code prevents
+        /// rows that don't have IDAHO ID's from being able to have a clickable checkbox.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DataGridView1_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            foreach (DataGridViewRow row in this.dataGridView1.Rows)
+            {
+                SetImageryCheckbox("PAN ID", "PAN", row);
+                SetImageryCheckbox("MS ID", "MS", row);
+
+            }
+        }
 
         private void SetImageryCheckbox(string idName, string checkboxName, DataGridViewRow row)
         {
@@ -436,8 +543,8 @@ namespace Gbdx.Gbd
             dt.Columns.Add(new DataColumn("Off Nadir Angle", typeof(double)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Sun Elevation", typeof(double)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Pan Resolution", typeof(double)) { ReadOnly = true });
-            dt.Columns.Add(new DataColumn("PAN ID", typeof(string)) { ReadOnly = true, DefaultValue = string.Empty });
-            dt.Columns.Add(new DataColumn("MS ID", typeof(string)) { ReadOnly = true, DefaultValue = string.Empty });
+            dt.Columns.Add(new DataColumn("PAN ID", typeof(string)) { ReadOnly = false, DefaultValue = string.Empty });
+            dt.Columns.Add(new DataColumn("MS ID", typeof(string)) { ReadOnly = false, DefaultValue = string.Empty });
 
             var primary = new DataColumn[1];
             primary[0] = dt.Columns["Catalog ID"];
@@ -840,6 +947,7 @@ namespace Gbdx.Gbd
 
                 var searchObject = new GbdSearchObject { searchAreaWkt = polygon.ToString() };
                 searchObject.types.Add("Acquisition");
+                searchObject.types.Add("IDAHOImage");
 
                 var serializedString = JsonConvert.SerializeObject(searchObject);
 
@@ -1004,31 +1112,98 @@ namespace Gbdx.Gbd
                     {
                         try
                         {
-                            // Currently if we don't have a catalog ID for the item let's omit it from the results.
+                            string catalogId = null;
                             if (string.IsNullOrEmpty(item.properties.catalogID))
+                            {
+                                if (!string.IsNullOrEmpty(item.properties.vendorDatasetIdentifier3))
+                                {
+                                    catalogId = item.properties.vendorDatasetIdentifier3;
+                                }
+                            }
+                            else
+                            {
+                                catalogId = item.properties.catalogID;
+                            }
+
+                            // if after checking both 
+                            if (string.IsNullOrEmpty(catalogId))
                             {
                                 continue;
                             }
 
-                            item.properties.Points = GbdJarvis.GetPointsFromWkt(item.properties.footprintWkt);
-
-                            // If the dictionary doesn't have the response lets add it.
-                            if (!responses.ContainsKey(item.properties.catalogID))
+                            if (item.properties.footprintWkt != null)
                             {
-                                responses.Add(item.properties.catalogID, item.properties);
+                                item.properties.Points = GbdJarvis.GetPointsFromWkt(item.properties.footprintWkt);
                             }
 
-                            // setup new row for datatable complete with VALUES!
-                            var row = dt.NewRow();
-                            row["Catalog ID"] = item.properties.catalogID;
-                            row["Sensor"] = item.properties.sensorPlatformName;
-                            row["Acquired"] = Convert.ToDateTime(item.properties.timestamp);
-                            row["Cloud Cover"] = Convert.ToDouble(item.properties.cloudCover);
-                            row["Off Nadir Angle"] = Convert.ToDouble(item.properties.offNadirAngle);
-                            row["Sun Elevation"] = Convert.ToDouble(item.properties.sunElevation);
-                            row["Pan Resolution"] = Convert.ToDouble(item.properties.panResolution);
+                            DataRow row;
+                            // If the dictionary doesn't have the response lets add it.
+                            if (!responses.ContainsKey(catalogId))
+                            {
+                                responses.Add(catalogId, item.properties);
 
-                            dt.Rows.Add(row);
+                                // setup new row for datatable complete with VALUES!
+                                row = dt.NewRow();
+                                row["Catalog ID"] = catalogId;
+                                if (!string.IsNullOrEmpty(item.properties.sensorPlatformName))
+                                {
+                                    row["Sensor"] = item.properties.sensorPlatformName;
+                                }
+
+                                if (!string.IsNullOrEmpty(item.properties.timestamp))
+                                {
+                                    row["Acquired"] = Convert.ToDateTime(item.properties.timestamp);
+                                }
+
+                                if (!string.IsNullOrEmpty(item.properties.cloudCover))
+                                {
+                                    row["Cloud Cover"] = Convert.ToDouble(item.properties.cloudCover);
+                                }
+
+                                if (!string.IsNullOrEmpty(item.properties.offNadirAngle))
+                                {
+                                    row["Off Nadir Angle"] = Convert.ToDouble(item.properties.offNadirAngle);
+                                }
+
+                                if (!string.IsNullOrEmpty(item.properties.sunElevation))
+                                {
+                                    row["Sun Elevation"] = Convert.ToDouble(item.properties.sunElevation);
+                                }
+
+                                if (!string.IsNullOrEmpty(item.properties.panResolution))
+                                {
+                                    row["Pan Resolution"] = Convert.ToDouble(item.properties.panResolution);
+                                }
+                                dt.Rows.Add(row);
+                            }
+                            else
+                            {
+                                row = dt.Rows.Find(catalogId);
+
+                                // no need to go further if the row isn't found
+                                if (row == null)
+                                {
+                                    continue;
+                                }
+
+                                var imageId = item.properties.imageId;
+
+                                if (!string.IsNullOrEmpty(imageId))
+                                {
+                                    if (!string.IsNullOrEmpty(item.properties.colorInterpretation))
+                                    {
+                                        if (item.properties.colorInterpretation.Equals("PAN"))
+                                        {
+                                            row["PAN ID"] = imageId;
+                                        }
+                                        else if (item.properties.colorInterpretation.Equals("WORLDVIEW_8_BAND"))
+                                        {
+                                            row["MS ID"] = imageId;
+                                        }
+                                    }
+                                }
+                            }
+                            
                         }
                         catch (Exception error)
                         {
@@ -1039,8 +1214,6 @@ namespace Gbdx.Gbd
 
                 // Now all the work has been completed so lets do a callback to the main thread to merge it with the existing results.
                 this.Invoke(new DataTableDone(this.UpdateDataTable), dt, responses);
-
-                this.GetIdahoIds(polygon, authToken);
             }
         }
 
@@ -2229,7 +2402,10 @@ namespace Gbdx.Gbd
         /// </param>
         private void DrawAoi(IGraphicsContainer graphicContainer)
         {
-            graphicContainer.AddElement(this.localElement, 0);
+            if(this.localElement != null)
+            {
+                graphicContainer.AddElement(this.localElement, 0);
+            }
         }
 
         /// <summary>
