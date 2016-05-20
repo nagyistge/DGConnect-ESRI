@@ -217,7 +217,7 @@ namespace Gbdx.Gbd
 
         #endregion
 
-        
+
         /// <summary>
         /// Initializes a new instance of the <see cref="GbdDockableWindow"/> class.
         /// </summary>
@@ -352,7 +352,7 @@ namespace Gbdx.Gbd
             {
                 var id = row.Cells[idName].Value.ToString();
                 var cell = (DataGridViewDisableCheckBoxCell)row.Cells[checkboxName];
-                
+
                 if (!string.IsNullOrEmpty(id))
                 {
                     cell.Enabled = true;
@@ -402,6 +402,8 @@ namespace Gbdx.Gbd
 
         private delegate void ExecuteAfterResponse(List<GbdOrder> orders);
 
+        private delegate void UpdateImageryCheckbox(string id, string name, DataGridViewRow row);
+
         /// <summary>
         /// Callback to update the order status.  Will be fired from a background thread
         /// </summary>
@@ -434,7 +436,7 @@ namespace Gbdx.Gbd
             dt.Columns.Add(new DataColumn("Off Nadir Angle", typeof(double)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Sun Elevation", typeof(double)) { ReadOnly = true });
             dt.Columns.Add(new DataColumn("Pan Resolution", typeof(double)) { ReadOnly = true });
-            dt.Columns.Add(new DataColumn("PAN ID", typeof(string)) { ReadOnly = true, DefaultValue = string.Empty});
+            dt.Columns.Add(new DataColumn("PAN ID", typeof(string)) { ReadOnly = true, DefaultValue = string.Empty });
             dt.Columns.Add(new DataColumn("MS ID", typeof(string)) { ReadOnly = true, DefaultValue = string.Empty });
 
             var primary = new DataColumn[1];
@@ -505,7 +507,7 @@ namespace Gbdx.Gbd
                 var dataGridViewColumn = this.dataGridView1.Columns["Selected"];
                 if (dataGridViewColumn != null)
                 {
-                    var chkBox = (DataGridViewCheckBoxHeaderCell) dataGridViewColumn.HeaderCell;
+                    var chkBox = (DataGridViewCheckBoxHeaderCell)dataGridViewColumn.HeaderCell;
 
                     if (chkBox.isChecked)
                     {
@@ -812,7 +814,7 @@ namespace Gbdx.Gbd
 
             return stringBuilder.ToString();
         }
-        
+
         #endregion
 
         #region Thread Methods
@@ -836,7 +838,7 @@ namespace Gbdx.Gbd
                 request.AddHeader("Authorization", "Bearer " + this.token);
                 request.AddHeader("Content-Type", "application/json");
 
-                var searchObject = new GbdSearchObject {searchAreaWkt = polygon.ToString()};
+                var searchObject = new GbdSearchObject { searchAreaWkt = polygon.ToString() };
                 searchObject.types.Add("Acquisition");
 
                 var serializedString = JsonConvert.SerializeObject(searchObject);
@@ -844,42 +846,37 @@ namespace Gbdx.Gbd
                 request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
 
                 restClient.ExecuteAsync<List<GbdResponse>>(
-                    request, resp => this.ProcessGbdSearchResult(resp,polygons, this.token));
+                    request, resp => this.ProcessGbdSearchResult(resp, polygon.ToString(), this.token));
             }
         }
 
-        private void GetIdahoIds(List<GbdPolygon> polygons, string authToken)
+        private void GetIdahoIds(string polygon, string authToken)
         {
             var restClient = new RestClient("https://geobigdata.io");
 
-            foreach (var polygon in polygons)
-            {
-                var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
-                request.AddHeader("Authorization", "Bearer " + authToken);
-                request.AddHeader("Content-Type", "application/json");
+            var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
+            request.AddHeader("Authorization", "Bearer " + authToken);
+            request.AddHeader("Content-Type", "application/json");
 
-                var searchObject = new GbdSearchObject {searchAreaWkt = polygon.ToString()};
-                searchObject.types.Add("IDAHOImage");
+            var searchObject = new GbdSearchObject { searchAreaWkt = polygon };
+            searchObject.types.Add("IDAHOImage");
 
-                var serializedString = JsonConvert.SerializeObject(searchObject);
+            var payload = JsonConvert.SerializeObject(searchObject);
 
-                request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
+            request.AddParameter("application/json", payload, ParameterType.RequestBody);
 
-                restClient.ExecuteAsync<List<GbdResponse>>(
-                    request,
-                    resp =>
-                        {
-                            Jarvis.Logger.Info(resp.ResponseUri.ToString());
-
-
-                        });
-
-            }
+            restClient.ExecuteAsync<List<GbdResponse>>(request, this.IdahoImageTableUpdate);
         }
 
-        private void IdahoImageTableUpdate(List<GbdResponse> responses)
+        private void IdahoImageTableUpdate(IRestResponse<List<GbdResponse>> response)
         {
-            foreach (var resp in responses)
+            if (response.ResponseUri == null)
+            {
+                Jarvis.Logger.Info("Response was null so nothing was logged ");
+                return;
+            }
+            Jarvis.Logger.Info(response.ResponseUri.ToString());
+            foreach (var resp in response.Data)
             {
                 var results = resp.results;
 
@@ -905,22 +902,31 @@ namespace Gbdx.Gbd
                         continue;
                     }
 
-                    var dataGridRow =
-                        this.dataGridView1.Rows
-                            .Cast<DataGridViewRow>()
-                            .First(r => r.Cells["Catalog ID"].Value.ToString().Equals(gbdId));
+                    var dataGridView = this.dataGridView1;
+                    if (dataGridView != null)
+                    {
+                        try
+                        {
+                            var dataGridRow = dataGridView.Rows
+                                .Cast<DataGridViewRow>()
+                                .First(r => r.Cells["Catalog ID"].Value.ToString().Equals(gbdId));
 
-                    SetImageryCheckbox("PAN ID", "PAN", dataGridRow);
-                    SetImageryCheckbox("MS ID", "MS", dataGridRow);
-                
-
-
-
-
-
+                            if (dataGridRow != null)
+                            {
+                                // Now all the work has been completed so lets do a callback to the main thread to merge it with the existing results.
+                                this.Invoke(new UpdateImageryCheckbox(this.SetImageryCheckbox), "PAN ID", "PAN", dataGridRow);
+                                this.Invoke(new UpdateImageryCheckbox(this.SetImageryCheckbox), "MS ID", "MS", dataGridRow);
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Jarvis.Logger.Error(e);
+                        }
+                    }
                 }
             }
         }
+
 
         /// <summary>
         /// The setup threads.
@@ -968,9 +974,17 @@ namespace Gbdx.Gbd
             }
         }
 
-        private void ProcessGbdSearchResult(IRestResponse<List<GbdResponse>> resp, List<GbdPolygon> polygons, string authToken)
+        private void ProcessGbdSearchResult(IRestResponse<List<GbdResponse>> resp, string polygon, string authToken)
         {
-            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            try
+            {
+                Jarvis.Logger.Info(resp.ResponseUri.ToString());
+            }
+            catch (Exception e)
+            {
+                Jarvis.Logger.Error(e);
+            }
 
             if (resp.Data != null)
             {
@@ -1025,6 +1039,8 @@ namespace Gbdx.Gbd
 
                 // Now all the work has been completed so lets do a callback to the main thread to merge it with the existing results.
                 this.Invoke(new DataTableDone(this.UpdateDataTable), dt, responses);
+
+                this.GetIdahoIds(polygon, authToken);
             }
         }
 
@@ -1040,7 +1056,7 @@ namespace Gbdx.Gbd
                     // while ok to work variable is true and we have work to do RUN!
 
                     // perform a thread safe call to dequeue a worker from the queue.
-                    var polygon = (GbdPolygon) Queue.Synchronized(this.workQueue).Dequeue();
+                    var polygon = (GbdPolygon)Queue.Synchronized(this.workQueue).Dequeue();
 
                     // Dictionary to hold the Properties
                     var responses = new Dictionary<string, Properties>();
@@ -1590,20 +1606,20 @@ namespace Gbdx.Gbd
                 this.asyncHandle = this.client.ExecuteAsync(
                     request,
                     response =>
+                    {
+                        if (response.RawBytes == null)
                         {
-                            if (response.RawBytes == null)
-                            {
-                                return;
-                            }
+                            return;
+                        }
 
-                            var ms = new MemoryStream(response.RawBytes);
-                            var returnImage = Image.FromStream(ms);
-                            this.thumbnailPictureBox.Image = returnImage;
-                            if (!this.cachedImages.ContainsKey(catId))
-                            {
-                                this.cachedImages.Add(catId, returnImage);
-                            }
-                        });
+                        var ms = new MemoryStream(response.RawBytes);
+                        var returnImage = Image.FromStream(ms);
+                        this.thumbnailPictureBox.Image = returnImage;
+                        if (!this.cachedImages.ContainsKey(catId))
+                        {
+                            this.cachedImages.Add(catId, returnImage);
+                        }
+                    });
             }
         }
 
