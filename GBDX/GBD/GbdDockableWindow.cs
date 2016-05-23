@@ -621,15 +621,16 @@ namespace Gbdx.Gbd
             var row = this.dataGridView1.Rows[e.RowIndex];
             var idahoId = string.Empty;
 
-            //var clickedCell = (DataGridViewCheckBoxCell)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            var clickedCell = (DataGridViewCheckBoxCell)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
 
 
+            var value = (bool)clickedCell.EditingCellFormattedValue;
 
-            //// try to prevent a user from "double loading" the idao wms layers by unchecking a checkbox.
-            //if (!value)
-            //{
-            //    return true;
-            //}
+            // try to prevent a user from "double loading" the idao wms layers by unchecking a checkbox.
+            if (!value)
+            {
+                return true;
+            }
             
             // Get the proper ID number associated
             if (dgColumn.Name == "PAN")
