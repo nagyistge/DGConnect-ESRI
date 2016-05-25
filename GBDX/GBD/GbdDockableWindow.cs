@@ -210,6 +210,8 @@ namespace Gbdx.Gbd
         /// </summary>
         private Thread statusUpdateThread;
 
+        private readonly Dictionary<string, string> usedIdahoIds;
+
         /// <summary>
         ///     Worker thread being used to get the meta data from GBD
         /// </summary>
@@ -273,7 +275,7 @@ namespace Gbdx.Gbd
 
             this.localDatatable = this.CreateDataTable();
 
-            this.dataGridView1.CellFormatting += this.DataGridView1CellFormatting;
+            this.dataGridView1.CellFormatting += this.EventHandlerCellFormatting;
 
             this.workQueue = Queue.Synchronized(new Queue());
             this.dataView = new DataView(this.localDatatable);
@@ -315,7 +317,7 @@ namespace Gbdx.Gbd
             this.userSelectedPolygons = new HashSet<string>();
 
             this.dataGridView1.CellContentClick += this.EventHandlerCellContentClick;
-
+            this.usedIdahoIds = new Dictionary<string, string>();
             try
             {
                 this.cbHeader = new DataGridViewCheckBoxHeaderCell();
@@ -392,7 +394,7 @@ namespace Gbdx.Gbd
         ///     Add WMS layer to arcmap based on the iaho id
         /// </summary>
         /// <param name="idahoId"></param>
-        private void AddIdahoWms(string idahoId)
+        private void AddIdahoWms(string idahoId, string catalogId)
         {
             try
             {
@@ -436,15 +438,15 @@ namespace Gbdx.Gbd
                     var grpLayer = wmsMapLayer.CreateWMSGroupLayers(layerDesc);
                     for (var j = 0; j <= grpLayer.Count - 1; j++)
                     {
-                        var newLayer = grpLayer.Layer[j];
-                        wmsMapLayer.InsertLayer(newLayer, 0);
                         wmsLayer = wmsMapLayer;
-                        wmsMapLayer.Name = serviceDesc.WMSTitle;
+                        wmsMapLayer.Name = "CAT ID: " + catalogId;
                     }
                 }
 
-                // Now that the layer has been assembled add it to arc map to be viewed
+                // turn on sub layers, add it to arcmap and move it to top of TOC
+                SublayerVisibleOn(wmsLayer);
                 ArcMap.Document.AddLayer(wmsLayer);
+                ArcMap.Document.FocusMap.MoveLayer(wmsLayer, 0);
             }
             catch (Exception e)
             {
@@ -603,7 +605,7 @@ namespace Gbdx.Gbd
         }
 
         /// <summary>
-        /// Functionality to check if the cell clicked was related to the WMS functionality.
+        ///     Functionality to check if the cell clicked was related to the WMS functionality.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -617,21 +619,10 @@ namespace Gbdx.Gbd
             {
                 return false;
             }
-            
+
             var row = this.dataGridView1.Rows[e.RowIndex];
             var idahoId = string.Empty;
 
-            var clickedCell = (DataGridViewCheckBoxCell)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
-
-
-            var value = (bool)clickedCell.EditingCellFormattedValue;
-
-            // try to prevent a user from "double loading" the idao wms layers by unchecking a checkbox.
-            if (!value)
-            {
-                return true;
-            }
-            
             // Get the proper ID number associated
             if (dgColumn.Name == "PAN")
             {
@@ -642,8 +633,40 @@ namespace Gbdx.Gbd
                 idahoId = row.Cells["MS ID"].Value.ToString();
             }
 
-            // The idaho id has been retrieved now ON TO ADDING IT
-            this.AddIdahoWms(idahoId);
+            var catalogId = row.Cells["Catalog ID"].Value.ToString();
+
+            // check to see if there is currently a known value for idahoId.
+            if (this.usedIdahoIds.ContainsKey(idahoId))
+            {
+                var map = ArcMap.Document.FocusMap;
+
+                for (var i = 0; i < map.LayerCount; i++)
+                {
+                    var layer = map.Layer[i];
+                    if (layer == null)
+                    {
+                        continue;
+                    }
+
+                    // make sure the layer name matches
+                    if (layer.Name != "CAT ID: " + catalogId)
+                    {
+                        continue;
+                    }
+
+                    // remove layer from arcmap and id from dictionary
+                    ArcMap.Document.FocusMap.DeleteLayer(layer);
+                    this.usedIdahoIds.Remove(idahoId);
+                }
+            }
+            else
+            {
+                // add idaho id
+                this.usedIdahoIds.Add(idahoId, catalogId);
+
+                // The idaho id has been retrieved now ON TO ADDING IT
+                this.AddIdahoWms(idahoId, catalogId);
+            }
             return true;
         }
 
@@ -761,22 +784,6 @@ namespace Gbdx.Gbd
             primary[0] = dt.Columns["Order ID"];
             dt.PrimaryKey = primary;
             return dt;
-        }
-
-        /// <summary>
-        ///     Everytime the cells format the imagery checkbox will update as well to ensure the row stays in sync correctly.
-        ///     Event Handling code prevents
-        ///     rows that don't have IDAHO ID's from being able to have a clickable checkbox.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void DataGridView1CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
-        {
-            foreach (DataGridViewRow row in this.dataGridView1.Rows)
-            {
-                this.SetImageryCheckbox("PAN ID", "PAN", row);
-                this.SetImageryCheckbox("MS ID", "MS", row);
-            }
         }
 
         /// <summary>
@@ -1070,6 +1077,22 @@ namespace Gbdx.Gbd
         }
 
         /// <summary>
+        ///     Everytime the cells format the imagery checkbox will update as well to ensure the row stays in sync correctly.
+        ///     Event Handling code prevents
+        ///     rows that don't have IDAHO ID's from being able to have a clickable checkbox.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void EventHandlerCellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            foreach (DataGridViewRow row in this.dataGridView1.Rows)
+            {
+                this.SetImageryCheckbox("PAN ID", "PAN", row, this.usedIdahoIds);
+                this.SetImageryCheckbox("MS ID", "MS", row, this.usedIdahoIds);
+            }
+        }
+
+        /// <summary>
         ///     Event handler for when the export button is clicked.
         /// </summary>
         /// <param name="sender">
@@ -1274,9 +1297,10 @@ namespace Gbdx.Gbd
 
                 request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
 
+                var polygon1 = polygon;
                 restClient.ExecuteAsync<List<GbdResponse>>(
                     request,
-                    resp => this.ProcessGbdSearchResult(resp, polygon.ToString(), this.token));
+                    resp => this.ProcessGbdSearchResult(resp, polygon1.ToString(), this.token));
             }
         }
 
@@ -1928,7 +1952,11 @@ namespace Gbdx.Gbd
             }
         }
 
-        private void SetImageryCheckbox(string idName, string checkboxName, DataGridViewRow row)
+        private void SetImageryCheckbox(
+            string idName,
+            string checkboxName,
+            DataGridViewRow row,
+            Dictionary<string, string> checkedIds)
         {
             try
             {
@@ -1938,6 +1966,10 @@ namespace Gbdx.Gbd
                 if (!string.IsNullOrEmpty(id))
                 {
                     cell.Enabled = true;
+                    if (checkedIds.ContainsKey(id))
+                    {
+                        cell.EditingCellFormattedValue = true;
+                    }
                 }
                 else
                 {
@@ -1957,6 +1989,37 @@ namespace Gbdx.Gbd
         {
             this.orderTable = this.CreateOrderTable();
             this.orderDataGridView.DataSource = this.orderTable;
+        }
+
+        /// <summary>
+        ///     Recursively iterate through the layers and turn their visbility to true
+        /// </summary>
+        /// <param name="layer">layer to check for sub layers</param>
+        private static void SublayerVisibleOn(ILayer layer)
+        {
+            var compLayer = layer as ICompositeLayer;
+
+            if (compLayer == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < compLayer.Count; i++)
+            {
+                var subLayer = compLayer.Layer[i];
+
+                // turn visibility on
+                subLayer.Visible = true;
+
+                // check to see if the layer has sub-layers
+                var subComp = subLayer as ICompositeLayer;
+
+                // if there are sub layers then enable them.
+                if (subComp != null && subComp.Count > 0)
+                {
+                    SublayerVisibleOn(subComp as ILayer);
+                }
+            }
         }
 
         /// <summary>

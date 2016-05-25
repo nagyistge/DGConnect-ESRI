@@ -1,9 +1,6 @@
-﻿/*
-* Class was taken from CodeProject.com
-* http://www.codeproject.com/Articles/31829/Disabled-Checkbox-Column-in-the-DataGridView
-* 
-* Licensed Under The Code Project Open License (CPOL)
-*/
+﻿/* Arthur: Russ Wittmer
+ * Purpose is to draw a checkbox if enabled otherwise no checkbox is drawn. 
+ */
 
 using System.Drawing;
 using System.Windows.Forms;
@@ -79,21 +76,7 @@ namespace GbdxTools
                 SolidBrush cellBackground = new SolidBrush(cellStyle.BackColor);
                 graphics.FillRectangle(cellBackground, cellBounds);
                 cellBackground.Dispose();
-                PaintBorder(graphics, clipBounds, cellBounds, cellStyle, advancedBorderStyle);
-                Rectangle checkBoxArea = cellBounds;
-                Rectangle buttonAdjustment = this.BorderWidths(advancedBorderStyle);
-                checkBoxArea.X += buttonAdjustment.X;
-                checkBoxArea.Y += buttonAdjustment.Y;
-
-                checkBoxArea.Height -= buttonAdjustment.Height;
-                checkBoxArea.Width -= buttonAdjustment.Width;
-                Point drawInPoint = new Point(cellBounds.X + cellBounds.Width / 2 - 7, cellBounds.Y + cellBounds.Height / 2 - 7);
-
-                if (this.enabledValue)
-                    CheckBoxRenderer.DrawCheckBox(graphics, drawInPoint, CheckBoxState.CheckedDisabled);
-                else
-                    CheckBoxRenderer.DrawCheckBox(graphics, drawInPoint, CheckBoxState.UncheckedDisabled);
-
+                this.PaintBorder(graphics, clipBounds, cellBounds, cellStyle, advancedBorderStyle);
             }
 
         }
