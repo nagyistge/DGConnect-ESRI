@@ -205,7 +205,13 @@ namespace Gbdx.Answer_Factory
             var aoi = Jarvis.ConvertPolygonsToGeoJson(polygons);
             var newProject = new Project();
             newProject.aois.Add(aoi);
+            
+            newProject.originalGeometries.Add(aoi);
+            newProject.namedBuffers.Add(new NamedBuffer{name="original AOI", buffer = aoi});
+            
             newProject.name = this.projectNameTextbox.Text;
+
+
 
             if (this.availableRecipesCombobox.SelectedIndex != -1)
             {

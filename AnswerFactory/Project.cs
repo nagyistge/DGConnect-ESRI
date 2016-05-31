@@ -12,8 +12,8 @@
         public List<object> aois { get; set; }
         public List<RecipeConfig> recipeConfigs { get; set; } 
         //public List<string> bestIdahoIds { get; set; } 
-        //public List<string> originalGeometries { get; set; } 
-        //public List<NamedBuffer> namedBuffers { get; set; }
+        public List<object> originalGeometries { get; set; }
+        public List<NamedBuffer> namedBuffers { get; set; }
 
         public Project()
         {
@@ -25,8 +25,8 @@
             this.aois = new List<object>();
             this.recipeConfigs = new List<RecipeConfig>();
             //this.bestIdahoIds = new List<string>();
-            //this.originalGeometries = new List<string>();
-            //this.namedBuffers = new List<NamedBuffer>();
+            this.originalGeometries = new List<object>();
+            this.namedBuffers = new List<NamedBuffer>();
         }
 
         //public override string ToString()
