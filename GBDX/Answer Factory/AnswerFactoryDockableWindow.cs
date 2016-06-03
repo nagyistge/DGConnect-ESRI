@@ -230,6 +230,11 @@ namespace Gbdx.Answer_Factory
 
             projectJson = projectJson.Replace("\"aois\":[\"{\"", "\"aois\":[{\"");
             projectJson = projectJson.Replace("\"],\"recipeConfigs\"", "],\"recipeConfigs\"");
+            projectJson = projectJson.Replace("\"originalGeometries\":[\"", "\"originalGeometries\":[");
+            projectJson = projectJson.Replace("\"],\"namedBuffers\"", "],\"namedBuffers\"");
+            projectJson = projectJson.Replace("\"buffer\":\"{", "\"buffer\":{");
+            projectJson = projectJson.Replace("]]}\"}]}", "]]}}]}");
+            
             return projectJson;
         }
 
