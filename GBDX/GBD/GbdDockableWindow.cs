@@ -245,7 +245,7 @@ namespace Gbdx.Gbd
         /// <param name="hook">
         ///     The hook.
         /// </param>
-        public GbdDockableWindow(object hook)
+        public GbdDockableWindow(object hook, Dictionary<string, HashSet<string>> panIdahoRepo, Dictionary<string, HashSet<string>> msIdahoRepo, Dictionary<string, HashSet<string>> pansIdahoRepo)
         {
             // Check to make sure there are credentials for GBD account.
             if (string.IsNullOrEmpty(Settings.Default.username) || string.IsNullOrEmpty(Settings.Default.password))
@@ -271,6 +271,9 @@ namespace Gbdx.Gbd
             this.InitializeComponent();
             this.VisibleChanged += this.GbdDockableWindowVisibleChanged;
             this.Hook = hook;
+            this.panIdahoRepo = panIdahoRepo;
+            this.msIdahoRepo = msIdahoRepo;
+            this.pansIdahoRepo = pansIdahoRepo;
             GbdRelay.Instance.AoiHasBeenDrawn += this.InstanceAoiHasBeenDrawn;
 
             this.localDatatable = this.CreateDataTable();
@@ -1581,6 +1584,10 @@ namespace Gbdx.Gbd
             return output;
         }
 
+        private Dictionary<string, HashSet<string>> msIdahoRepo;
+        private Dictionary<string, HashSet<string>> pansIdahoRepo;
+
+
         private void ProcessGbdSearchResult(IRestResponse<List<GbdResponse>> resp, string polygon, string authToken)
         {
             try
@@ -1608,128 +1615,164 @@ namespace Gbdx.Gbd
 
                     foreach (var item in gbdResponse.results)
                     {
-                        try
-                        {
-                            string catalogId = null;
-                            if (string.IsNullOrEmpty(item.properties.catalogID))
-                            {
-                                if (!string.IsNullOrEmpty(item.properties.vendorDatasetIdentifier3))
-                                {
-                                    catalogId = item.properties.vendorDatasetIdentifier3;
-                                }
-                            }
-                            else
-                            {
-                                catalogId = item.properties.catalogID;
-                            }
-
-                            // if after checking both 
-                            if (string.IsNullOrEmpty(catalogId))
-                            {
-                                continue;
-                            }
-
-                            if (item.properties.footprintWkt != null)
-                            {
-                                item.properties.Points = GbdJarvis.GetPointsFromWkt(item.properties.footprintWkt);
-                            }
-
-                            DataRow row;
-                            // If the dictionary doesn't have the response lets add it.
-                            if (!responses.ContainsKey(catalogId))
-                            {
-                                responses.Add(catalogId, item.properties);
-
-                                // setup new row for datatable complete with VALUES!
-                                row = dt.NewRow();
-                                row["Catalog ID"] = catalogId;
-                                if (!string.IsNullOrEmpty(item.properties.sensorPlatformName))
-                                {
-                                    row["Sensor"] = item.properties.sensorPlatformName;
-                                }
-
-                                if (!string.IsNullOrEmpty(item.properties.timestamp))
-                                {
-                                    row["Acquired"] = Convert.ToDateTime(item.properties.timestamp);
-                                }
-
-                                if (!string.IsNullOrEmpty(item.properties.cloudCover))
-                                {
-                                    row["Cloud Cover"] = Convert.ToDouble(item.properties.cloudCover);
-                                }
-
-                                if (!string.IsNullOrEmpty(item.properties.offNadirAngle))
-                                {
-                                    row["Off Nadir Angle"] = Convert.ToDouble(item.properties.offNadirAngle);
-                                }
-
-                                if (!string.IsNullOrEmpty(item.properties.sunElevation))
-                                {
-                                    row["Sun Elevation"] = Convert.ToDouble(item.properties.sunElevation);
-                                }
-
-                                if (!string.IsNullOrEmpty(item.properties.panResolution))
-                                {
-                                    row["Pan Resolution"] = Convert.ToDouble(item.properties.panResolution);
-                                }
-                                dt.Rows.Add(row);
-                            }
-                            else
-                            {
-                                row = dt.Rows.Find(catalogId);
-
-                                // no need to go further if the row isn't found
-                                if (row == null)
-                                {
-                                    continue;
-                                }
-
-                                var imageId = item.properties.imageId;
-
-                                // if string doesn't have an imageId, doesn't have a color interp and isn't PNG format move on
-                                if (string.IsNullOrEmpty(imageId)
-                                    || string.IsNullOrEmpty(item.properties.colorInterpretation))
-                                {
-                                    continue;
-                                }
-
-                                // only add the ID's if there currently isn't one or the new ideas are of type PNG
-                                if (item.properties.colorInterpretation.Equals("PAN"))
-                                {
-                                    var currentValue = row["PAN ID"].ToString();
-
-                                    if (string.IsNullOrEmpty(currentValue)
-                                        || item.properties.nativeTileFileFormat.Equals(
-                                            "PNG",
-                                            StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        row["PAN ID"] = imageId;
-                                    }
-                                }
-                                else if (item.properties.colorInterpretation.Equals("WORLDVIEW_8_BAND"))
-                                {
-                                    var currentValue = row["MS ID"].ToString();
-
-                                    if (string.IsNullOrEmpty(currentValue)
-                                        || item.properties.nativeTileFileFormat.Equals(
-                                            "PNG",
-                                            StringComparison.OrdinalIgnoreCase))
-                                    {
-                                        row["MS ID"] = imageId;
-                                    }
-                                }
-                            }
-                        }
-                        catch (Exception error)
-                        {
-                            Jarvis.Logger.Error(error);
-                        }
+                        ProcessRow(item, dt, responses);
                     }
                 }
 
                 // Now all the work has been completed so lets do a callback to the main thread to merge it with the existing results.
                 this.Invoke(new DataTableDone(this.UpdateDataTable), dt, responses);
             }
+        }
+
+        private static void ProcessRow(Result item, DataTable dt, Dictionary<string, Properties> responses)
+        {
+            try
+            {
+                string catalogId = null;
+                if (string.IsNullOrEmpty(item.properties.catalogID))
+                {
+                    if (!string.IsNullOrEmpty(item.properties.vendorDatasetIdentifier3))
+                    {
+                        catalogId = item.properties.vendorDatasetIdentifier3;
+                    }
+                }
+                else
+                {
+                    catalogId = item.properties.catalogID;
+                }
+
+                // if after checking both 
+                if (string.IsNullOrEmpty(catalogId))
+                {
+                    return;
+                }
+
+                if (item.properties.footprintWkt != null)
+                {
+                    item.properties.Points = GbdJarvis.GetPointsFromWkt(item.properties.footprintWkt);
+                }
+
+                DataRow row;
+                // If the dictionary doesn't have the response lets add it.
+                if (!responses.ContainsKey(catalogId))
+                {
+                    responses.Add(catalogId, item.properties);
+
+                    // setup new row for datatable complete with VALUES!
+                    row = dt.NewRow();
+                    row = CreateNewRow(row, item, catalogId);
+                    dt.Rows.Add(row);
+                }
+                else
+                {
+                    row = dt.Rows.Find(catalogId);
+                    ProcessIdahoResult(row, item);
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
+        }
+
+        private static void ProcessIdahoResult(DataRow row, Result item)
+        {
+            // no need to go further if the row isn't found
+            if (row == null)
+            {
+                return;
+            }
+
+            var imageId = item.properties.imageId;
+
+            // if string doesn't have an imageId, doesn't have a color interp and isn't PNG format move on
+            if (string.IsNullOrEmpty(imageId)
+                || string.IsNullOrEmpty(item.properties.colorInterpretation))
+            {
+                return;
+            }
+
+            // only add the ID's if there currently isn't one or the new ideas are of type PNG
+            if (item.properties.colorInterpretation.Equals("PAN"))
+            {
+                var currentValue = row["PAN ID"].ToString();
+
+                if (string.IsNullOrEmpty(currentValue)
+                    || item.properties.nativeTileFileFormat.Equals(
+                        "PNG",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    row["PAN ID"] = imageId;
+                }
+            }
+            else if (item.properties.colorInterpretation.Equals("WORLDVIEW_8_BAND"))
+            {
+                var currentValue = row["MS ID"].ToString();
+
+                if (string.IsNullOrEmpty(currentValue)
+                    || item.properties.nativeTileFileFormat.Equals(
+                        "PNG",
+                        StringComparison.OrdinalIgnoreCase))
+                {
+                    row["MS ID"] = imageId;
+                }
+            }
+        }
+
+        private static void ProcessIdahoResult2(Result item, string catalogId)
+        {
+            var imageId = item.properties.imageId;
+            
+            switch (item.properties.colorInterpretation)
+            {
+                case "PAN":
+                    IdahoIdRepo.AddSinglePanId(catalogId,imageId);
+                    break;
+
+                case "WORLDVIEW_8_BAND":
+                    IdahoIdRepo.AddSingleMsId(catalogId, imageId);
+                    break;
+
+                // don't do anything if it doesn't match one of those.
+                default:
+                    break;
+            }
+        }
+
+        private static DataRow CreateNewRow(DataRow row, Result item, string catalogId)
+        {
+            // setup new row for datatable complete with VALUES!
+            row["Catalog ID"] = catalogId;
+            if (!string.IsNullOrEmpty(item.properties.sensorPlatformName))
+            {
+                row["Sensor"] = item.properties.sensorPlatformName;
+            }
+
+            if (!string.IsNullOrEmpty(item.properties.timestamp))
+            {
+                row["Acquired"] = Convert.ToDateTime(item.properties.timestamp);
+            }
+
+            if (!string.IsNullOrEmpty(item.properties.cloudCover))
+            {
+                row["Cloud Cover"] = Convert.ToDouble(item.properties.cloudCover);
+            }
+
+            if (!string.IsNullOrEmpty(item.properties.offNadirAngle))
+            {
+                row["Off Nadir Angle"] = Convert.ToDouble(item.properties.offNadirAngle);
+            }
+
+            if (!string.IsNullOrEmpty(item.properties.sunElevation))
+            {
+                row["Sun Elevation"] = Convert.ToDouble(item.properties.sunElevation);
+            }
+
+            if (!string.IsNullOrEmpty(item.properties.panResolution))
+            {
+                row["Pan Resolution"] = Convert.ToDouble(item.properties.panResolution);
+            }
+            return row;
         }
 
         /// <summary>
