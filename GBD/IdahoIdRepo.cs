@@ -34,6 +34,18 @@
             panIds.Clear();                                                                                                                                                                                                                                                                                                                         
         }
 
+        public static HashSet<string> GetMsIdahoIds(string catalogId)
+        {
+            if (!msIds.ContainsKey(catalogId)) return null;
+            return msIds[catalogId];
+        }
+
+        public static HashSet<string> GetPanIdahoIds(string catalogId)
+        {
+            if (!panIds.ContainsKey(catalogId)) return null;
+            return panIds[catalogId];
+        }
+
         public static void AddSingleMsId(string catalogId, string idahoId)
         {
             AddSingleId(catalogId, idahoId, "MS", msLockObject);

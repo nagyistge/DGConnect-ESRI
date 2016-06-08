@@ -65,6 +65,7 @@
     <Compile Include="GbdPolygon.cs" />
     <Compile Include="GbdSearchObject.cs" />
     <Compile Include="Header.cs" />
+    <Compile Include="IdahoIdRepo.cs" />
     <Compile Include="Line.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
