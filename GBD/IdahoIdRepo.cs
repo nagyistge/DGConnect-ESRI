@@ -8,10 +8,13 @@
         private static IdahoIdRepo localInstance = new IdahoIdRepo();
 
         private static Dictionary<string, HashSet<string>> msIds = new Dictionary<string, HashSet<string>>();
+
         private static Dictionary<string, HashSet<string>> panIds = new Dictionary<string, HashSet<string>>();
 
         private static object msLockObject = new object();
+
         private static object panLockObject = new object();
+
         private IdahoIdRepo()
         {
         }
@@ -31,7 +34,7 @@
 
         public static void ClearPanRepo()
         {
-            panIds.Clear();                                                                                                                                                                                                                                                                                                                         
+            panIds.Clear();
         }
 
         public static HashSet<string> GetMsIdahoIds(string catalogId)
@@ -60,25 +63,29 @@
         {
             if (colorInterp.Equals("PAN"))
             {
-                lock(lockObject)
+                lock (lockObject)
                 {
-                    if (!panIds.ContainsKey(catalogId)) return;
-
-                    if (!panIds[catalogId].Contains(idahoId))
+                    if (panIds.ContainsKey(catalogId))
                     {
                         panIds[catalogId].Add(idahoId);
+                    }
+                    else
+                    {
+                        panIds.Add(catalogId, new HashSet<string> { idahoId });
                     }
                 }
             }
             else if (colorInterp.Equals("MS"))
             {
-                lock(lockObject)
+                lock (lockObject)
                 {
-                    if (!msIds.ContainsKey(catalogId)) return;
-
-                    if (!msIds[catalogId].Contains(idahoId))
+                    if (msIds.ContainsKey(catalogId))
                     {
                         msIds[catalogId].Add(idahoId);
+                    }
+                    else
+                    {
+                        msIds.Add(catalogId, new HashSet<string> { idahoId });
                     }
                 }
             }

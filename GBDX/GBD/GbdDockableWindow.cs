@@ -245,8 +245,7 @@ namespace Gbdx.Gbd
         /// <param name="hook">
         ///     The hook.
         /// </param>
-        public GbdDockableWindow(
-            object hook)
+        public GbdDockableWindow(object hook)
         {
             // Check to make sure there are credentials for GBD account.
             if (string.IsNullOrEmpty(Settings.Default.username) || string.IsNullOrEmpty(Settings.Default.password))
@@ -391,10 +390,15 @@ namespace Gbdx.Gbd
             return output;
         }
 
-        private void AddIdahoWms2(string catalogId, string colorInterp)
+        /// <summary>
+        ///     Add all current idaho ids for a given catalog id to arcmap
+        /// </summary>
+        /// <param name="catalogId">catalog id to be added</param>
+        /// <param name="colorInterp">Kind of color interpretation.  PAN, MS</param>
+        private void AddIdahoWms(string catalogId, string colorInterp)
         {
             HashSet<string> idahoIds;
-
+            IWMSGroupLayer wmsGroupLayer = null;
             switch (colorInterp)
             {
                 case "PAN":
@@ -411,11 +415,13 @@ namespace Gbdx.Gbd
 
             if (idahoIds == null) return;
 
-            foreach (string id in idahoIds)
+            IGroupLayer groupLayer = new GroupLayerClass();
+            groupLayer.Name = colorInterp + " " + catalogId;
+            foreach (var id in idahoIds)
             {
                 var wmsMapLayer = new WMSMapLayerClass();
 
-                //create and configure wms connection name, this is used to store the connection properties
+                // create and configure wms connection name, this is used to store the connection properties
                 IWMSConnectionName pConnName = new WMSConnectionNameClass();
                 IPropertySet propSet = new PropertySetClass();
 
@@ -423,46 +429,6 @@ namespace Gbdx.Gbd
                 var idahoUrl = string.Format(
                     "http://idaho.geobigdata.io/v1/wms/idaho-images/{0}/{1}/mapserv?",
                     id,
-                    this.token);
-
-                Jarvis.Logger.Info("Adding WMS Layer to: " + idahoUrl);
-
-                // setup the arcmap connection properties
-                propSet.SetProperty("URL", idahoUrl);
-                pConnName.ConnectionProperties = propSet;
-
-                //uses the name information to connect to the service
-                IDataLayer dataLayer = wmsMapLayer;
-                try
-                {
-                    dataLayer.Connect((IName)pConnName);
-                }
-                catch (Exception e)
-                {
-                    Jarvis.Logger.Error("Problems connecting to WMS: " + e.Message);
-                }
-
-            }
-        }
-
-        /// <summary>
-        ///     Add WMS layer to arcmap based on the iaho id
-        /// </summary>
-        /// <param name="idahoId"></param>
-        private void AddIdahoWms(string idahoId, string catalogId)
-        {
-            try
-            {
-                var wmsMapLayer = new WMSMapLayerClass();
-
-                //create and configure wms connection name, this is used to store the connection properties
-                IWMSConnectionName pConnName = new WMSConnectionNameClass();
-                IPropertySet propSet = new PropertySetClass();
-
-                // create the idaho wms url
-                var idahoUrl = string.Format(
-                    "http://idaho.geobigdata.io/v1/wms/idaho-images/{0}/{1}/mapserv?",
-                    idahoId,
                     this.token);
 
                 Jarvis.Logger.Info("Adding WMS Layer to: " + idahoUrl);
@@ -496,19 +462,17 @@ namespace Gbdx.Gbd
                     for (var j = 0; j <= grpLayer.Count - 1; j++)
                     {
                         wmsLayer = wmsMapLayer;
-                        wmsMapLayer.Name = "CAT ID: " + catalogId;
+                        wmsMapLayer.Name = id;
                     }
                 }
 
                 // turn on sub layers, add it to arcmap and move it to top of TOC
                 SublayerVisibleOn(wmsLayer);
-                ArcMap.Document.AddLayer(wmsLayer);
-                ArcMap.Document.FocusMap.MoveLayer(wmsLayer, 0);
+                groupLayer.Add(wmsLayer);
             }
-            catch (Exception e)
-            {
-                Jarvis.Logger.Error(e);
-            }
+            // turn on sub layers, add it to arcmap and move it to top of TOC
+            ArcMap.Document.AddLayer(groupLayer);
+            ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
         }
 
         private static string CatalogIdFilter(string filter, string catId)
@@ -680,14 +644,18 @@ namespace Gbdx.Gbd
             var row = this.dataGridView1.Rows[e.RowIndex];
             var idahoId = string.Empty;
 
+            var interp = string.Empty;
+
             // Get the proper ID number associated
             if (dgColumn.Name == "PAN")
             {
                 idahoId = row.Cells["PAN ID"].Value.ToString();
+                interp = "PAN";
             }
             else if (dgColumn.Name == "MS")
             {
                 idahoId = row.Cells["MS ID"].Value.ToString();
+                interp = "MS";
             }
 
             var catalogId = row.Cells["Catalog ID"].Value.ToString();
@@ -706,7 +674,7 @@ namespace Gbdx.Gbd
                     }
 
                     // make sure the layer name matches
-                    if (layer.Name != "CAT ID: " + catalogId)
+                    if (layer.Name != interp + " " + catalogId)
                     {
                         continue;
                     }
@@ -722,7 +690,7 @@ namespace Gbdx.Gbd
                 this.usedIdahoIds.Add(idahoId, catalogId);
 
                 // The idaho id has been retrieved now ON TO ADDING IT
-                this.AddIdahoWms(idahoId, catalogId);
+                this.AddIdahoWms(catalogId, interp);
             }
             return true;
         }
@@ -1828,7 +1796,7 @@ namespace Gbdx.Gbd
                 else
                 {
                     row = dt.Rows.Find(catalogId);
-                    ProcessIdahoResult(item, catalogId,row);
+                    ProcessIdahoResult(item, catalogId, row);
                 }
             }
             catch (Exception error)
@@ -2118,7 +2086,7 @@ namespace Gbdx.Gbd
 
                 // check to see if the layer has sub-layers
                 var subComp = subLayer as ICompositeLayer;
-                
+
                 // if there are sub layers then enable them.
                 if (subComp != null && subComp.Count > 0)
                 {
