@@ -41,10 +41,6 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataGridViewCheckBoxHeaderCell.cs" />
@@ -70,10 +66,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\GBDXSettings\GBDXSettings.csproj">
-      <Project>{f96e1da5-a0cd-4569-8727-8fb3c2935731}</Project>
-      <Name>GBDXSettings</Name>
-    </ProjectReference>
     <ProjectReference Include="..\GbdxTools\GbdxTools.csproj">
       <Project>{95b5413e-160a-4afb-8b0a-b0df1b1c093b}</Project>
       <Name>GbdxTools</Name>

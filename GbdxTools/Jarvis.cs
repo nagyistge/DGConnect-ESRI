@@ -1,4 +1,7 @@
-﻿namespace GbdxTools
+﻿using System.Windows.Forms;
+using DataInterop;
+
+namespace GbdxTools
 {
     using System;
     using System.Collections;
@@ -64,7 +67,7 @@
         /// The logger.
         /// </summary>
         public static readonly Logger Logger = new Logger(LogFile, false);
-
+        
 
         /// <summary>
         /// The base 32 codes dictionary.
@@ -94,21 +97,7 @@
       IFields validatedFields = null;
       IEnumFieldError enumFieldError = null;
       fieldChecker.Validate(fields, out enumFieldError, out validatedFields);
- 
-      // You can either notify the user of any errors or just skip this step.
-      IFieldError fieldError = null;
-      while ((fieldError = enumFieldError.Next()) != null)
-      {
-          int errorIndex = fieldError.FieldIndex;
-          var alias = fields.Field[errorIndex].AliasName;
-          if (fieldError.FieldError == esriFieldNameErrorType.esriInvalidFieldNameLength)
-          {
-              //Logger.Error("here we go");
-              //validatedFields.Field[errorIndex].Name
-          }
-          Logger.Error(string.Format("Error in field {0} AKA {1} : {2}", alias,fields.Field[errorIndex].Name, fieldError.FieldError));
-      }
- 
+
       // Return the validated fields.
       return validatedFields;
 }
@@ -359,6 +348,67 @@
             }
 
             return polygons;
+        }
+
+        public static DataInterop.MultiPolygon CreateMultiPolygon(List<IPolygon> polygons)
+        {
+            List<DataInterop.Polygon> polyList = new List<DataInterop.Polygon>();
+
+            foreach (var poly in polygons)
+            {
+                var poly4 = (IPolygon4) poly;
+                var exteriorRingGeometryBag = poly4.ExteriorRingBag;
+                var exteriorRingGeometryCollection = exteriorRingGeometryBag as IGeometryCollection;
+
+                if (exteriorRingGeometryCollection != null)
+                {
+                    for (int i = 0; i < exteriorRingGeometryCollection.GeometryCount; i++)
+                    {
+                        var exteriorRingGeometry = exteriorRingGeometryCollection.Geometry[i];
+                        var pointCollect = exteriorRingGeometry as IPointCollection;
+
+                        var coordinates = new List<List<IPosition>>();
+                        if (pointCollect != null)
+                        {
+                            var exteriorPointString = new List<IPosition>();
+                            for (int j = 0; j < pointCollect.PointCount; j++)
+                            {
+                                var point = pointCollect.Point[j];
+                                exteriorPointString.Add(new GeographicPosition(point.Y,point.X));
+                            }
+                            coordinates.Add(exteriorPointString);
+                        }
+
+                        var interiorRingBag = poly4.InteriorRingBag[exteriorRingGeometry as IRing];
+                        var interiorRingGeometryCollection = interiorRingBag as IGeometryCollection;
+                        if (interiorRingGeometryCollection != null)
+                        {
+                            for (int t = 0; t < interiorRingGeometryCollection.GeometryCount; t++) 
+                            {
+                                var interiorPointCollect =
+                                    interiorRingGeometryCollection.Geometry[t] as IPointCollection;
+
+                                if (interiorPointCollect != null)
+                                {
+                                    var interiorPointString = new List<IPosition>();
+                                    for (int z = 0; z < interiorPointCollect.PointCount; z++)
+                                    {
+                                        var point = interiorPointCollect.Point[z];
+                                        interiorPointString.Add(new GeographicPosition(point.Y,point.X));
+                                    }
+                                    coordinates.Add(interiorPointString);
+                                }
+                            }
+                        }
+                        var linestring = new LineString(coordinates[0]);
+                //polyList.Add(new DataInterop.Polygon());
+                    }
+                }
+                
+            }
+
+            DataInterop.MultiPolygon output = new DataInterop.MultiPolygon();
+            return output;
         }
 
         public static string ConvertPolygonsToGeoJson(List<IPolygon> polygons)

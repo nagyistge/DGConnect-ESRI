@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using NetworkConnections;
 using Rhino.Mocks;
 
@@ -23,7 +24,6 @@ namespace NetworkConnections.Tests
     using Newtonsoft.Json;
 
     using RestSharp;
-    using RestSharp.Contrib;
     using RestSharp.Deserializers;
 
 

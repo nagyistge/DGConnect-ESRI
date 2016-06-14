@@ -29,26 +29,15 @@ namespace Gbdx.Vector_Index
     public class PageId
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="PageId"/> class.
-        /// </summary>
-        /// <param name="itemCount">
-        /// The item count.
-        /// </param>
-        public PageId(int itemCount)
-        {
-            this.ItemCount = itemCount;
-        }
-
-        /// <summary>
         /// Gets or sets the paging id.
         /// </summary>
         [JsonProperty(PropertyName = "pagingId")]
-        public string PagingId { get; set; }
+        public string pagingId { get; set; }
 
         /// <summary>
         /// Gets or sets the item count.
         /// </summary>
         [JsonProperty(PropertyName = "itemCount")]
-        public int ItemCount { get; set; }
+        public int itemCount { get; set; }
     }
 }
