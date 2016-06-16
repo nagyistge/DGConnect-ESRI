@@ -7,12 +7,11 @@
     {
         public string recipeId { get; set; }
         public string recipeName { get; set; }
-        public DateTime? configurationDate { get; set; }
+        public long configurationDate { get; set; }
         public List<RecipeConfigParameter> parameters { get; set; }
 
         public RecipeConfig()
         {
-            this.configurationDate = null;
             this.parameters = new List<RecipeConfigParameter>();
             //var localTime = DateTime.UtcNow;
             //this.configurationDate = new DateTime(localTime.Year,localTime.Month,localTime.Day,localTime.Hour,localTime.Minute,localTime.Second,localTime.Millisecond);

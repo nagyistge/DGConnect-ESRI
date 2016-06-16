@@ -39,6 +39,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnswerFactory", "AnswerFact
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataInterop", "DataInterop\DataInterop.csproj", "{A244D658-8116-4D04-850A-BE06ACF5905B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Answer Factory Unit Tests", "Answer Factory Unit Tests\Answer Factory Unit Tests.csproj", "{1298A7F8-F3C0-434E-9ACF-3562EC38A680}"
+EndProject
 Global
 	GlobalSection(TestCaseManagementSettings) = postSolution
 		CategoryFile = smarc.vsmdi
@@ -190,6 +192,15 @@ Global
 		{A244D658-8116-4D04-850A-BE06ACF5905B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A244D658-8116-4D04-850A-BE06ACF5905B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A244D658-8116-4D04-850A-BE06ACF5905B}.Release|x86.ActiveCfg = Release|Any CPU
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680}.Publish|Any CPU.ActiveCfg = Release|Any CPU
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680}.Publish|Any CPU.Build.0 = Release|Any CPU
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680}.Publish|x86.ActiveCfg = Release|Any CPU
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,5 +211,6 @@ Global
 		{B32BBB44-7758-4017-A069-6504DA23B2CC} = {1550284F-5B85-4205-8A14-947A754F0EA4}
 		{F37D477E-08A6-4676-8640-0176D41319DC} = {1550284F-5B85-4205-8A14-947A754F0EA4}
 		{18AF8581-835E-43BB-BC46-7CEC41BCF0D9} = {1550284F-5B85-4205-8A14-947A754F0EA4}
+		{1298A7F8-F3C0-434E-9ACF-3562EC38A680} = {1550284F-5B85-4205-8A14-947A754F0EA4}
 	EndGlobalSection
 EndGlobal
