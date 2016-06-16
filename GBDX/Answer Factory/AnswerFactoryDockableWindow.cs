@@ -1059,6 +1059,7 @@ namespace Gbdx.Answer_Factory
 
         private void UpdateUiWithRecipes(List<Project2> results)
         {
+            this.selectedAois.Clear();
             foreach (var item in results)
             {
                 this.selectedAois.AddRange(item.aois);
