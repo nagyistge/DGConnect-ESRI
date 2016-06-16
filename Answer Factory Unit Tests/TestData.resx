@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Project2JsonData" xml:space="preserve">
+    <value>{"id":"dabd1296-dd7f-4c7a-8b14-d16b6a8a6106","owner":"rwittmer","name":"webapp create test","accountId":"596bd3ed-ffad-496f-9394-291648fb8250","aois":[{"type":"Polygon","coordinates":[[[33.046863,44.425896],[33.046856,44.425899],[33.04685,44.425903],[33.046845,44.425908],[33.04684,44.425915],[33.046837,44.425921],[33.046835,44.425929],[32.805136,46.080846],[32.805136,46.080854],[32.805137,46.080861],[32.805139,46.080868],[32.805143,46.080875],[32.805148,46.080881],[32.805154,46.080886],[32.805161,46.080889],[32.805169,46.080891],[32.805176,46.080892],[35.738526,46.035149],[35.738534,46.035148],[35.738542,46.035146],[35.738549,46.035141],[35.738556,46.035136],[35.73856,46.035129],[35.738564,46.035121],[36.28788,44.23734],[36.287882,44.237332],[36.287882,44.237324],[36.28788,44.237316],[36.287876,44.237308],[36.287871,44.237302],[36.287865,44.237296],[36.287858,44.237292],[36.28785,44.237289],[36.287842,44.237288],[33.75,44.205795],[33.749994,44.205795],[33.749988,44.205797],[33.046863,44.425896]]]}],"recipeConfigs":[{"recipeId":"tweet-1-recipe","recipeName":"Query Tweets (Last Day)","configurationDate":1465229286821,"startDate":null,"endDate":null,"parameters":[]}],"originalGeometries":[{"type":"Feature","properties":{},"geometry":{"type":"Polygon","coordinates":[[[33.046875,44.425934421],[32.805175781,46.080851737],[35.738525391,46.035109279],[36.287841797,44.237328318],[33.75,44.205835001],[33.046875,44.425934421]]]}}],"namedBuffers":[{"name":"b8f592d8-a29e-4ba3-ba5a-50cffcc255da","buffer":{"type":"Polygon","coordinates":[[[33.046863,44.425896],[33.046856,44.425899],[33.04685,44.425903],[33.046845,44.425908],[33.04684,44.425915],[33.046837,44.425921],[33.046835,44.425929],[32.805136,46.080846],[32.805136,46.080854],[32.805137,46.080861],[32.805139,46.080868],[32.805143,46.080875],[32.805148,46.080881],[32.805154,46.080886],[32.805161,46.080889],[32.805169,46.080891],[32.805176,46.080892],[35.738526,46.035149],[35.738534,46.035148],[35.738542,46.035146],[35.738549,46.035141],[35.738556,46.035136],[35.73856,46.035129],[35.738564,46.035121],[36.28788,44.23734],[36.287882,44.237332],[36.287882,44.237324],[36.28788,44.237316],[36.287876,44.237308],[36.287871,44.237302],[36.287865,44.237296],[36.287858,44.237292],[36.28785,44.237289],[36.287842,44.237288],[33.75,44.205795],[33.749994,44.205795],[33.749988,44.205797],[33.046863,44.425896]]]}}],"createDate":1465229286814,"updateDate":1465229286814}</value>
+  </data>
+</root>

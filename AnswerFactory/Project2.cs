@@ -20,5 +20,7 @@
         public List<object> bestIdahoIds { get; set; }
         public object originalGeometries { get; set; }
         public object namedBuffers { get; set; }
+        public long createDate { get; set; }
+        public long updateDate { get; set; }
     }
 }
