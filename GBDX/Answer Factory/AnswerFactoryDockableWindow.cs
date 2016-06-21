@@ -839,6 +839,8 @@ namespace Gbdx.Answer_Factory
             var aoi = ConvertAoisToGeometryCollection(AoiList);
             if (resp.Data != null)
             {
+                // since there can be multiple query ids its good to check to make sure we don't end up pulling duplicate results.
+                HashSet<string> usedQueries = new HashSet<string>();
                 foreach (var item in resp.Data)
                 {
                     // if the recipe names don't match move on to the next
@@ -851,6 +853,12 @@ namespace Gbdx.Answer_Factory
 
                     if (!string.IsNullOrEmpty(aoi) && !string.IsNullOrEmpty(layername))
                     {
+                        if (usedQueries.Contains(item.properties.query_string))
+                        {
+                            continue;
+                        }
+
+                        usedQueries.Add(item.properties.query_string);
                         this.GetGeometries(item.properties.query_string, token, aoi, client, layername);
                     }
                 }
@@ -1059,6 +1067,7 @@ namespace Gbdx.Answer_Factory
 
         private void UpdateUiWithRecipes(List<Project2> results)
         {
+            this.selectedAois.Clear();
             foreach (var item in results)
             {
                 this.selectedAois.AddRange(item.aois);
