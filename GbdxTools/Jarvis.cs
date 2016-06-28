@@ -216,6 +216,45 @@
             return output.ToString();
         }
 
+        public static string ConvertPointGeoJson(IPoint point)
+        {
+            var output = new StringBuilder("{ \"type\": \"Point\", \"coordinates\": ");
+            var pointStr = PointToString(point);
+
+            if (string.IsNullOrEmpty(pointStr))
+            {
+                return string.Empty;
+            }
+            output.Append(pointStr);
+            output.Append("}");
+            return output.ToString();
+        }
+
+        public static string ConvertPolyLineGeoJson(IPolyline line)
+        {
+            StringBuilder output = new StringBuilder("{\"type\": \"LineString\",\"coordinates\": [");
+            IPointCollection pointCollection = (IPointCollection)line;
+
+            for (int i = 0; i < pointCollection.PointCount; i++)
+            {
+                if (i != 0)
+                {
+                    output.Append(",");
+                }
+                var point = pointCollection.Point[i];
+
+                var pointStr = PointToString(point);
+
+                if (!string.IsNullOrEmpty(pointStr))
+                {
+                    output.Append(pointStr);
+                }
+            }
+            output.Append("]}");
+
+            return output.ToString();
+        }
+
         public static MultiPolygon CreateMultiPolygon(List<IPolygon> polygons)
         {
             var polyList = new List<Polygon>();
