@@ -188,6 +188,20 @@
             return output.ToString();
         }
 
+        public static string ConvertPolygonsGeoJson(IPolygon polygon)
+        {
+            var output = new StringBuilder("{\"type\":\"MultiPolygon\", \"coordinates\": [");
+            var polygonStr = ConvertToPolygonGeoJson(polygon);
+
+            if (string.IsNullOrEmpty(polygonStr))
+            {
+                return string.Empty;
+            }
+            output.Append(polygonStr);
+            output.Append("]}");
+            return output.ToString();
+        }
+
         private static string ConvertToPolygonGeoJson(IPolygon poly)
         {
             var output = new StringBuilder();
@@ -306,7 +320,6 @@
                             }
                         }
                         var linestring = new LineString(coordinates[0]);
-                        //polyList.Add(new DataInterop.Polygon());
                     }
                 }
             }
@@ -495,6 +508,72 @@
             }
 
             return polygons;
+        }
+
+
+        public static List<IGeometry> GetSelectedGeometries(IMap focusMap)
+        {
+            var geometries = new List<IGeometry>();
+            var pEnumFeat = (IEnumFeature)focusMap.FeatureSelection;
+            pEnumFeat.Reset();
+
+            try
+            {
+                IFeature pfeat;
+                while ((pfeat = pEnumFeat.Next()) != null)
+                {
+                    var geo = pfeat.ShapeCopy;
+                    
+                    var geo2 = ProjectToWGS84(geo);
+                    geometries.Add(geo2);
+                }
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+            }
+            return geometries;
+        }
+
+
+        public static string CreateGeometryCollectionGeoJson(List<IGeometry> geometries)
+        {
+            var output = new StringBuilder("{\"type\": \"GeometryCollection\",\"geometries\": [");
+            for (int i = 0; i < geometries.Count; i++)
+            {
+                if (i != 0)
+                {
+                    output.Append(",");
+                }
+
+                var geom = geometries[i];
+
+                var geometryStr = string.Empty;
+                switch (geom.GeometryType)
+                {
+                    case esriGeometryType.esriGeometryPoint:
+                        var point = (IPoint)geom;
+                        geometryStr = ConvertPointGeoJson(point);
+                        break;
+
+                    case esriGeometryType.esriGeometryPolyline:
+                        var line = (IPolyline)geom;
+                        geometryStr = ConvertPolyLineGeoJson(line);
+                        break;
+                    case esriGeometryType.esriGeometryPolygon:
+                        var polygon = (IPolygon)geom;
+                        geometryStr = ConvertPolygonsGeoJson(polygon);
+                        break;
+                }
+
+                if (!string.IsNullOrEmpty(geometryStr))
+                {
+                    output.Append(geometryStr);
+                }
+            }
+
+            output.Append("]}");
+            return output.ToString();
         }
 
         /// <summary>

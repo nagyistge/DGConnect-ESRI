@@ -1035,10 +1035,10 @@ namespace Gbdx.Vector_Index.Forms
             {
                 this.networkObject = this.SetupNetObject(Settings.Default.username, Settings.Default.password);
             }
-            var polys = Jarvis.GetPolygons(ArcMap.Document.FocusMap);
+            var geometries = Jarvis.GetSelectedGeometries(ArcMap.Document.FocusMap);
 
             // check to see if features were selected
-            if (polys.Count == 0)
+            if (geometries.Count == 0)
             {
                 MessageBox.Show(GbdxResources.noFeaturesSelected);
                 return;
@@ -1052,7 +1052,7 @@ namespace Gbdx.Vector_Index.Forms
             this.networkObject.ApiKey = Settings.Default.apiKey;
             this.networkObject.AuthUrl = Settings.Default.AuthBase;
             this.networkObject.UsingShapeAoi = true;
-            this.networkObject.ShapeAoi = GetGeoJson(polys);
+            this.networkObject.ShapeAoi = Jarvis.CreateGeometryCollectionGeoJson(geometries);
 
             // There was a problem in creating the network object so dont proceed.
             if (this.networkObject == null)
