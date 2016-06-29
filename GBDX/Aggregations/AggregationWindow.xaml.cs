@@ -88,7 +88,7 @@ namespace Gbdx.Aggregations
         /// <summary>
         ///     Gets or sets the AOI polygon.
         /// </summary>
-        private IPolygon AoiPolygon { get; set; }
+        private IPolygon ShapeAoi { get; set; }
 
         /// <summary>
         ///     Gets or sets the search item.
@@ -683,10 +683,10 @@ namespace Gbdx.Aggregations
             }
 
             // Add the important AOI points.
-            request.AddParameter("left", this.AoiPolygon.Envelope.UpperLeft.X, ParameterType.QueryString);
-            request.AddParameter("right", this.AoiPolygon.Envelope.UpperRight.X, ParameterType.QueryString);
-            request.AddParameter("upper", this.AoiPolygon.Envelope.UpperLeft.Y, ParameterType.QueryString);
-            request.AddParameter("lower", this.AoiPolygon.Envelope.LowerLeft.Y, ParameterType.QueryString);
+            request.AddParameter("left", this.ShapeAoi.Envelope.UpperLeft.X, ParameterType.QueryString);
+            request.AddParameter("right", this.ShapeAoi.Envelope.UpperRight.X, ParameterType.QueryString);
+            request.AddParameter("upper", this.ShapeAoi.Envelope.UpperLeft.Y, ParameterType.QueryString);
+            request.AddParameter("lower", this.ShapeAoi.Envelope.LowerLeft.Y, ParameterType.QueryString);
         }
 
         /// <summary>
@@ -1024,7 +1024,7 @@ namespace Gbdx.Aggregations
         /// </param>
         private void GoButtonClick(object sender, RoutedEventArgs e)
         {
-            if (this.AoiPolygon == null && this.selectionTypeComboBox.SelectedIndex == 0)
+            if (this.ShapeAoi == null && this.selectionTypeComboBox.SelectedIndex == 0)
             {
                 MessageBox.Show(GbdxResources.invalidBoundingBox);
                 return;
@@ -1085,6 +1085,10 @@ namespace Gbdx.Aggregations
             // the user selected use selected features for AOI
             if (this.selectionTypeComboBox.SelectedIndex == 1)
             {
+                // This is the code change required t make the geometry collections work.
+//                var geometries = Jarvis.GetSelectedGeometries(ArcMap.Document.FocusMap);
+//                var aoi = Jarvis.CreateGeometryCollectionGeoJson(geometries);
+
                 var aoi = Jarvis.ConvertPolygonsToGeoJson(Jarvis.GetPolygons(ArcMap.Document.FocusMap));
                 request.Method = Method.POST;
                 request.AddHeader("Content-Type", "application/json");
@@ -1296,7 +1300,7 @@ namespace Gbdx.Aggregations
         private void InstanceAoiHasBeenDrawn(IPolygon poly, IElement elm)
         {
             poly.Project(Jarvis.ProjectedCoordinateSystem);
-            this.AoiPolygon = poly;
+            this.ShapeAoi = poly;
         }
 
         /// <summary>
