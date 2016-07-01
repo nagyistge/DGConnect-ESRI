@@ -40,12 +40,12 @@ namespace NetworkConnections
         /// <summary>
         /// The geojson representation of the polygon being sent to vector services.
         /// </summary>
-        public string PolygonAoi { get; set; }
+        public string ShapeAoi { get; set; }
 
         /// <summary>
         /// Flag used to determine if a polygon Aoi is being used.
         /// </summary>
-        public bool UsingPolygonAoi { get; set; }
+        public bool UsingShapeAoi { get; set; }
         
         /// <summary>
         /// Gets or sets the authorization token. 
