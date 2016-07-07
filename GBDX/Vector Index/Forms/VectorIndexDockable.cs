@@ -1187,12 +1187,12 @@ namespace Gbdx.Vector_Index.Forms
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json", this.Aoi, ParameterType.RequestBody);
 
-            client.ExecuteAsync(request, resp => this.ProcessGetTypesResponse() );
+            client.ExecuteAsync<SourceTypeResponseObject>(request, resp => this.ProcessGetTypesResponse(resp));
         }
 
-        private void ProcessGetTypesResponse()
+        private void ProcessGetTypesResponse(IRestResponse<SourceTypeResponseObject> resp)
         {
-            
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
         }
         /// <summary>
         ///     Process a query node item click
