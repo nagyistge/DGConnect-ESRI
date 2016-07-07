@@ -532,43 +532,6 @@ namespace Gbdx.Answer_Factory
                     });
         }
 
-        private void GetRecipeStatus(string projectId)
-        {
-            this.CheckBaseUrl();
-
-            var request =
-                new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectId));
-            request.AddHeader("Authorization", "Bearer " + this.token);
-            request.AddHeader("Content-Type", "application/json");
-
-            this.client.ExecuteAsync<List<ResultItem>>(
-                request,
-                resp =>
-                    {
-                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
-                        if (resp.Data != null)
-                        {
-                            foreach (var item in resp.Data)
-                            {
-                                var query = from row in this.RecipeRepo.AsEnumerable()
-                                            where (string)row["Recipe Name"] == item.recipeName
-                                            select row;
-                                foreach (var queryItem in query)
-                                {
-                                    queryItem["Status"] = item.status;
-                                }
-                            }
-                        }
-
-                        this.Invoke(
-                            (MethodInvoker)(() =>
-                                {
-                                    this.recipeStatusDataGridView.Refresh();
-                                    this.recipeStatusDataGridView.PerformLayout();
-                                }));
-                    });
-        }
-
         private void GetResult(string id, string recipeName, string projectName)
         {
             this.CheckBaseUrl();

@@ -19,6 +19,9 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Net;
+using RestSharp;
+
 namespace Gbdx.Vector_Index.Forms
 {
     using System;
@@ -80,6 +83,8 @@ namespace Gbdx.Vector_Index.Forms
         private delegate void TypeTree(WorkerObject obj);
 
         #region Fields & Properties
+
+        private string Aoi = string.Empty;
 
         /// <summary>
         ///     Max number of threads allowed to communicate with GBDX services.
@@ -186,6 +191,8 @@ namespace Gbdx.Vector_Index.Forms
         /// </summary>
         private object Hook { get; set; }
 
+        private string token = string.Empty;
+
         #endregion
 
         /// <summary>
@@ -207,6 +214,7 @@ namespace Gbdx.Vector_Index.Forms
         public VectorIndexDockable(object hook)
         {
             this.InitializeComponent();
+            this.GetAuthenticationToken();
 
             this.logWriter = new Logger(Jarvis.LogFile, ConsoleLogging);
 
@@ -231,33 +239,6 @@ namespace Gbdx.Vector_Index.Forms
             this.aoiTypeComboBox.SelectedIndex = 0;
             this.ActiveControl = this.treeView1;
             this.comms = new GbdxComms(Jarvis.LogFile, ConsoleLogging);
-        }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="VectorIndexDockable" /> class.
-        ///     Constructor to be used in a developer setting for testing purposes.
-        /// </summary>
-        /// <param name="hook">
-        ///     hook coming from arc map
-        /// </param>
-        /// <param name="isTest">
-        ///     is test variable
-        /// </param>
-        public VectorIndexDockable(object hook, bool isTest)
-        {
-            this.InitializeComponent();
-            this.Hook = hook;
-            this.UserAuthenticationCheck(Settings.Default, ref this.username, ref this.password, this.comms, true);
-            this.smartThreadPool = new SmartThreadPool();
-            this.treeView1.AfterCheck += this.TreeView1AfterCheck;
-            this.VisibleChanged += this.VectorIndexDockableVisibleChanged;
-            this.textBoxSearch.LostFocus += this.TextBoxSearchLeave;
-            this.textBoxSearch.GotFocus += this.TextBoxSearchEnter;
-            ArcMap.Events.NewDocument += this.ResetVectorIndex;
-            ArcMap.Events.OpenDocument += this.ResetVectorIndex;
-            ArcMap.Events.CloseDocument += this.ResetVectorIndex;
-            this.currentApplicationState = this.applicationStateGenerator.Next();
-            this.test = isTest;
         }
 
         /// <summary>
@@ -1101,6 +1082,43 @@ namespace Gbdx.Vector_Index.Forms
             ThreadPool.QueueUserWorkItem(this.LoadSources, new object[] { work, this.comms });
         }
 
+        private void GetAuthenticationToken()
+        {
+            IRestClient restClient = new RestClient(Settings.Default.AuthBase);
+
+            string password;
+            var result = Aes.Instance.Decrypt128(Settings.Default.password, out password);
+
+            if (!result)
+            {
+                Jarvis.Logger.Warning("PASSWORD FAILED DECRYPTION");
+                return;
+            }
+
+            var request = new RestRequest(Settings.Default.authenticationServer, Method.POST);
+            request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.AddHeader("Authorization", string.Format("Basic {0}", Settings.Default.apiKey));
+            request.AddParameter("grant_type", "password");
+            request.AddParameter("username", Settings.Default.username);
+            request.AddParameter("password", password);
+
+            restClient.ExecuteAsync<AccessToken>(
+                request,
+                resp =>
+                {
+                    Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+                    if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
+                    {
+                        this.token = resp.Data.access_token;
+                    }
+                    else
+                    {
+                        this.token = string.Empty;
+                    }
+                });
+        }
+
         /// <summary>
         ///     Process a geometry node click.  (Polygon, Polyline, Point)
         /// </summary>
@@ -1151,6 +1169,31 @@ namespace Gbdx.Vector_Index.Forms
             ThreadPool.QueueUserWorkItem(this.GetVectorTypes, parms);
         }
 
+        private void ProcessGeometryNodeClick2(TreeNode geometryNode)
+        {
+
+
+            geometryNode.Text = geometryNode.Text.Replace(GbdxResources.Source_ErrorMessage, string.Empty);
+            geometryNode.Text += GbdxResources.SearchingText;
+
+            var sourceNode = (VectorIndexSourceNode) geometryNode.Parent;
+            var geomNode = (VectorIndexGeometryNode) geometryNode;
+            
+            var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
+            var addressString = string.Format("/insight-vector/api/shape/{0}/{1}/types",sourceNode.Source.Name,geomNode.GeometryType.Name);
+
+            var request = new RestRequest(addressString, Method.POST);
+            request.AddHeader("Authoriation", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json", this.Aoi, ParameterType.RequestBody);
+
+            client.ExecuteAsync(request, resp => this.ProcessGetTypesResponse() );
+        }
+
+        private void ProcessGetTypesResponse()
+        {
+            
+        }
         /// <summary>
         ///     Process a query node item click
         /// </summary>
