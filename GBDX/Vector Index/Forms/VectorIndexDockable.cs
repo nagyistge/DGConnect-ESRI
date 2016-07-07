@@ -619,7 +619,7 @@ namespace Gbdx.Vector_Index.Forms
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK)
+            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
             {
                 GetGeometries(source, attempts);
             }
