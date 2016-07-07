@@ -512,6 +512,29 @@ namespace Gbdx.Answer_Factory
                     });
         }
 
+        private void GetResult(string id, string recipeName, string projectName)
+        {
+            this.CheckBaseUrl();
+
+            if (string.IsNullOrEmpty(id))
+            {
+                MessageBox.Show("No Project id");
+                return;
+            }
+            var request = new RestRequest(
+                string.Format("/answer-factory-recipe-service/api/result/project/{0}", id),
+                Method.GET);
+
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+            this.client.ExecuteAsync<List<ResultItem>>(
+                request,
+                resp =>
+                {
+                    this.ProcessResult(projectName, recipeName, resp, this.selectedAois, this.token, this.client);
+                });
+        }
+
         private void GetRecipeStatus(string authToken, string projectId)
         {
             var restClient = new RestClient(Settings.Default.baseUrl);
@@ -531,30 +554,6 @@ namespace Gbdx.Answer_Factory
                         }
                     });
         }
-
-        private void GetResult(string id, string recipeName, string projectName)
-        {
-            this.CheckBaseUrl();
-
-            if (string.IsNullOrEmpty(id))
-            {
-                MessageBox.Show("No Project id");
-                return;
-            }
-            var request = new RestRequest(
-                string.Format("/answer-factory-recipe-service/api/result/project/{0}", id),
-                Method.GET);
-
-            request.AddHeader("Authorization", "Bearer " + this.token);
-            request.AddHeader("Content-Type", "application/json");
-            this.client.ExecuteAsync<List<ResultItem>>(
-                request,
-                resp =>
-                    {
-                        this.ProcessResult(projectName, recipeName, resp, this.selectedAois, this.token, this.client);
-                    });
-        }
-
         /// <summary>
         ///     Get Token to use with GBDX services
         /// </summary>
