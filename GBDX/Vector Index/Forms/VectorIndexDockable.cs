@@ -35,9 +35,12 @@ namespace Gbdx.Vector_Index.Forms
 
     using Amib.Threading;
 
+    using AnswerFactory;
+
     using Encryption;
 
     using ESRI.ArcGIS.Carto;
+    using ESRI.ArcGIS.CartoUI;
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Framework;
     using ESRI.ArcGIS.Geodatabase;
@@ -58,6 +61,7 @@ namespace Gbdx.Vector_Index.Forms
     using RestSharp;
 
     using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
+    using FileStream = System.IO.FileStream;
     using Path = System.IO.Path;
 
     /// <summary>
@@ -1274,6 +1278,7 @@ namespace Gbdx.Vector_Index.Forms
                     1,
                     100);
             }
+
             // Create url to get the Paging ID.
             work.OriginalPagingIdUrl = url;
             var para = new object[2];
@@ -1294,16 +1299,16 @@ namespace Gbdx.Vector_Index.Forms
             {
                 addressUrl = string.Format(
                     "/insight-vector/api/shape/{0}/{1}/{2}/paging",
-                    sourceNode.Name,
-                    geometryNode.Name,
-                    typeNode.Name);
+                    sourceNode.Source.Name,
+                    geometryNode.GeometryType.Name,
+                    typeNode.Type.Name);
             }
             else
             {
                 addressUrl = string.Format(
                     "/insight-vector/api/shape/query/{0}/{1}/paging?q={2}",
-                    geometryNode.Name,
-                    typeNode.Name,
+                    geometryNode.GeometryType.Name,
+                    typeNode.Type.Name,
                     query);
             }
 
@@ -1328,6 +1333,67 @@ namespace Gbdx.Vector_Index.Forms
                 GetPagingId(node, query, attempts);
                 return;
             }
+
+
+            var tempFile = Path.GetTempFileName();
+            var fileStream = File.Open(tempFile, FileMode.Append);
+            var fileStreamWriter = new StreamWriter(fileStream);
+
+            this.GetPages(resp.Data.pagingId, "test",fileStreamWriter);
+        }
+
+        private void GetPages(string pageId, string layerName, StreamWriter fileStreamWriter, int attempts = 0)
+        {
+            var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
+            var request = new RestRequest("/insight-vector/api/esri/paging", Method.POST);
+
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+
+            request.AddParameter("ttl", "5m");
+            request.AddParameter("fields", "attributes");
+            request.AddParameter("pagingId", pageId);
+
+            attempts++;
+            client.ExecuteAsync<PagedData2>(
+                request,
+                resp => ProcessPage(resp, pageId, layerName, fileStreamWriter, attempts));
+        }
+
+
+
+        private void ProcessPage(
+            IRestResponse<PagedData2> resp,
+            string pageId,
+            string layerName,
+            StreamWriter fileStreamWriter,
+            int attempts)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            // If we have a problem getting the page try again up to max attempts
+            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            {
+                GetPages(pageId, layerName, fileStreamWriter, attempts);
+                return;
+            }
+
+            if (resp.Data.item_count != "0")
+            {
+                // Write entire page of data to one line in the temp file
+                fileStreamWriter.WriteLine(resp.Data.data.Replace("\r", "").Replace("\n", ""));
+
+                // Continue getting the rest of the associated pages.
+                GetPages(resp.Data.next_paging_id, layerName, fileStreamWriter);
+            }
+            else
+            {
+                var fs = (FileStream)fileStreamWriter.BaseStream;
+                var filepath = fs.Name;
+                fileStreamWriter.Close();
+                //this.ConvertPagesToFeatureClass(filepath, layerName);
+            }
+            
         }
 
         /// <summary>
