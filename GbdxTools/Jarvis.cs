@@ -32,6 +32,8 @@
         /// </summary>
         private const string Base32Codes = "0123456789bcdefghjkmnpqrstuvwxyz";
 
+        public static object FeatureClassLockerObject = new object();
+
         /// <summary>
         ///     Log file where all information should be written too.
         /// </summary>
@@ -670,7 +672,7 @@
             return validatedFields;
         }
 
-        public static void ConvertPagesToFeatureClass(string filepath, string layerName)
+        public static string ConvertPagesToFeatureClass(string filepath, string layerName, string prefix="GBDX")
         {
             try
             {
@@ -685,12 +687,12 @@
                 IFieldChecker fieldChecker = new FieldCheckerClass();
                 fieldChecker.ValidateWorkspace = workspace;
 
-                var proposedTableName = string.Format("AnswerFactory{0}", Guid.NewGuid());
+                var proposedTableName = string.Format("{0}{1}",prefix, Guid.NewGuid());
                 string tableName;
 
                 fieldChecker.ValidateTableName(proposedTableName, out tableName);
 
-                WriteToTable(workspace, jsonOutput, tableName, new object());
+                WriteToTable(workspace, jsonOutput, tableName);
 
                 //this.Invoke((MethodInvoker)(() => { AddLayerToMap(tableName, layerName); }));
 
@@ -698,11 +700,14 @@
                 {
                     File.Delete(filepath);
                 }
+
+                return tableName;
             }
             catch (Exception error)
             {
                 Jarvis.Logger.Error(error);
             }
+            return string.Empty;
         }
 
         /// <summary>
@@ -741,7 +746,7 @@
             }
         }
 
-        private static bool WriteToTable(IWorkspace workspace, string featureClassJson, string tableName, object locker)
+        private static bool WriteToTable(IWorkspace workspace, string featureClassJson, string tableName)
         {
             var success = true;
             if (string.IsNullOrEmpty(featureClassJson))
@@ -752,7 +757,7 @@
             try
             {
                 var outputTable = GetTable(featureClassJson);
-                lock (locker)
+                lock (FeatureClassLockerObject)
                 {
                     outputTable.SaveAsTable(workspace, tableName);
                 }

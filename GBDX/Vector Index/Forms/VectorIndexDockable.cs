@@ -95,6 +95,8 @@ namespace Gbdx.Vector_Index.Forms
         private delegate void UpdateTreeTypes(IRestResponse<SourceTypeResponseObject> resp, VectorIndexGeometryNode geom
             );
 
+        private delegate void AddLayerToMapDelegate(string tableName, string layerName);
+
         #region Fields & Properties
 
         /// <summary>
@@ -272,7 +274,7 @@ namespace Gbdx.Vector_Index.Forms
             var success = false;
             try
             {
-                lock (this.locker)
+                lock (Jarvis.FeatureClassLockerObject)
                 {
                     var featureWorkspace = (IFeatureWorkspace)Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
                     var featureClass = featureWorkspace.OpenFeatureClass(workObj.TableName);
@@ -1334,12 +1336,31 @@ namespace Gbdx.Vector_Index.Forms
                 return;
             }
 
-
+            var typeNode = (VectorIndexTypeNode)node;
             var tempFile = Path.GetTempFileName();
             var fileStream = File.Open(tempFile, FileMode.Append);
             var fileStreamWriter = new StreamWriter(fileStream);
 
-            this.GetPages(resp.Data.pagingId, "test",fileStreamWriter);
+            this.GetPages(resp.Data.pagingId, typeNode.Type.Name,fileStreamWriter);
+        }
+
+        private static void AddLayerToMap(string tableName, string layerName)
+        {
+            try
+            {
+                lock (Jarvis.FeatureClassLockerObject)
+                {
+                    var featureWorkspace = (IFeatureWorkspace)Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+                    var featureClass = featureWorkspace.OpenFeatureClass(tableName);
+                    ILayer featureLayer;
+                    featureLayer = VectorIndexHelper.CreateFeatureLayer(featureClass, layerName);
+                    VectorIndexHelper.AddFeatureLayerToMap(featureLayer);
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
         }
 
         private void GetPages(string pageId, string layerName, StreamWriter fileStreamWriter, int attempts = 0)
@@ -1391,7 +1412,13 @@ namespace Gbdx.Vector_Index.Forms
                 var fs = (FileStream)fileStreamWriter.BaseStream;
                 var filepath = fs.Name;
                 fileStreamWriter.Close();
-                //this.ConvertPagesToFeatureClass(filepath, layerName);
+
+                var tableName = Jarvis.ConvertPagesToFeatureClass(filepath, layerName);
+
+                if (!string.IsNullOrEmpty(tableName))
+                {
+                    this.Invoke(new AddLayerToMapDelegate(AddLayerToMap), tableName, layerName);
+                }
             }
             
         }
@@ -2267,7 +2294,7 @@ namespace Gbdx.Vector_Index.Forms
             try
             {
                 var outputTable = VectorIndexHelper.GetTable(work.CombinedJsonData);
-                lock (this.locker)
+                lock (Jarvis.FeatureClassLockerObject)
                 {
                     outputTable.SaveAsTable(workspace, work.TableName);
                 }
