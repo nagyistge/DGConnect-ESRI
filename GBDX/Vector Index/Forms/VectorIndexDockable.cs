@@ -19,72 +19,46 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Net;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Web;
+using System.Windows.Forms;
+using Amib.Threading;
+using AnswerFactory;
+using Encryption;
+using ESRI.ArcGIS.Carto;
+using ESRI.ArcGIS.esriSystem;
+using ESRI.ArcGIS.Framework;
+using ESRI.ArcGIS.Geodatabase;
+using ESRI.ArcGIS.Geometry;
+using GbdxSettings;
+using GbdxSettings.Properties;
+using GbdxTools;
+using Logging;
+using NetworkConnections;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using RestSharp;
+using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
+using FileStream = System.IO.FileStream;
+using Path = System.IO.Path;
+
 namespace Gbdx.Vector_Index.Forms
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Collections.Specialized;
-    using System.Diagnostics;
-    using System.Drawing;
-    using System.IO;
-    using System.Net;
-    using System.Text.RegularExpressions;
-    using System.Threading;
-    using System.Web;
-    using System.Windows.Forms;
-
-    using Amib.Threading;
-
-    using AnswerFactory;
-
-    using Encryption;
-
-    using ESRI.ArcGIS.Carto;
-    using ESRI.ArcGIS.CartoUI;
-    using ESRI.ArcGIS.esriSystem;
-    using ESRI.ArcGIS.Framework;
-    using ESRI.ArcGIS.Geodatabase;
-    using ESRI.ArcGIS.Geometry;
-
-    using GbdxSettings;
-    using GbdxSettings.Properties;
-
-    using GbdxTools;
-
-    using Logging;
-
-    using NetworkConnections;
-
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-
-    using RestSharp;
-
-    using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
-    using FileStream = System.IO.FileStream;
-    using Path = System.IO.Path;
-
     /// <summary>
     ///     Designer class of the dock able window add-in. It contains user interfaces that
     ///     make up the dockable window.
     /// </summary>
     public partial class VectorIndexDockable : UserControl
     {
-        /// <summary>
-        ///     The deserialize JSON.
-        /// </summary>
-        /// <param name="obj">
-        ///     The worker object containing response results.
-        /// </param>
-        private delegate void DeserializeJson(WorkerObject obj);
-
-        /// <summary>
-        ///     The type tree.
-        /// </summary>
-        /// <param name="obj">
-        ///     The worker object containing response results.
-        /// </param>
-        private delegate void TypeTree(WorkerObject obj);
+        private delegate void AddLayerToMapDelegate(string tableName, string layerName);
 
         private delegate void UpdateTreeGeometries(
             IRestResponse<SourceTypeResponseObject> resp,
@@ -94,8 +68,6 @@ namespace Gbdx.Vector_Index.Forms
 
         private delegate void UpdateTreeTypes(IRestResponse<SourceTypeResponseObject> resp, VectorIndexGeometryNode geom
             );
-
-        private delegate void AddLayerToMapDelegate(string tableName, string layerName);
 
         #region Fields & Properties
 
@@ -133,11 +105,6 @@ namespace Gbdx.Vector_Index.Forms
         ///     to the queue.  When a job finishes the queue is checked to see if any jobs are currently waiting.
         /// </summary>
         private readonly Queue<TreeNode> jobQueue = new Queue<TreeNode>();
-
-        /// <summary>
-        ///     Object to lock to synchronize threads
-        /// </summary>
-        private readonly object locker = new object();
 
         /// <summary>
         ///     The logger variable to capture info, warnings, errors etc.
@@ -276,7 +243,7 @@ namespace Gbdx.Vector_Index.Forms
             {
                 lock (Jarvis.FeatureClassLockerObject)
                 {
-                    var featureWorkspace = (IFeatureWorkspace)Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+                    var featureWorkspace = (IFeatureWorkspace) Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
                     var featureClass = featureWorkspace.OpenFeatureClass(workObj.TableName);
                     ILayer featureLayer;
                     featureLayer = VectorIndexHelper.CreateFeatureLayer(
@@ -293,59 +260,7 @@ namespace Gbdx.Vector_Index.Forms
 
             return success;
         }
-
-        /// <summary>
-        ///     Called after the vector data has been received to add data to the map
-        /// </summary>
-        /// <param name="source">
-        ///     The WorkerObject
-        /// </param>
-        private void ArcObjectsDeserializeJson(object source)
-        {
-            var work = (WorkerObject)source;
-
-            if (this.jobQueue.Count > 0)
-            {
-                this.StartJob(this.jobQueue);
-            }
-            else
-            {
-                // Reduce the number of working threads
-                this.currentThreadCount -= 1;
-            }
-
-            if (work.NetworkObject.ErrorOccurred)
-            {
-                // Remove the node from the list of checked nodes because an error occurred.
-                this.checkedNodes.Remove(
-                    this.treeView1.Nodes[work.SourceNode.Index].Nodes[work.GeometryNode.Index].Nodes[work.TypeNode.Index
-                        ]);
-                this.treeView1.Nodes[work.SourceNode.Index].Nodes[work.GeometryNode.Index].Nodes[work.TypeNode.Index]
-                    .Checked = false;
-                this.treeView1.Nodes[work.SourceNode.Index].Nodes[work.GeometryNode.Index].Nodes[work.TypeNode.Index]
-                    .Text += GbdxResources.Source_ErrorMessage;
-
-                // Don't allow it to process further.
-                return;
-            }
-
-            work.WorkspacePath = Settings.Default.geoDatabase;
-            if (work.QuerySource)
-            {
-                work.TableName = "VI_" + work.GeometryNode.GeometryType.Name.Replace(" ", "_") + "QUERY_Search_"
-                                 + this.textBoxSearch.Text + "_" + DateTime.Now.ToString("ddMMMHHmmss");
-            }
-            else
-            {
-                work.TableName = "VI_" + work.TypeNode.Type.Name.Replace(" ", "_") + work.SourceNode.Source.Name + "_"
-                                 + DateTime.Now.ToString("ddMMMHHmmss");
-            }
-
-            var rgx = new Regex("[^a-zA-Z0-9]");
-            work.TableName = rgx.Replace(work.TableName, string.Empty);
-            this.smartThreadPool.QueueWorkItem(this.ProcessVectorIndexResponse2, work, this.DoPostWork);
-        }
-
+        
         /// <summary>
         ///     The check credentials.
         /// </summary>
@@ -414,10 +329,10 @@ namespace Gbdx.Vector_Index.Forms
         {
             var menuStrip = new UviContextMenuStrip(node);
             var downloadAllToolStrip = new ToolStripMenuItem
-                                           {
-                                               Text = GbdxResources.Download_all_Below_100000,
-                                               Name = "DownloadAll"
-                                           };
+            {
+                Text = GbdxResources.Download_all_Below_100000,
+                Name = "DownloadAll"
+            };
             downloadAllToolStrip.Click += this.DownloadAllToolStripOnClick;
             menuStrip.Items.Add(downloadAllToolStrip);
 
@@ -435,7 +350,7 @@ namespace Gbdx.Vector_Index.Forms
             // If not on the UI thread switch to it.
             if (this.InvokeRequired)
             {
-                this.Invoke((MethodInvoker)delegate { this.DoPostWork(wir); });
+                this.Invoke((MethodInvoker) delegate { this.DoPostWork(wir); });
                 return;
             }
 
@@ -459,14 +374,14 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void DownloadAllToolStripOnClick(object sender, EventArgs e)
         {
-            var item = (ToolStripDropDownItem)sender;
-            var owner = (UviContextMenuStrip)item.Owner;
+            var item = (ToolStripDropDownItem) sender;
+            var owner = (UviContextMenuStrip) item.Owner;
             owner.AttachedTreeNode.Nodes.GetEnumerator();
             if (this.usingQuerySource)
             {
                 for (var i = 0; i <= owner.AttachedTreeNode.Nodes.Count - 1; i++)
                 {
-                    var node = (VectorIndexGeometryNode)owner.AttachedTreeNode.Nodes[i];
+                    var node = (VectorIndexGeometryNode) owner.AttachedTreeNode.Nodes[i];
                     if (node.Source.Count <= 100000)
                     {
                         node.Checked = true;
@@ -477,7 +392,7 @@ namespace Gbdx.Vector_Index.Forms
             {
                 for (var i = 0; i <= owner.AttachedTreeNode.Nodes.Count - 1; i++)
                 {
-                    var node = (VectorIndexTypeNode)owner.AttachedTreeNode.Nodes[i];
+                    var node = (VectorIndexTypeNode) owner.AttachedTreeNode.Nodes[i];
                     if (node.Type.Count <= 100000)
                     {
                         node.Checked = true;
@@ -509,18 +424,18 @@ namespace Gbdx.Vector_Index.Forms
             restClient.ExecuteAsync<AccessToken>(
                 request,
                 resp =>
-                    {
-                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                {
+                    Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-                        if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
-                        {
-                            this.token = resp.Data.access_token;
-                        }
-                        else
-                        {
-                            this.token = string.Empty;
-                        }
-                    });
+                    if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
+                    {
+                        this.token = resp.Data.access_token;
+                    }
+                    else
+                    {
+                        this.token = string.Empty;
+                    }
+                });
         }
 
         /// <summary>
@@ -551,15 +466,19 @@ namespace Gbdx.Vector_Index.Forms
             return output;
         }
 
-        private static string GetGeoJson(List<IPolygon> polys)
-        {
-            return Jarvis.ConvertPolygonsToGeoJson(polys);
-        }
-
         private void GetGeometries(VectorIndexSourceNode source, int attempts = 0)
         {
             var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
-            var addressUrl = string.Format("/insight-vector/api/shape/{0}/geometries", source.Source.Name);
+            string addressUrl = string.Empty;
+
+            if (string.IsNullOrEmpty(this.query))
+            {
+                addressUrl = string.Format("/insight-vector/api/shape/{0}/geometries", source.Source.Name);
+            }
+            else
+            {
+                addressUrl = "/insight-vector/api/shape/query/geometries?q=" + query;
+            }
 
             var request = new RestRequest(addressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer  " + this.token);
@@ -571,63 +490,12 @@ namespace Gbdx.Vector_Index.Forms
                 resp => this.ProcessGeometries(resp, source, attempts));
         }
 
-        /// <summary>
-        ///     The call to get the types for selected source.
-        /// </summary>
-        /// <param name="source">
-        ///     worker object
-        /// </param>
-        private void GetGeometryTypes(object source)
-        {
-            var parms = (object[])source;
-            var work = (WorkerObject)parms[0];
-            var gbdxCloudComms = (IGbdxComms)parms[1];
-            work.NetworkObject.Result = string.Empty;
-            var netobj = work.NetworkObject;
-
-            if (netobj.UsingShapeAoi)
-            {
-                netobj = gbdxCloudComms.PushRequest(netobj);
-            }
-            else
-            {
-                netobj = gbdxCloudComms.Request(netobj);
-            }
-
-            work.NetworkObject = netobj;
-
-            work.ResponseObject = VectorIndexHelper.GetSourceType(netobj.Result);
-            if (work.ResponseObject == null)
-            {
-                netobj.ErrorOccurred = true;
-            }
-
-            // If NetworkObject is null or the result string is null or empty don't process any further
-            if (netobj == null || netobj.ErrorOccurred)
-            {
-                // Update the UI with error information
-                this.Invoke(new TypeTree(this.UpdateTreeviewWithGeometryTypes), work);
-
-                // Error occurred so stop procesing
-                return;
-            }
-
-            // ReSharper disable once PossibleNullReferenceException
-            // The null case is checked for above.
-            work.GeometryTypes = work.ResponseObject.Data;
-
-            if (work.IsUnitTest)
-            {
-                return;
-            }
-
-            this.Invoke(new TypeTree(this.UpdateTreeviewWithGeometryTypes), work);
-        }
-
         private void GetSources(int attempts = 0)
         {
             var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
+
             var addressUrl = "/insight-vector/api/shape/sources";
+            
             var request = new RestRequest(addressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
@@ -642,14 +510,22 @@ namespace Gbdx.Vector_Index.Forms
             geometryNode.Text = geometryNode.Text.Replace(GbdxResources.Source_ErrorMessage, string.Empty);
             geometryNode.Text += GbdxResources.SearchingText;
 
-            var sourceNode = (VectorIndexSourceNode)geometryNode.Parent;
-            var geomNode = (VectorIndexGeometryNode)geometryNode;
+            var sourceNode = (VectorIndexSourceNode) geometryNode.Parent;
+            var geomNode = (VectorIndexGeometryNode) geometryNode;
 
             var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
-            var addressString = string.Format(
-                "/insight-vector/api/shape/{0}/{1}/types",
-                sourceNode.Source.Name,
-                geomNode.GeometryType.Name);
+            string addressString = string.Empty;
+            if (string.IsNullOrEmpty(this.query))
+            {
+                addressString = string.Format(
+                    "/insight-vector/api/shape/{0}/{1}/types",
+                    sourceNode.Source.Name,
+                    geomNode.GeometryType.Name);
+            }
+            else
+            {
+                addressString = string.Format("/insight-vector/api/shape/query/{0}/types?q={1}",geomNode.GeometryType.Name, this.query);
+            }
 
             var request = new RestRequest(addressString, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.token);
@@ -660,160 +536,7 @@ namespace Gbdx.Vector_Index.Forms
                 request,
                 resp => this.ProcessGetTypesResponse(resp, geometryNode, attempts));
         }
-
-        /// <summary>
-        ///     The get vector data.
-        /// </summary>
-        /// <param name="source">
-        ///     The source.
-        /// </param>
-        private void GetVectorData(object source)
-        {
-            var param = (object[])source;
-            var work = (WorkerObject)param[0];
-            var gbdxComms = (GbdxComms)param[1];
-
-            work.NetworkObject.Result = string.Empty;
-            work.NetworkObject.AddressUrl = work.OriginalPagingIdUrl;
-            work.NetworkObject.BaseUrl = work.BaseUrl;
-            work.NetworkObject.AuthUrl = Settings.Default.AuthBase;
-            work.NetworkObject.AuthEndpoint = Settings.Default.authenticationServer;
-            var netobj = work.NetworkObject;
-
-            // Set the result and page id back empty string. only needed when this function gets called again.  
-            netobj.Result = string.Empty;
-            netobj.PageId = string.Empty;
-
-            if (netobj.UsingShapeAoi)
-            {
-                netobj = gbdxComms.PushRequest(netobj);
-            }
-            else
-            {
-                netobj = gbdxComms.Request(netobj);
-            }
-
-            if (netobj == null || netobj.ErrorOccurred)
-            {
-                this.Invoke(new DeserializeJson(this.ArcObjectsDeserializeJson), work);
-                return;
-            }
-
-            // Use the page id to get the first page of results.
-            work.NetworkObject.PageId = VectorIndexHelper.GetPageId(netobj.Result);
-
-            work.Responses = new List<string>();
-            var done = false;
-            var itemsReceived = 0;
-            var success = true;
-
-            work.TemporaryFilePath = Path.GetTempFileName();
-            using (var file = new StreamWriter(work.TemporaryFilePath))
-            {
-                while (!done)
-                {
-                    // modifed to work with rest sharp
-                    work.NetworkObject.AddressUrl = VectorIndexHelper.CreateStagedDataRequestUrl(string.Empty);
-
-                    // Make a locally copy of the network object.
-                    var networkObj = work.NetworkObject;
-
-                    // Set the form parameters for paged requests.
-                    var formParams = HttpUtility.ParseQueryString(string.Empty);
-                    formParams.Add("ttl", "1m");
-                    formParams.Add("fields", "attributes");
-                    formParams.Add("pagingId", work.NetworkObject.PageId);
-
-                    // Get the staged request.  If no error return true.
-                    success = gbdxComms.StagedRequest(ref networkObj, formParams);
-
-                    var pagedResult = JsonConvert.DeserializeObject<PagedData>(networkObj.Result);
-
-                    networkObj.PageId = pagedResult.next_paging_id;
-                    networkObj.PageItemCount = Convert.ToInt32(pagedResult.item_count);
-
-                    // Download didn't start so lets try it again.  but after a 250 ms nap to give the service a chance to catch up
-                    if (itemsReceived == 0 && !success)
-                    {
-                        if (work.NumberOfAttempts <= 5)
-                        {
-                            Thread.Sleep(250);
-                            work.NumberOfAttempts++;
-                            this.GetVectorData(source);
-                            return;
-                        }
-
-                        // Attempting to restart this isn't working lets stop and let the user decide what to do
-                        work.NetworkObject.ErrorOccurred = true;
-                        this.Invoke(new DeserializeJson(this.ArcObjectsDeserializeJson), work);
-                        return;
-                    }
-
-                    // If we started getting results but the download stalled
-                    if (itemsReceived > 0 && !success)
-                    {
-                        success = this.ItemRetrievalErrorRecovery(gbdxComms, ref networkObj, formParams);
-
-                        // The attempt to recover from the stalled transfer has failed so let's restart the transfer.
-                        if (!success)
-                        {
-                            if (work.NumberOfAttempts <= 5)
-                            {
-                                work.NumberOfAttempts++;
-                                this.GetVectorData(source);
-
-                                return;
-                            }
-
-                            // Attempting to restart this isn't working lets stop and let the user decide what to do
-                            work.NetworkObject.ErrorOccurred = true;
-                            this.Invoke(new DeserializeJson(this.ArcObjectsDeserializeJson), work);
-                            return;
-                        }
-                    }
-
-                    // Check to see if the last page has been received otherwise process it.
-                    if (networkObj.PageItemCount == 0)
-                    {
-                        done = true;
-                    }
-                    else
-                    {
-                        // If successfull update the UI on the progress and add the page of results to the responses.
-                        if (success)
-                        {
-                            itemsReceived += work.NetworkObject.PageItemCount;
-                            try
-                            {
-                                this.UpdateUiPercentageComplete(work, itemsReceived);
-                            }
-                            catch
-                            {
-                                // A problem occurred in updating the progress of the transfer.  Most likely that the tree structure
-                                // doesnt exist anymore.  So lets stop processing
-                                return;
-                            }
-
-                            work.NumberOfLines++;
-                            var outputStr = pagedResult.data.ToString().Replace("\r", "").Replace("\n", "");
-                            file.WriteLine(outputStr);
-                        }
-
-                        // close If(success)
-                    }
-
-                    // close else
-                }
-
-                // close the while loop
-            }
-
-            // Close using filestream
-
-            // All data has been received Invoke the ArcObjectsDeserilizeJson function on the main UI thread.
-            this.Invoke(new DeserializeJson(this.ArcObjectsDeserializeJson), work);
-        }
-
+        
         /// <summary>
         ///     Event handler for the polygon has been set.  This is how the Vector index through the select area button
         ///     gets kicked off.
@@ -839,242 +562,11 @@ namespace Gbdx.Vector_Index.Forms
             this.PolygonAoi(poly);
         }
 
-        /// <summary>
-        ///     When a error during stage retrieval happens there is a set mount of time that.
-        /// </summary>
-        /// <param name="localComms">
-        ///     The local Comms.
-        /// </param>
-        /// <param name="networkObj">
-        ///     The network object.
-        /// </param>
-        /// <param name="formParams">
-        ///     The form parameters for paged requests.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="bool" />.
-        /// </returns>
-        private bool ItemRetrievalErrorRecovery(
-            IGbdxComms localComms,
-            ref NetObject networkObj,
-            NameValueCollection formParams)
-        {
-            var success = false;
-
-            // Create a stopwatch timer and ensure it's starting at 0.
-            var timer = new Stopwatch();
-            timer.Stop();
-            timer.Reset();
-            timer.Start();
-
-            // Try again for 60 seconds to get a successful response.
-            // After 60 seconds Elastic Search will "forget" about the page id
-            // Requiring a whole new calling of this function.
-            while (timer.ElapsedMilliseconds < 60000)
-            {
-                // Sleep for 250 milliseconds before each attempt.
-                Thread.Sleep(250);
-                success = localComms.StagedRequest(ref networkObj, formParams);
-
-                if (success)
-                {
-                    timer.Stop();
-
-                    // the staged request returned successfully and recovered from the stall.
-                    break;
-                }
-            }
-
-            return success;
-        }
-
-        /// <summary>
-        ///     Call to get the sources within the boundaries of the bounding box
-        /// </summary>
-        /// <param name="param">
-        ///     working object
-        /// </param>
-        private void LoadSources(object param)
-        {
-            var parmArray = (object[])param;
-
-            var work = (WorkerObject)parmArray[0];
-
-            var gbdxComms = (IGbdxComms)parmArray[1];
-
-            work.NetworkObject.Result = string.Empty;
-
-            var netObj = work.NetworkObject;
-
-            if (netObj.UsingShapeAoi)
-            {
-                netObj = gbdxComms.PushRequest(netObj);
-            }
-            else
-            {
-                netObj = gbdxComms.Request(netObj);
-            }
-
-            work.NetworkObject = netObj;
-            work.ResponseObject = VectorIndexHelper.GetSourceType(netObj.Result);
-            if (work.ResponseObject == null)
-            {
-                netObj.ErrorOccurred = true;
-            }
-
-            // If NetworkObject is null or the result string is null or empty don't process any further
-            // Perhaps a messagebox should be spawned with more details about the issue.
-            if (netObj == null || netObj.ErrorOccurred)
-            {
-                // Update the UI with error information
-                this.Invoke(new TypeTree(this.UpdateTreeViewWithSources), work);
-
-                // Error occurred so stop procesing
-                return;
-            }
-
-            // ReSharper disable once PossibleNullReferenceException
-            // The null case is checked for above.
-            work.Types = work.ResponseObject.Data;
-
-            // If not a unit test call the invoke to update the UI Thread
-            this.Invoke(new TypeTree(this.UpdateTreeViewWithSources), work);
-        }
-
-        /// <summary>
-        ///     The merge JSON strings.
-        /// </summary>
-        /// <param name="work">
-        ///     The work.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="JObject" />.
-        /// </returns>
-        private JObject MergeJsonStrings(WorkerObject work)
-        {
-            var count = 0;
-            var mergeSettings = new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union };
-            var sourceNodeIndex = work.SourceNode.Index;
-            var geometryNodeIndex = work.GeometryNode.Index;
-            var typeNodeIndex = -1;
-            if (!work.QuerySource)
-            {
-                typeNodeIndex = work.TypeNode.Index;
-            }
-
-            double progress;
-
-            JObject jsonObject = null;
-            var max = work.NumberOfLines * 2 + 2;
-            try
-            {
-                string line;
-                using (var file = new StreamReader(work.TemporaryFilePath))
-                {
-                    while ((line = file.ReadLine()) != null)
-                    {
-                        count++;
-
-                        if (jsonObject != null)
-                        {
-                            jsonObject.Merge(JObject.Parse(line), mergeSettings);
-                        }
-                        else
-                        {
-                            jsonObject = JObject.Parse(line);
-                        }
-
-                        progress = Math.Round((double)count / max * 100, 1) + 50;
-                        if (work.QuerySource)
-                        {
-                            var doneMessage = string.Format(
-                                "{0} ({1}): {2}% ",
-                                work.GeometryNode.GeometryType.Name,
-                                work.GeometryNode.GeometryType.Count,
-                                progress);
-                            this.UpdateUiProgress(sourceNodeIndex, geometryNodeIndex, doneMessage);
-                        }
-                        else
-                        {
-                            var doneMessage = string.Format(
-                                "{0} ({1}): {2}% ",
-                                work.TypeNode.Type.Name,
-                                work.TypeNode.Type.Count,
-                                progress);
-                            this.UpdateUiProgress(sourceNodeIndex, geometryNodeIndex, typeNodeIndex, doneMessage);
-                        }
-                    }
-                }
-            }
-            catch (Exception error)
-            {
-                work.Logger.Error(error);
-                return null;
-            }
-
-            return jsonObject;
-        }
-
-        /// <summary>
-        ///     The merge properties.
-        /// </summary>
-        /// <param name="jsonObject">
-        ///     The JSON object.
-        /// </param>
-        /// <param name="work">
-        ///     The work.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="JObject" />.
-        /// </returns>
-        private JObject MergeProperties(JObject jsonObject, WorkerObject work)
-        {
-            try
-            {
-                var fields = new Dictionary<string, FieldDefinition>();
-                if (jsonObject != null)
-                {
-                    var jsonFields = (JArray)jsonObject["fields"];
-
-                    // This for loops looks through all of the fields and updtes the max length for the fields
-                    foreach (var t in jsonFields)
-                    {
-                        var tempFieldDefintion = JsonConvert.DeserializeObject<FieldDefinition>(t.ToString());
-                        FieldDefinition value;
-
-                        // Attempt to get the value if one is received will evaluate to true and return the object.
-                        if (fields.TryGetValue(tempFieldDefintion.Alias, out value))
-                        {
-                            if (value.Length < tempFieldDefintion.Length)
-                            {
-                                value.Length = tempFieldDefintion.Length;
-                            }
-                        }
-                        else
-                        {
-                            fields.Add(tempFieldDefintion.Alias, tempFieldDefintion);
-                        }
-                    }
-
-                    jsonFields.RemoveAll();
-                    foreach (var defintion in fields.Values)
-                    {
-                        jsonFields.Add(JObject.FromObject(defintion));
-                    }
-                }
-            }
-            catch (Exception error)
-            {
-                work.Logger.Error(error);
-                return null;
-            }
-
-            return jsonObject;
-        }
-
         private void PolygonAoi(IPolygon poly = null)
         {
-            List<IGeometry> geometries = new List<IGeometry>();
+            this.query = string.Empty;
+
+            var geometries = new List<IGeometry>();
             if (poly == null)
             {
                 geometries = Jarvis.GetSelectedGeometries(ArcMap.Document.FocusMap);
@@ -1093,28 +585,23 @@ namespace Gbdx.Vector_Index.Forms
 
             this.Aoi = Jarvis.CreateGeometryCollectionGeoJson(geometries);
 
-            if (this.textBoxSearch.Text.Equals(GbdxResources.EnterSearchTerms)
-                || this.textBoxSearch.Text == string.Empty)
-            {
-                this.usingQuerySource = false;
-
-                // Modified to work with Restsharp
-                //                work.NetworkObject.AddressUrl = "/insight-vector/api/shape/sources";
-            }
-            else
-            {
-                this.usingQuerySource = true;
-                //                work.NetworkObject.AddressUrl = "/insight-vector/api/shape/query/geometries?q="
-                //                                                + this.textBoxSearch.Text;
-            }
-
             this.treeView1.CheckBoxes = false;
             this.treeView1.Nodes.Clear();
             var searchingNode = new VectorIndexSourceNode { Text = GbdxResources.SearchingText };
             this.treeView1.Nodes.Add(searchingNode);
 
+            if (this.textBoxSearch.Text.Equals(GbdxResources.EnterSearchTerms)
+                || this.textBoxSearch.Text == string.Empty)
+            {
+                this.query = string.Empty;
+                this.GetSources();
+            }
+            else
+            {
+                this.query = this.textBoxSearch.Text;
+                this.GetGeometries(searchingNode);
+            }
             //            work.ApplicationState = this.currentApplicationState;
-            this.GetSources();
         }
 
         private void ProcessGeometries(
@@ -1159,56 +646,55 @@ namespace Gbdx.Vector_Index.Forms
             this.Invoke(new UpdateTreeTypes(this.UpdateTreeviewWithTypes2), resp, geometryNode);
         }
 
-        /// <summary>
-        ///     Process a query node item click
-        /// </summary>
-        /// <param name="itemNode">
-        ///     query source (geometry)
-        /// </param>
-        private void ProcessQueryItemNodeClick(TreeNode itemNode)
-        {
-            itemNode.Text = itemNode.Text.Replace(GbdxResources.Source_ErrorMessage, string.Empty);
-            var work = new WorkerObject
-                           {
-                               BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
-                               BoundBox = this.bBox,
-                               SourceNode = (VectorIndexSourceNode)itemNode.Parent,
-                               GeometryNode = (VectorIndexGeometryNode)itemNode,
-                               NetworkObject = this.networkObject,
-                               QuerySource = true,
-                               ApplicationState = this.currentApplicationState,
-                               Logger = this.logWriter
-                           };
+        ///// <summary>
+        /////     Process a query node item click
+        ///// </summary>
+        ///// <param name="itemNode">
+        /////     query source (geometry)
+        ///// </param>
+        //private void ProcessQueryItemNodeClick(TreeNode itemNode)
+        //{
+        //    itemNode.Text = itemNode.Text.Replace(GbdxResources.Source_ErrorMessage, string.Empty);
+        //    var work = new WorkerObject
+        //    {
+        //        BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
+        //        BoundBox = this.bBox,
+        //        SourceNode = (VectorIndexSourceNode) itemNode.Parent,
+        //        GeometryNode = (VectorIndexGeometryNode) itemNode,
+        //        NetworkObject = this.networkObject,
+        //        QuerySource = true,
+        //        ApplicationState = this.currentApplicationState,
+        //        Logger = this.logWriter
+        //    };
 
-            var geometry = ((VectorIndexSourceNode)itemNode.Parent).Source.Name;
-            var item = ((VectorIndexGeometryNode)itemNode).GeometryType.Name;
+        //    var geometry = ((VectorIndexSourceNode) itemNode.Parent).Source.Name;
+        //    var item = ((VectorIndexGeometryNode) itemNode).GeometryType.Name;
 
-            // Modifed to work with restsharp
-            if (this.networkObject.UsingShapeAoi)
-            {
-                work.OriginalPagingIdUrl = string.Format(
-                    "/insight-vector/api/shape/query/{0}/{1}/paging?q={2}",
-                    Uri.EscapeDataString(geometry),
-                    Uri.EscapeDataString(item),
-                    Uri.EscapeDataString(this.textBoxSearch.Text));
-            }
-            else
-            {
-                work.OriginalPagingIdUrl = VectorIndexHelper.CreateQueryUrl(
-                    work.BoundBox,
-                    string.Empty,
-                    Uri.EscapeDataString(this.textBoxSearch.Text),
-                    Uri.EscapeDataString(geometry),
-                    Uri.EscapeDataString(item));
-            }
-            var para = new object[2];
-            para[0] = work;
-            para[1] = this.comms;
+        //    // Modifed to work with restsharp
+        //    if (this.networkObject.UsingShapeAoi)
+        //    {
+        //        work.OriginalPagingIdUrl = string.Format(
+        //            "/insight-vector/api/shape/query/{0}/{1}/paging?q={2}",
+        //            Uri.EscapeDataString(geometry),
+        //            Uri.EscapeDataString(item),
+        //            Uri.EscapeDataString(this.textBoxSearch.Text));
+        //    }
+        //    else
+        //    {
+        //        work.OriginalPagingIdUrl = VectorIndexHelper.CreateQueryUrl(
+        //            work.BoundBox,
+        //            string.Empty,
+        //            Uri.EscapeDataString(this.textBoxSearch.Text),
+        //            Uri.EscapeDataString(geometry),
+        //            Uri.EscapeDataString(item));
+        //    }
+        //    var para = new object[2];
+        //    para[0] = work;
+        //    para[1] = this.comms;
 
-            ThreadPool.QueueUserWorkItem(this.GetVectorData, para);
-        }
+        //    ThreadPool.QueueUserWorkItem(this.GetVectorData, para);
+        //}
 
-        
 
         /// <summary>
         ///     Process a Source Node Click
@@ -1236,68 +722,68 @@ namespace Gbdx.Vector_Index.Forms
             this.Invoke(new UpdateTreeSources(this.UpdateTreeViewWithSources), resp);
         }
 
-        /// <summary>
-        ///     Process when a type node is clicked like a HGIS &gt; Point &gt; Towers
-        /// </summary>
-        /// <param name="typeNode">
-        ///     Node that was checked
-        /// </param>
-        private void ProcessTypeNodeClick(TreeNode typeNode)
+//        /// <summary>
+//        ///     Process when a type node is clicked like a HGIS &gt; Point &gt; Towers
+//        /// </summary>
+//        /// <param name="typeNode">
+//        ///     Node that was checked
+//        /// </param>
+//        private void ProcessTypeNodeClick(TreeNode typeNode)
+//        {
+//            typeNode.Text = typeNode.Text.Replace(GbdxResources.Source_ErrorMessage, string.Empty);
+//
+//            var work = new WorkerObject
+//            {
+//                BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
+//                BoundBox = this.bBox,
+//                SourceNode = (VectorIndexSourceNode) typeNode.Parent.Parent,
+//                GeometryNode = (VectorIndexGeometryNode) typeNode.Parent,
+//                NetworkObject = this.networkObject,
+//                TypeNode = (VectorIndexTypeNode) typeNode,
+//                QuerySource = false,
+//                ApplicationState = this.currentApplicationState,
+//                Logger = this.logWriter
+//            };
+//
+//            // modified to work with restsharp
+//            string url;
+//            if (this.networkObject.UsingShapeAoi)
+//            {
+//                url = string.Format(
+//                    "/insight-vector/api/shape/{0}/{1}/{2}/paging",
+//                    Uri.EscapeDataString(work.SourceNode.Source.Name),
+//                    Uri.EscapeDataString(work.GeometryNode.GeometryType.Name),
+//                    Uri.EscapeDataString(work.TypeNode.Type.Name));
+//            }
+//            else
+//            {
+//                url = VectorIndexHelper.CreateStagingIdUrl(
+//                    work.BoundBox,
+//                    string.Empty,
+//                    Uri.EscapeDataString(work.SourceNode.Source.Name),
+//                    Uri.EscapeDataString(work.GeometryNode.GeometryType.Name),
+//                    Uri.EscapeDataString(work.TypeNode.Type.Name),
+//                    1,
+//                    100);
+//            }
+//
+//            // Create url to get the Paging ID.
+//            work.OriginalPagingIdUrl = url;
+//            var para = new object[2];
+//            para[0] = work;
+//            para[1] = this.comms;
+//            ThreadPool.QueueUserWorkItem(this.GetVectorData, para);
+//        }
+
+        private void GetPagingId(TreeNode node, int attempts = 0)
         {
-            typeNode.Text = typeNode.Text.Replace(GbdxResources.Source_ErrorMessage, string.Empty);
-
-            var work = new WorkerObject
-                           {
-                               BaseUrl = GbdxHelper.GetEndpointBase(Settings.Default),
-                               BoundBox = this.bBox,
-                               SourceNode = (VectorIndexSourceNode)typeNode.Parent.Parent,
-                               GeometryNode = (VectorIndexGeometryNode)typeNode.Parent,
-                               NetworkObject = this.networkObject,
-                               TypeNode = (VectorIndexTypeNode)typeNode,
-                               QuerySource = false,
-                               ApplicationState = this.currentApplicationState,
-                               Logger = this.logWriter
-                           };
-
-            // modified to work with restsharp
-            string url;
-            if (this.networkObject.UsingShapeAoi)
-            {
-                url = string.Format(
-                    "/insight-vector/api/shape/{0}/{1}/{2}/paging",
-                    Uri.EscapeDataString(work.SourceNode.Source.Name),
-                    Uri.EscapeDataString(work.GeometryNode.GeometryType.Name),
-                    Uri.EscapeDataString(work.TypeNode.Type.Name));
-            }
-            else
-            {
-                url = VectorIndexHelper.CreateStagingIdUrl(
-                    work.BoundBox,
-                    string.Empty,
-                    Uri.EscapeDataString(work.SourceNode.Source.Name),
-                    Uri.EscapeDataString(work.GeometryNode.GeometryType.Name),
-                    Uri.EscapeDataString(work.TypeNode.Type.Name),
-                    1,
-                    100);
-            }
-
-            // Create url to get the Paging ID.
-            work.OriginalPagingIdUrl = url;
-            var para = new object[2];
-            para[0] = work;
-            para[1] = this.comms;
-            ThreadPool.QueueUserWorkItem(this.GetVectorData, para);
-        }
-
-        private void GetPagingId(TreeNode node, string query = "", int attempts = 0)
-        {
-            var sourceNode = (VectorIndexSourceNode)node.Parent.Parent;
-            var geometryNode = (VectorIndexGeometryNode)node.Parent;
-            var typeNode = (VectorIndexTypeNode)node;
+            var sourceNode = (VectorIndexSourceNode) node.Parent.Parent;
+            var geometryNode = (VectorIndexGeometryNode) node.Parent;
+            var typeNode = (VectorIndexTypeNode) node;
 
             var addressUrl = string.Empty;
 
-            if (query == string.Empty)
+            if (string.IsNullOrEmpty(this.query))
             {
                 addressUrl = string.Format(
                     "/insight-vector/api/shape/{0}/{1}/{2}/paging",
@@ -1323,7 +809,7 @@ namespace Gbdx.Vector_Index.Forms
 
             attempts++;
 
-            client.ExecuteAsync<PageId>(request, resp => ProcessPagingId(resp,attempts, query, node));
+            client.ExecuteAsync<PageId>(request, resp => this.ProcessPagingId(resp, attempts, query, node));
         }
 
         private void ProcessPagingId(IRestResponse<PageId> resp, int attempts, string query, TreeNode node)
@@ -1332,16 +818,16 @@ namespace Gbdx.Vector_Index.Forms
 
             if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
             {
-                GetPagingId(node, query, attempts);
+                this.GetPagingId(node, attempts);
                 return;
             }
 
-            var typeNode = (VectorIndexTypeNode)node;
+            var typeNode = (VectorIndexTypeNode) node;
             var tempFile = Path.GetTempFileName();
             var fileStream = File.Open(tempFile, FileMode.Append);
             var fileStreamWriter = new StreamWriter(fileStream);
 
-            this.GetPages(resp.Data.pagingId, typeNode.Type.Name,fileStreamWriter);
+            this.GetPages(resp.Data.pagingId, typeNode.Type.Name, fileStreamWriter);
         }
 
         private static void AddLayerToMap(string tableName, string layerName)
@@ -1350,7 +836,7 @@ namespace Gbdx.Vector_Index.Forms
             {
                 lock (Jarvis.FeatureClassLockerObject)
                 {
-                    var featureWorkspace = (IFeatureWorkspace)Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+                    var featureWorkspace = (IFeatureWorkspace) Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
                     var featureClass = featureWorkspace.OpenFeatureClass(tableName);
                     ILayer featureLayer;
                     featureLayer = VectorIndexHelper.CreateFeatureLayer(featureClass, layerName);
@@ -1378,9 +864,8 @@ namespace Gbdx.Vector_Index.Forms
             attempts++;
             client.ExecuteAsync<PagedData2>(
                 request,
-                resp => ProcessPage(resp, pageId, layerName, fileStreamWriter, attempts));
+                resp => this.ProcessPage(resp, pageId, layerName, fileStreamWriter, attempts));
         }
-
 
 
         private void ProcessPage(
@@ -1395,7 +880,7 @@ namespace Gbdx.Vector_Index.Forms
             // If we have a problem getting the page try again up to max attempts
             if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
             {
-                GetPages(pageId, layerName, fileStreamWriter, attempts);
+                this.GetPages(pageId, layerName, fileStreamWriter, attempts);
                 return;
             }
 
@@ -1405,11 +890,11 @@ namespace Gbdx.Vector_Index.Forms
                 fileStreamWriter.WriteLine(resp.Data.data.Replace("\r", "").Replace("\n", ""));
 
                 // Continue getting the rest of the associated pages.
-                GetPages(resp.Data.next_paging_id, layerName, fileStreamWriter);
+                this.GetPages(resp.Data.next_paging_id, layerName, fileStreamWriter);
             }
             else
             {
-                var fs = (FileStream)fileStreamWriter.BaseStream;
+                var fs = (FileStream) fileStreamWriter.BaseStream;
                 var filepath = fs.Name;
                 fileStreamWriter.Close();
 
@@ -1420,69 +905,6 @@ namespace Gbdx.Vector_Index.Forms
                     this.Invoke(new AddLayerToMapDelegate(AddLayerToMap), tableName, layerName);
                 }
             }
-            
-        }
-
-        /// <summary>
-        ///     The process vector index response 2.
-        /// </summary>
-        /// <param name="source">
-        ///     The source.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="object" />.
-        /// </returns>
-        private object ProcessVectorIndexResponse2(object source)
-        {
-            var work = (WorkerObject)source;
-            var workspace = Jarvis.OpenWorkspace(work.WorkspacePath);
-            var sourceNodeIndex = work.SourceNode.Index;
-            var geometryNodeIndex = work.GeometryNode.Index;
-            var typeNodeIndex = -1;
-            if (!work.QuerySource)
-            {
-                typeNodeIndex = work.TypeNode.Index;
-            }
-
-            var jsonObject = this.MergeJsonStrings(work);
-
-            jsonObject = this.MergeProperties(jsonObject, work);
-
-            if (jsonObject != null)
-            {
-                var mergedJson = jsonObject.ToString(Formatting.None);
-                work.CombinedJsonData = mergedJson;
-            }
-
-            try
-            {
-                this.WriteToTable(workspace, work);
-            }
-            catch (Exception error)
-            {
-                work.Logger.Error(error);
-            }
-
-            if (work.QuerySource)
-            {
-                var doneMessage = string.Format(
-                    "{0} ({1}): {2}% ",
-                    work.GeometryNode.GeometryType.Name,
-                    work.GeometryNode.GeometryType.Count,
-                    100);
-                this.UpdateUiProgress(sourceNodeIndex, geometryNodeIndex, doneMessage);
-            }
-            else
-            {
-                var doneMessage = string.Format(
-                    "{0} ({1}): {2}% ",
-                    work.TypeNode.Type.Name,
-                    work.TypeNode.Type.Count,
-                    100);
-                this.UpdateUiProgress(sourceNodeIndex, geometryNodeIndex, typeNodeIndex, doneMessage);
-            }
-
-            return true; // all is good
         }
 
         /// <summary>
@@ -1553,7 +975,7 @@ namespace Gbdx.Vector_Index.Forms
 
                     this.currentApplicationState = this.applicationStateGenerator.Next();
                     var commandBars = ArcMap.Application.Document.CommandBars;
-                    var commandId = new UIDClass { Value = "DigitalGlobe_Inc_sma_VectorIndex" };
+                    var commandId = new UIDClass {Value = "DigitalGlobe_Inc_sma_VectorIndex"};
 
                     var commandItem = commandBars.Find(commandId, false, false);
                     if (commandItem != null)
@@ -1619,7 +1041,7 @@ namespace Gbdx.Vector_Index.Forms
                 return null;
             }
 
-            var netObj = new NetObject { Password = decyrptedPassword, User = gbdxUsername };
+            var netObj = new NetObject {Password = decyrptedPassword, User = gbdxUsername};
 
             netObj.AuthUrl = Settings.Default.AuthBase;
             netObj.ApiKey = Settings.Default.apiKey;
@@ -1629,31 +1051,31 @@ namespace Gbdx.Vector_Index.Forms
             return netObj;
         }
 
-        /// <summary>
-        ///     The start job.
-        /// </summary>
-        /// <param name="jobs">
-        ///     The jobs.
-        /// </param>
-        private void StartJob(Queue<TreeNode> jobs)
-        {
-            if (jobs.Count == 0)
-            {
-                // No jobs left so abort
-                return;
-            }
-
-            var item = jobs.Dequeue();
-
-            if (item.GetType() == typeof(VectorIndexGeometryNode))
-            {
-                this.ProcessQueryItemNodeClick(item);
-            }
-            else
-            {
-                this.ProcessTypeNodeClick(item);
-            }
-        }
+//        /// <summary>
+//        ///     The start job.
+//        /// </summary>
+//        /// <param name="jobs">
+//        ///     The jobs.
+//        /// </param>
+//        private void StartJob(Queue<TreeNode> jobs)
+//        {
+//            if (jobs.Count == 0)
+//            {
+//                // No jobs left so abort
+//                return;
+//            }
+//
+//            var item = jobs.Dequeue();
+//
+//            if (item.GetType() == typeof (VectorIndexGeometryNode))
+//            {
+//                this.ProcessQueryItemNodeClick(item);
+//            }
+//            else
+//            {
+//                this.ProcessTypeNodeClick(item);
+//            }
+//        }
 
         /// <summary>
         ///     Event handler for when the search textbox gets focus
@@ -1718,7 +1140,7 @@ namespace Gbdx.Vector_Index.Forms
                 }
 
                 // We already have a bounding box drawn so lets re-use that without redrawing the aoi.
-                var tempPolygon = (IPolygon)this.boundingBoxGraphicElement.Geometry;
+                var tempPolygon = (IPolygon) this.boundingBoxGraphicElement.Geometry;
                 this.PolygonAoi(tempPolygon);
             }
             else
@@ -1783,111 +1205,26 @@ namespace Gbdx.Vector_Index.Forms
                 this.checkedNodes.Add(item);
 
                 // Check to see if the node type is a source node.
-                if (item.GetType() == typeof(VectorIndexSourceNode))
+                if (item.GetType() == typeof (VectorIndexSourceNode))
                 {
                     this.ProcessSourceNodeClick(item);
                     return;
                 }
 
                 // Check to see if the node type is a geometry node.
-                if (item.GetType() == typeof(VectorIndexGeometryNode))
+                if (item.GetType() == typeof (VectorIndexGeometryNode))
                 {
-                    // if using query source process the node differently than normal.  There is no next level of nodes before
-                    // data acquistion 
-                    if (this.usingQuerySource)
-                    {
-                        // Check to see if the number of max threads has exceeded teh threshold
-                        if (this.currentThreadCount + 1 > MaxThreads)
-                        {
-                            // Currently the number of threads is at it's max so lets add to the queue
-                            this.jobQueue.Enqueue(item);
-                            item.Text += GbdxResources.Queued;
-                            return;
-                        }
-
-                        // Max number of threads has not been exceeded so kick of a thread for it
-                        this.currentThreadCount += 1;
-                        this.ProcessQueryItemNodeClick(item);
-                    }
-                    else
-                    {
-                        this.ProcessGeometryNodeClick(item);
-                    }
-
+                    this.ProcessGeometryNodeClick(item);
                     return;
                 }
 
                 // Check to see if the node type is a type node.
-                if (item.GetType() == typeof(VectorIndexTypeNode))
+                if (item.GetType() == typeof (VectorIndexTypeNode))
                 {
-                    // Check to see if the number of max threads has exceeded the threshold
-                    if (this.currentThreadCount + 1 > MaxThreads)
-                    {
-                        // Currently the number of threads is at it's max so lets add to the queue
-                        this.jobQueue.Enqueue(item);
-                        item.Text += GbdxResources.Queued;
-                        return;
-                    }
-
-                    // Max number of threads has not been exceeded so kick of a thread for it
-                    this.currentThreadCount += 1;
-
-                    //this.ProcessTypeNodeClick(item);
                     this.GetPagingId(item);
                     return;
                 }
             }
-        }
-
-        /// <summary>
-        ///     Updates the treeview with the types for each source.  Ensures that the type is properly nested under the source
-        ///     node.
-        /// </summary>
-        /// <param name="workObjs">
-        ///     The WorkerObject
-        /// </param>
-        private void UpdateTreeviewWithGeometryTypes(object workObjs)
-        {
-            var worker = (WorkerObject)workObjs;
-            if (worker.NetworkObject.ErrorOccurred)
-            {
-                // Remove the node from the list of checked nodes because an error occurred.
-                this.checkedNodes.Remove(this.treeView1.Nodes[worker.SourceNode.Index]);
-                this.treeView1.Nodes[worker.SourceNode.Index].Checked = false;
-                this.treeView1.Nodes[worker.SourceNode.Index].Text =
-                    this.treeView1.Nodes[worker.SourceNode.Index].Text.Replace(
-                        GbdxResources.SearchingText,
-                        GbdxResources.Source_ErrorMessage);
-
-                // Don't allow it to process further.
-                return;
-            }
-
-            // Results were found so lets get rid of the searching text.
-            this.treeView1.Nodes[worker.SourceNode.Index].Text =
-                this.treeView1.Nodes[worker.SourceNode.Index].Text.Replace(GbdxResources.SearchingText, string.Empty);
-            foreach (var geoType in worker.GeometryTypes)
-            {
-                var newItem = new VectorIndexGeometryNode
-                                  {
-                                      Source = worker.SourceNode.Source,
-                                      GeometryType = geoType,
-                                      Text =
-                                          string.Format("{0} ({1})", geoType.Name, geoType.Count),
-                                      ResponseObject = worker.ResponseObject
-                                  };
-
-                // If we are using querysource then the source node needs to have the "download all" option in the context menu.
-                if (this.usingQuerySource)
-                {
-                    this.treeView1.Nodes[worker.SourceNode.Index].ContextMenuStrip =
-                        this.CreateContextMenuStrip(this.treeView1.Nodes[worker.SourceNode.Index]);
-                }
-
-                this.treeView1.Nodes[worker.SourceNode.Index].Nodes.Add(newItem);
-            }
-
-            this.treeView1.Sort();
         }
 
         private void UpdateTreeviewWithGeometryTypes(
@@ -1908,94 +1245,49 @@ namespace Gbdx.Vector_Index.Forms
                 return;
             }
 
-            // Results were found so lets get rid of the searching text.
-            this.treeView1.Nodes[source.Index].Text =
-                this.treeView1.Nodes[source.Index].Text.Replace(GbdxResources.SearchingText, string.Empty);
-            foreach (var geoType in resp.Data.Data)
+            // do this for normal tree traversal with a source - geometry - type
+            if (string.IsNullOrEmpty(this.query))
             {
-                var newItem = new VectorIndexGeometryNode
-                                  {
-                                      Source = source.Source,
-                                      GeometryType = geoType,
-                                      Text =
-                                          string.Format("{0} ({1})", geoType.Name, geoType.Count)
-                                  };
-
-                // If we are using querysource then the source node needs to have the "download all" option in the context menu.
-                if (this.usingQuerySource)
+                 // Results were found so lets get rid of the searching text.
+                this.treeView1.Nodes[source.Index].Text =
+                    this.treeView1.Nodes[source.Index].Text.Replace(GbdxResources.SearchingText, string.Empty);
+                foreach (var geoType in resp.Data.Data)
                 {
-                    this.treeView1.Nodes[source.Index].ContextMenuStrip =
-                        this.CreateContextMenuStrip(this.treeView1.Nodes[source.Index]);
+                    var newItem = new VectorIndexGeometryNode
+                    {
+                        Source = source.Source,
+                        GeometryType = geoType,
+                        Text =
+                            string.Format("{0} ({1})", geoType.Name, geoType.Count)
+                    };
+
+                    
+
+                    this.treeView1.Nodes[source.Index].Nodes.Add(newItem);
                 }
-
-                this.treeView1.Nodes[source.Index].Nodes.Add(newItem);
             }
-
-            this.treeView1.Sort();
-        }
-
-        /// <summary>
-        ///     Once sources have been received update the UI
-        /// </summary>
-        /// <param name="workObjs">
-        ///     Worker object
-        /// </param>
-        private void UpdateTreeViewWithSources(object workObjs)
-        {
-            var work = (WorkerObject)workObjs;
-
-            if (work.ApplicationState != this.currentApplicationState)
+            else // do this when there is a query whose tree structure goes geoemtry - type
             {
-                return;
-            }
+                // Results were found so lets get rid of the searching text.
+                this.treeView1.Nodes.Remove(source);
+                this.treeView1.CheckBoxes = true;
+                foreach(var geoType in resp.Data.Data)
+                {
+                    var newItem = new VectorIndexGeometryNode
+                    {
+                        Source = null,
+                        GeometryType = geoType,
+                        Text = string.Format("{0} ({1})", geoType.Name, geoType.Count)
+                    };
+                    this.treeView1.Nodes.Add(newItem);
 
-            var sourceList = work.Types;
-
-            // An error occurred
-            if (work.NetworkObject.ErrorOccurred || sourceList == null)
-            {
-                var newItem = new VectorIndexSourceNode
-                                  {
-                                      Text = GbdxResources.Source_ErrorMessage,
-                                      ResponseObject = work.ResponseObject
-                                  };
-                this.treeView1.Nodes.Clear();
-                this.treeView1.Nodes.Add(newItem);
-                this.treeView1.CheckBoxes = false;
-
-                // A error occured so stop processing
-                return;
-            }
-
-            // If no sources found.
-            if (work.ResponseObject.Data.Count == 0)
-            {
-                var newItem = new VectorIndexSourceNode
-                                  {
-                                      Text = GbdxResources.NoDataFound,
-                                      ResponseObject = work.ResponseObject
-                                  };
-                this.treeView1.Nodes.Add(newItem);
-                this.treeView1.CheckBoxes = false;
-
-                // No sources were found so stop processing
-                return;
-            }
-
-            // Before populating the tree lets remove the empty node i created and turn checkboxes back on
-            this.treeView1.Nodes.Clear();
-            this.treeView1.CheckBoxes = true;
-
-            foreach (var item in sourceList)
-            {
-                var newItem = new VectorIndexSourceNode
-                                  {
-                                      Text = string.Format("{0} ({1})", item.Name, item.Count),
-                                      Source = item,
-                                      ResponseObject = work.ResponseObject
-                                  };
-
-                this.treeView1.Nodes.Add(newItem);
+                    // If we are using querysource then the source node needs to have the "download all" option in the context menu.
+                    if (!string.IsNullOrEmpty(this.query))
+                    {
+                        this.treeView1.Nodes[newItem.Index].ContextMenuStrip =
+                            this.CreateContextMenuStrip(this.treeView1.Nodes[newItem.Index]);
+                    }
+                }
             }
 
             this.treeView1.Sort();
@@ -2012,7 +1304,7 @@ namespace Gbdx.Vector_Index.Forms
             // An error occurred
             if (resp.Data == null || resp.Data.Data == null)
             {
-                var newItem = new VectorIndexSourceNode { Text = GbdxResources.Source_ErrorMessage };
+                var newItem = new VectorIndexSourceNode {Text = GbdxResources.Source_ErrorMessage};
                 this.treeView1.Nodes.Clear();
                 this.treeView1.Nodes.Add(newItem);
                 this.treeView1.CheckBoxes = false;
@@ -2024,7 +1316,7 @@ namespace Gbdx.Vector_Index.Forms
             // If no sources found.
             if (resp.Data.Data.Count == 0)
             {
-                var newItem = new VectorIndexSourceNode { Text = GbdxResources.NoDataFound };
+                var newItem = new VectorIndexSourceNode {Text = GbdxResources.NoDataFound};
                 this.treeView1.Nodes.Add(newItem);
                 this.treeView1.CheckBoxes = false;
 
@@ -2039,10 +1331,10 @@ namespace Gbdx.Vector_Index.Forms
             foreach (var item in resp.Data.Data)
             {
                 var newItem = new VectorIndexSourceNode
-                                  {
-                                      Text = string.Format("{0} ({1})", item.Name, item.Count),
-                                      Source = item
-                                  };
+                {
+                    Text = string.Format("{0} ({1})", item.Name, item.Count),
+                    Source = item
+                };
 
                 this.treeView1.Nodes.Add(newItem);
             }
@@ -2054,7 +1346,7 @@ namespace Gbdx.Vector_Index.Forms
             IRestResponse<SourceTypeResponseObject> resp,
             VectorIndexGeometryNode geometryNode)
         {
-            var sourceNode = (VectorIndexSourceNode)geometryNode.Parent;
+            var sourceNode = (VectorIndexSourceNode) geometryNode.Parent;
 
             if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK)
             {
@@ -2070,10 +1362,20 @@ namespace Gbdx.Vector_Index.Forms
                 return;
             }
 
-            this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index].Text =
-                this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index].Text.Replace(
-                    GbdxResources.SearchingText,
-                    string.Empty);
+            // if not using a query
+            if (string.IsNullOrEmpty(this.query))
+            {
+                this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index].Text =
+                    this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index].Text.Replace(
+                        GbdxResources.SearchingText,
+                        string.Empty);
+            }
+            else // if using a query
+            {
+                this.treeView1.Nodes[geometryNode.Index].Text = this.treeView1.Nodes[geometryNode.Index].Text.Replace(
+                        GbdxResources.SearchingText,
+                        string.Empty);
+            }
 
             foreach (var type in resp.Data.Data)
             {
@@ -2083,15 +1385,29 @@ namespace Gbdx.Vector_Index.Forms
                 }
 
                 var newItem = new VectorIndexTypeNode
-                                  {
-                                      Source = sourceNode.Source,
-                                      Geometry = geometryNode.GeometryType,
-                                      Type = type,
-                                      Text = string.Format("{0} ({1})", type.Name, type.Count)
-                                  };
-                this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index].ContextMenuStrip =
-                    this.CreateContextMenuStrip(this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index]);
-                this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index].Nodes.Add(newItem);
+                {
+                    Geometry = geometryNode.GeometryType,
+                    Type = type,
+                    Text = string.Format("{0} ({1})", type.Name, type.Count)
+                };
+
+                if (string.IsNullOrEmpty(this.query))
+                {   // non query
+                    newItem.Source = sourceNode.Source;
+                    this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index].ContextMenuStrip =
+                        this.CreateContextMenuStrip(this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index]);
+
+                    this.treeView1.Nodes[sourceNode.Index].Nodes[geometryNode.Index].Nodes.Add(newItem);
+                }
+                else
+                {   // query
+                    newItem.Source = null;
+
+                    this.treeView1.Nodes[geometryNode.Index].ContextMenuStrip =
+                        this.CreateContextMenuStrip(this.treeView1.Nodes[geometryNode.Index]);
+
+                    this.treeView1.Nodes[geometryNode.Index].Nodes.Add(newItem);
+                }
             }
 
             this.treeView1.Sort();
@@ -2113,7 +1429,7 @@ namespace Gbdx.Vector_Index.Forms
                 var sourceNodeIndex = work.SourceNode.Index;
                 var geometryNodeIndex = work.GeometryNode.Index;
                 var typeNodeIndex = work.TypeNode.Index;
-                var percentComplete = (double)(100 * itemsReceived / work.TypeNode.Type.Count) / 200 * 100;
+                var percentComplete = (double) (100*itemsReceived/work.TypeNode.Type.Count)/200*100;
                 var message = string.Format(
                     "{0} ({1}): {2}% ",
                     work.TypeNode.Type.Name,
@@ -2124,8 +1440,8 @@ namespace Gbdx.Vector_Index.Forms
                 this.treeView1.Invoke(
                     new MethodInvoker(
                         () =>
-                        this.treeView1.Nodes[sourceNodeIndex].Nodes[geometryNodeIndex].Nodes[typeNodeIndex].Text =
-                        message));
+                            this.treeView1.Nodes[sourceNodeIndex].Nodes[geometryNodeIndex].Nodes[typeNodeIndex].Text =
+                                message));
             }
             else
             {
@@ -2133,7 +1449,7 @@ namespace Gbdx.Vector_Index.Forms
                 // The query tree structure is 1 level shorter than the normal vector index tree.
                 var sourceNodeIndex = work.SourceNode.Index;
                 var geometryNodeIndex = work.GeometryNode.Index;
-                var percentComplete = (double)(100 * itemsReceived / work.GeometryNode.GeometryType.Count) / 200 * 100;
+                var percentComplete = (double) (100*itemsReceived/work.GeometryNode.GeometryType.Count)/200*100;
                 var message = string.Format(
                     "{0} ({1}): {2}% ",
                     work.GeometryNode.GeometryType.Name,
@@ -2167,7 +1483,8 @@ namespace Gbdx.Vector_Index.Forms
             this.treeView1.Invoke(
                 new MethodInvoker(
                     () =>
-                    this.treeView1.Nodes[sourceNodeIndex].Nodes[geometryNodeIndex].Nodes[typeNodeIndex].Text = message));
+                        this.treeView1.Nodes[sourceNodeIndex].Nodes[geometryNodeIndex].Nodes[typeNodeIndex].Text =
+                            message));
         }
 
         /// <summary>
@@ -2234,8 +1551,8 @@ namespace Gbdx.Vector_Index.Forms
                 // Re create the network object
                 this.networkObject = this.SetupNetObject(settings.username, settings.password);
                 this.networkObject.AuthUrl = string.IsNullOrEmpty(Settings.Default.AuthBase)
-                                                 ? Settings.Default.DefaultAuthBase
-                                                 : Settings.Default.AuthBase;
+                    ? Settings.Default.DefaultAuthBase
+                    : Settings.Default.AuthBase;
                 // Authorize the network object if it fails inform the user.
                 if (cloudComms.AuthenticateNetworkObject(ref this.networkObject))
                 {
@@ -2256,7 +1573,7 @@ namespace Gbdx.Vector_Index.Forms
             // Everything checked out so lets continue
             return true;
         }
-        
+
         /// <summary>
         ///     Event handler to handle the events of when the form's visibility changes.
         /// </summary>
@@ -2270,44 +1587,7 @@ namespace Gbdx.Vector_Index.Forms
         {
             this.ResetVectorIndex();
         }
-
-        /// <summary>
-        ///     The write to table.
-        /// </summary>
-        /// <param name="workspace">
-        ///     The workspace.
-        /// </param>
-        /// <param name="work">
-        ///     The work.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="bool" />.
-        /// </returns>
-        private bool WriteToTable(IWorkspace workspace, WorkerObject work)
-        {
-            var success = true;
-            if (string.IsNullOrEmpty(work.CombinedJsonData))
-            {
-                return false;
-            }
-
-            try
-            {
-                var outputTable = VectorIndexHelper.GetTable(work.CombinedJsonData);
-                lock (Jarvis.FeatureClassLockerObject)
-                {
-                    outputTable.SaveAsTable(workspace, work.TableName);
-                }
-            }
-            catch (Exception error)
-            {
-                work.Logger.Error(error);
-                success = false;
-            }
-
-            return success;
-        }
-
+        
         /// <summary>
         ///     Implementation class of the dockable window add-in. It is responsible for
         ///     creating and disposing the user interface class of the dockable window.
