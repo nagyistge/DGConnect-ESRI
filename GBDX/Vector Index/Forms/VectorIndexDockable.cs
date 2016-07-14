@@ -19,30 +19,39 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.IO;
-using System.Net;
-using System.Windows.Forms;
-using AnswerFactory;
-using Encryption;
-using ESRI.ArcGIS.Carto;
-using ESRI.ArcGIS.esriSystem;
-using ESRI.ArcGIS.Framework;
-using ESRI.ArcGIS.Geodatabase;
-using ESRI.ArcGIS.Geometry;
-using GbdxSettings;
-using GbdxSettings.Properties;
-using GbdxTools;
-using NetworkConnections;
-using RestSharp;
-using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
-using FileStream = System.IO.FileStream;
-using Path = System.IO.Path;
-
 namespace Gbdx.Vector_Index.Forms
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Drawing;
+    using System.IO;
+    using System.Net;
+    using System.Windows.Forms;
+    using System.Linq;
+
+    using AnswerFactory;
+
+    using Encryption;
+
+    using ESRI.ArcGIS.Carto;
+    using ESRI.ArcGIS.esriSystem;
+    using ESRI.ArcGIS.Framework;
+    using ESRI.ArcGIS.Geodatabase;
+    using ESRI.ArcGIS.Geometry;
+
+    using GbdxSettings;
+    using GbdxSettings.Properties;
+
+    using GbdxTools;
+
+    using NetworkConnections;
+
+    using RestSharp;
+
+    using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
+    using FileStream = System.IO.FileStream;
+    using Path = System.IO.Path;
+
     /// <summary>
     ///     Designer class of the dock able window add-in. It contains user interfaces that
     ///     make up the dockable window.
@@ -52,17 +61,19 @@ namespace Gbdx.Vector_Index.Forms
         private delegate void AddLayerToMapDelegate(string tableName, string layerName);
 
         private delegate void UpdateTreeGeometries(
-            IRestResponse<SourceTypeResponseObject> resp, VectorIndexSourceNode source);
+            IRestResponse<SourceTypeResponseObject> resp,
+            VectorIndexSourceNode source);
 
         private delegate void UpdateTreeSources(IRestResponse<SourceTypeResponseObject> resp);
 
-        private delegate void UpdateTreeTypes(IRestResponse<SourceTypeResponseObject> resp, VectorIndexGeometryNode geom
-            );
+        private delegate void UpdateTreeTypes(IRestResponse<SourceTypeResponseObject> resp, VectorIndexGeometryNode geom);
+
+        private delegate void UpdateStatusText(TreeNode node, string message);
 
         #region Fields & Properties
 
         /// <summary>
-        /// Max number of attempts before an error message is displayed.
+        ///     Max number of attempts before an error message is displayed.
         /// </summary>
         private const int MaxAttempts = 5;
 
@@ -143,7 +154,7 @@ namespace Gbdx.Vector_Index.Forms
         /// </summary>
         public VectorIndexDockable()
         {
-            this.treeView1.AfterCheck += this.TreeView1AfterCheck;
+            this.treeView1.AfterCheck += this.EventHandlerTreeViewAfterCheck;
         }
 
         /// <summary>
@@ -160,47 +171,40 @@ namespace Gbdx.Vector_Index.Forms
             this.Hook = hook;
             this.textBoxSearch.Text = GbdxResources.EnterSearchTerms;
             this.textBoxSearch.ForeColor = Color.DarkGray;
-            this.treeView1.AfterCheck += this.TreeView1AfterCheck;
-            this.VisibleChanged += this.VectorIndexDockableVisibleChanged;
-            this.textBoxSearch.LostFocus += this.TextBoxSearchLeave;
-            this.textBoxSearch.GotFocus += this.TextBoxSearchEnter;
+            this.treeView1.AfterCheck += this.EventHandlerTreeViewAfterCheck;
+            this.VisibleChanged += this.EventHandlerVectorIndexDockableVisibleChanged;
+            this.textBoxSearch.LostFocus += this.EventHandlerTextBoxSearchLeave;
+            this.textBoxSearch.GotFocus += this.EventHandlerTextBoxSearchEnter;
 
-            this.textBoxSearch.KeyUp += this.TextBoxSearchKeyUp;
+            this.textBoxSearch.KeyUp += this.EventHandlerTextBoxSearchKeyUp;
             this.textBoxSearch.Invalidate();
 
-            ArcMap.Events.NewDocument += this.ResetVectorIndex;
-            ArcMap.Events.OpenDocument += this.ResetVectorIndex;
-            ArcMap.Events.CloseDocument += this.ResetVectorIndex;
+            ArcMap.Events.NewDocument += this.ResetVectorServices;
+            ArcMap.Events.OpenDocument += this.ResetVectorServices;
+            ArcMap.Events.CloseDocument += this.ResetVectorServices;
             this.currentApplicationState = this.applicationStateGenerator.Next();
 
             this.aoiTypeComboBox.SelectedIndex = 0;
             this.ActiveControl = this.treeView1;
         }
 
-        /// <summary>
-        ///     Event handler for when the clear button is clicked.
-        /// </summary>
-        /// <param name="sender">
-        ///     the button that is clicked
-        /// </param>
-        /// <param name="e">
-        ///     event arguments that get sent by the button
-        /// </param>
-        private void ClearButtonClick(object sender, EventArgs e)
+        private static void AddLayerToMap(string tableName, string layerName)
         {
-            // Clear any current drawn images
-            if (this.boundingBoxGraphicElement != null)
+            try
             {
-                ArcUtility.DeleteElementFromGraphicContainer(
-                    ArcMap.Document.ActivatedView,
-                    this.boundingBoxGraphicElement);
-                this.boundingBoxGraphicElement = null;
+                lock (Jarvis.FeatureClassLockerObject)
+                {
+                    var featureWorkspace = (IFeatureWorkspace)Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+                    var featureClass = featureWorkspace.OpenFeatureClass(tableName);
+                    ILayer featureLayer;
+                    featureLayer = VectorIndexHelper.CreateFeatureLayer(featureClass, layerName);
+                    VectorIndexHelper.AddFeatureLayerToMap(featureLayer);
+                }
             }
-
-            // Clear Treeview
-            this.treeView1.Nodes.Clear();
-            this.textBoxSearch.Clear();
-            this.currentApplicationState = this.applicationStateGenerator.Next();
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
         }
 
         /// <summary>
@@ -216,10 +220,10 @@ namespace Gbdx.Vector_Index.Forms
         {
             var menuStrip = new UviContextMenuStrip(node);
             var downloadAllToolStrip = new ToolStripMenuItem
-            {
-                Text = GbdxResources.Download_all_Below_100000,
-                Name = "DownloadAll"
-            };
+                                           {
+                                               Text = GbdxResources.Download_all_Below_100000,
+                                               Name = "DownloadAll"
+                                           };
             downloadAllToolStrip.Click += this.DownloadAllToolStripOnClick;
             menuStrip.Items.Add(downloadAllToolStrip);
 
@@ -237,14 +241,14 @@ namespace Gbdx.Vector_Index.Forms
         /// </param>
         private void DownloadAllToolStripOnClick(object sender, EventArgs e)
         {
-            var item = (ToolStripDropDownItem) sender;
-            var owner = (UviContextMenuStrip) item.Owner;
+            var item = (ToolStripDropDownItem)sender;
+            var owner = (UviContextMenuStrip)item.Owner;
             owner.AttachedTreeNode.Nodes.GetEnumerator();
             if (this.usingQuerySource)
             {
                 for (var i = 0; i <= owner.AttachedTreeNode.Nodes.Count - 1; i++)
                 {
-                    var node = (VectorIndexGeometryNode) owner.AttachedTreeNode.Nodes[i];
+                    var node = (VectorIndexGeometryNode)owner.AttachedTreeNode.Nodes[i];
                     if (node.Source.Count <= 100000)
                     {
                         node.Checked = true;
@@ -255,13 +259,274 @@ namespace Gbdx.Vector_Index.Forms
             {
                 for (var i = 0; i <= owner.AttachedTreeNode.Nodes.Count - 1; i++)
                 {
-                    var node = (VectorIndexTypeNode) owner.AttachedTreeNode.Nodes[i];
+                    var node = (VectorIndexTypeNode)owner.AttachedTreeNode.Nodes[i];
                     if (node.Type.Count <= 100000)
                     {
                         node.Checked = true;
                     }
                 }
             }
+        }
+
+        /// <summary>
+        ///     Event handler for when the clear button is clicked.
+        /// </summary>
+        /// <param name="sender">
+        ///     the button that is clicked
+        /// </param>
+        /// <param name="e">
+        ///     event arguments that get sent by the button
+        /// </param>
+        private void EventHandlerClearButtonClick(object sender, EventArgs e)
+        {
+            // Clear any current drawn images
+            if (this.boundingBoxGraphicElement != null)
+            {
+                ArcUtility.DeleteElementFromGraphicContainer(
+                    ArcMap.Document.ActivatedView,
+                    this.boundingBoxGraphicElement);
+                this.boundingBoxGraphicElement = null;
+            }
+
+            // Clear Treeview
+            this.treeView1.Nodes.Clear();
+            this.textBoxSearch.Clear();
+            this.currentApplicationState = this.applicationStateGenerator.Next();
+        }
+
+        /// <summary>
+        ///     Event handler for when the select area button is clicked.
+        /// </summary>
+        /// <param name="sender">
+        ///     the button that is clicked
+        /// </param>
+        /// <param name="e">
+        ///     event arguments that get sent by the button
+        /// </param>
+        private void EventHandlerSelectAreaButtonClick(object sender, EventArgs e)
+        {
+            // Draw Rectangle option
+            if (this.aoiTypeComboBox.SelectedIndex == 0)
+            {
+                // Reset this variable to allow the user to differentiate between normal and query search.
+                this.usingQuerySource = false;
+                this.treeView1.CheckBoxes = true;
+
+                if (ArcMap.Application.CurrentTool.Name != "DigitalGlobe_Inc_sma_VectorIndex")
+                {
+                    // Unsubscribe from any previous events.  Prevents awesome mode
+                    VectorIndexRelay.Instance.PolygonHasBeenSet -= this.InstancePolygonHasBeenSet;
+
+                    // Subscribe to the event
+                    VectorIndexRelay.Instance.PolygonHasBeenSet += this.InstancePolygonHasBeenSet;
+
+                    // Clear any current drawn images
+                    if (this.boundingBoxGraphicElement != null)
+                    {
+                        ArcUtility.DeleteElementFromGraphicContainer(
+                            ArcMap.Document.ActivatedView,
+                            this.boundingBoxGraphicElement);
+                        this.boundingBoxGraphicElement = null;
+                    }
+
+                    // Clear the treeview
+                    this.treeView1.Nodes.Clear();
+                    this.textBoxSearch.Clear();
+
+                    this.currentApplicationState = this.applicationStateGenerator.Next();
+                    var commandBars = ArcMap.Application.Document.CommandBars;
+                    var commandId = new UIDClass { Value = "DigitalGlobe_Inc_sma_VectorIndex" };
+
+                    var commandItem = commandBars.Find(commandId, false, false);
+                    if (commandItem != null)
+                    {
+                        this.originallySelectedItem = ArcMap.Application.CurrentTool;
+                        ArcMap.Application.CurrentTool = commandItem;
+                    }
+                }
+            }
+
+            // Use selected AOI 
+            else if (this.aoiTypeComboBox.SelectedIndex == 1)
+            {
+                // Clear any current drawn images
+                if (this.boundingBoxGraphicElement != null)
+                {
+                    ArcUtility.DeleteElementFromGraphicContainer(
+                        ArcMap.Document.ActivatedView,
+                        this.boundingBoxGraphicElement);
+                    this.boundingBoxGraphicElement = null;
+                }
+
+                this.ShapeAoi();
+            }
+        }
+
+        /// <summary>
+        ///     Event handler for when the search textbox gets focus
+        /// </summary>
+        /// <param name="sender">
+        ///     the textbox
+        /// </param>
+        /// <param name="e">
+        ///     event arguments
+        /// </param>
+        private void EventHandlerTextBoxSearchEnter(object sender, EventArgs e)
+        {
+            if (this.textBoxSearch.Text.Equals(GbdxResources.EnterSearchTerms))
+            {
+                this.textBoxSearch.Clear();
+                this.textBoxSearch.ForeColor = Color.Black;
+            }
+        }
+
+        /// <summary>
+        ///     The event handler for when the key up event for the search textbox is triggered.
+        /// </summary>
+        /// <param name="sender">
+        ///     textbox listening for the key up event.
+        /// </param>
+        /// <param name="e">
+        ///     Event arguments
+        /// </param>
+        private void EventHandlerTextBoxSearchKeyUp(object sender, KeyEventArgs e)
+        {
+            // Only care about the enter key
+            if (e.KeyCode != Keys.Enter)
+            {
+                return;
+            }
+
+            this.currentApplicationState = this.applicationStateGenerator.Next();
+            this.treeView1.Nodes.Clear();
+            this.checkedNodes.Clear();
+            this.treeView1.CheckBoxes = true;
+            this.usingQuerySource = false;
+
+            if (this.aoiTypeComboBox.SelectedIndex == 0)
+            {
+                // if the boundingbox graphic element hasn't been pressed then
+                // lets assume that we use the curren't active views extent as the envelope.
+                if (this.boundingBoxGraphicElement == null)
+                {
+                    var poly = VectorIndexHelper.DisplayRectangle(
+                        ArcMap.Document.ActiveView,
+                        out this.boundingBoxGraphicElement);
+
+                    // Kick off vector index functionality
+                    this.ShapeAoi(poly);
+                    return;
+                }
+
+                // We already have a bounding box drawn so lets re-use that without redrawing the aoi.
+                var tempPolygon = (IPolygon)this.boundingBoxGraphicElement.Geometry;
+                this.ShapeAoi(tempPolygon);
+            }
+            else
+            {
+                // Clear any current drawn images
+                if (this.boundingBoxGraphicElement != null)
+                {
+                    ArcUtility.DeleteElementFromGraphicContainer(
+                        ArcMap.Document.ActivatedView,
+                        this.boundingBoxGraphicElement);
+                    this.boundingBoxGraphicElement = null;
+                }
+
+                this.ShapeAoi();
+            }
+        }
+
+        /// <summary>
+        ///     Event handler for when the search textbox loses focus
+        /// </summary>
+        /// <param name="sender">
+        ///     the textbox
+        /// </param>
+        /// <param name="e">
+        ///     Event arguments
+        /// </param>
+        private void EventHandlerTextBoxSearchLeave(object sender, EventArgs e)
+        {
+            if (string.IsNullOrEmpty(this.textBoxSearch.Text))
+            {
+                this.textBoxSearch.Text = GbdxResources.EnterSearchTerms;
+                this.textBoxSearch.ForeColor = Color.DarkGray;
+            }
+        }
+
+        /// <summary>
+        ///     Event handler that fires every time a item is checked in the tree view.
+        /// </summary>
+        /// <param name="sender">
+        ///     Tree view
+        /// </param>
+        /// <param name="e">
+        ///     Tree view Arguments
+        /// </param>
+        private void EventHandlerTreeViewAfterCheck(object sender, TreeViewEventArgs e)
+        {
+            var nodes = this.GetCheckedNodes(this.treeView1.Nodes);
+            foreach (var item in nodes)
+            {
+                // if we already have the node as Checked stop processing.
+                if (this.checkedNodes.Contains(item))
+                {
+                    continue;
+                }
+
+                // Add the item to the list of checked items
+                this.checkedNodes.Add(item);
+
+                // Check to see if the node type is a source node.
+                if (item.GetType() == typeof(VectorIndexSourceNode))
+                {
+                    this.ProcessSourceNodeClick(item);
+                    return;
+                }
+
+                // Check to see if the node type is a geometry node.
+                if (item.GetType() == typeof(VectorIndexGeometryNode))
+                {
+                    this.ProcessGeometryNodeClick(item);
+                    return;
+                }
+
+                // Check to see if the node type is a type node.
+                if (item.GetType() == typeof(VectorIndexTypeNode))
+                {
+                    this.GetPagingId(item, this.currentApplicationState);
+                    return;
+                }
+
+            }
+        }
+
+        private void UpdateTreeNodeStatus(TreeNode node, string message)
+        {
+            var vectorNode = (VectorIndexTypeNode)node;
+
+            var result = this.treeView1.Nodes.Find(node.Name, true);
+            var updatedMessage = string.Format("{0} ({1}) [{2}]", vectorNode.Type.Name, vectorNode.Type.Count, message);
+
+            if (result.Length != 0)
+            {
+                result[0].Text = updatedMessage;
+            }
+        }
+
+        /// <summary>
+        ///     Event handler to handle the events of when the form's visibility changes.
+        /// </summary>
+        /// <param name="sender">
+        ///     sender of the event
+        /// </param>
+        /// <param name="e">
+        ///     event arguments
+        /// </param>
+        private void EventHandlerVectorIndexDockableVisibleChanged(object sender, EventArgs e)
+        {
+            this.ResetVectorServices();
         }
 
         private void GetAuthenticationToken()
@@ -287,18 +552,18 @@ namespace Gbdx.Vector_Index.Forms
             restClient.ExecuteAsync<AccessToken>(
                 request,
                 resp =>
-                {
-                    Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                    {
+                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-                    if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
-                    {
-                        this.token = resp.Data.access_token;
-                    }
-                    else
-                    {
-                        this.token = string.Empty;
-                    }
-                });
+                        if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
+                        {
+                            this.token = resp.Data.access_token;
+                        }
+                        else
+                        {
+                            this.token = string.Empty;
+                        }
+                    });
         }
 
         /// <summary>
@@ -329,6 +594,15 @@ namespace Gbdx.Vector_Index.Forms
             return output;
         }
 
+        private static string GetFileNameCloseStream(StreamWriter streamWriter)
+        {
+            var fs = (FileStream)streamWriter.BaseStream;
+            var filepath = fs.Name;
+            streamWriter.Close();
+
+            return filepath;
+        }
+
         private void GetGeometries(VectorIndexSourceNode source, int applicationState, int attempts = 0)
         {
             var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
@@ -353,7 +627,64 @@ namespace Gbdx.Vector_Index.Forms
                 resp => this.ProcessGeometries(resp, source, applicationState, attempts));
         }
 
-        private void GetSources(int applicationState,int attempts = 0)
+        private void GetPages(TreeNode node, string pageId, int applicationState, int totalCount, int currentCount, string layerName, StreamWriter fileStreamWriter, int attempts = 0)
+        {
+            var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
+            var request = new RestRequest("/insight-vector/api/esri/paging", Method.POST);
+
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+
+            request.AddParameter("ttl", "5m");
+            request.AddParameter("fields", "attributes");
+            request.AddParameter("pagingId", pageId);
+
+            attempts++;
+            client.ExecuteAsync<PagedData2>(
+                request,
+                resp => this.ProcessPage(node, resp, applicationState, totalCount, currentCount, pageId, layerName, fileStreamWriter, attempts));
+        }
+
+        //private void UpdateStatus(TreeNode node, )
+
+        private void GetPagingId(TreeNode node, int applicationState, int attempts = 0)
+        {
+            var sourceNode = (VectorIndexSourceNode)node.Parent.Parent;
+            var geometryNode = (VectorIndexGeometryNode)node.Parent;
+            var typeNode = (VectorIndexTypeNode)node;
+
+            var addressUrl = string.Empty;
+
+            if (string.IsNullOrEmpty(this.query))
+            {
+                addressUrl = string.Format(
+                    "/insight-vector/api/shape/{0}/{1}/{2}/paging",
+                    sourceNode.Source.Name,
+                    geometryNode.GeometryType.Name,
+                    typeNode.Type.Name);
+            }
+            else
+            {
+                addressUrl = string.Format(
+                    "/insight-vector/api/shape/query/{0}/{1}/paging?q={2}",
+                    geometryNode.GeometryType.Name,
+                    typeNode.Type.Name,
+                    this.query);
+            }
+
+            var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
+
+            var request = new RestRequest(addressUrl, Method.POST);
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json", this.Aoi, ParameterType.RequestBody);
+
+            attempts++;
+
+            client.ExecuteAsync<PageId>(request, resp => this.ProcessPagingId(resp, attempts, node, applicationState));
+        }
+
+        private void GetSources(int applicationState, int attempts = 0)
         {
             var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
 
@@ -365,7 +696,9 @@ namespace Gbdx.Vector_Index.Forms
             request.AddParameter("application/json", this.Aoi, ParameterType.RequestBody);
             attempts++;
 
-            client.ExecuteAsync<SourceTypeResponseObject>(request, resp => this.ProcessSources(resp,applicationState, attempts));
+            client.ExecuteAsync<SourceTypeResponseObject>(
+                request,
+                resp => this.ProcessSources(resp, applicationState, attempts));
         }
 
         private void GetTypes(TreeNode geometryNode, int applicationState, int attempts = 0)
@@ -373,8 +706,8 @@ namespace Gbdx.Vector_Index.Forms
             geometryNode.Text = geometryNode.Text.Replace(GbdxResources.Source_ErrorMessage, string.Empty);
             geometryNode.Text += GbdxResources.SearchingText;
 
-            var sourceNode = (VectorIndexSourceNode) geometryNode.Parent;
-            var geomNode = (VectorIndexGeometryNode) geometryNode;
+            var sourceNode = (VectorIndexSourceNode)geometryNode.Parent;
+            var geomNode = (VectorIndexGeometryNode)geometryNode;
 
             var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
             var addressString = string.Empty;
@@ -387,8 +720,10 @@ namespace Gbdx.Vector_Index.Forms
             }
             else
             {
-                addressString = string.Format("/insight-vector/api/shape/query/{0}/types?q={1}",
-                    geomNode.GeometryType.Name, this.query);
+                addressString = string.Format(
+                    "/insight-vector/api/shape/query/{0}/types?q={1}",
+                    geomNode.GeometryType.Name,
+                    this.query);
             }
 
             var request = new RestRequest(addressString, Method.POST);
@@ -426,6 +761,213 @@ namespace Gbdx.Vector_Index.Forms
             this.ShapeAoi(poly);
         }
 
+        private void ProcessGeometries(
+            IRestResponse<SourceTypeResponseObject> resp,
+            VectorIndexSourceNode source,
+            int applicationState,
+            int attempts)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            {
+                this.GetGeometries(source, applicationState, attempts);
+            }
+
+            if (applicationState == this.currentApplicationState)
+            {
+                this.Invoke(new UpdateTreeGeometries(this.UpdateTreeviewWithGeometry), resp, source);
+            }
+        }
+
+        /// <summary>
+        ///     Process a geometry node click.  (Polygon, Polyline, Point)
+        /// </summary>
+        /// <param name="geometryNode">
+        ///     The node that was checked
+        /// </param>
+        private void ProcessGeometryNodeClick(TreeNode geometryNode)
+        {
+            this.GetTypes(geometryNode, this.currentApplicationState);
+        }
+
+        private void ProcessGetTypesResponse(
+            IRestResponse<SourceTypeResponseObject> resp,
+            TreeNode geometryNode,
+            int applicationState,
+            int attempts)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            {
+                this.GetTypes(geometryNode, applicationState, attempts);
+                return;
+            }
+
+            if (applicationState == this.currentApplicationState)
+            {
+                this.Invoke(new UpdateTreeTypes(this.UpdateTreeviewWithTypes), resp, geometryNode);
+            }
+        }
+
+        /// <summary>
+        ///     Combine all the pages of json results into one big json collection and convert it to a feature class
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="resp">IRestResponse</param>
+        /// <param name="applicationState"></param>
+        /// <param name="totalCount"></param>
+        /// <param name="currentCount"></param>
+        /// <param name="pageId">page id for the next page of results</param>
+        /// <param name="layerName">name of the layer that will be made</param>
+        /// <param name="fileStreamWriter">streamwriter to the tempfile</param>
+        /// <param name="attempts">number of attempts to make before erroring out</param>
+        private void ProcessPage(TreeNode node, IRestResponse<PagedData2> resp, int applicationState, int totalCount, int currentCount, string pageId, string layerName, StreamWriter fileStreamWriter, int attempts)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            // If we have a problem getting the page try again up to max attempts
+            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            {
+                this.GetPages(node, pageId, applicationState, totalCount, currentCount, layerName, fileStreamWriter, attempts);
+                return;
+            }
+
+            // there are items so write them to the temp file.
+            // one page of results per line
+            if (resp.Data.item_count != "0")
+            {
+                // Write entire page of data to one line in the temp file
+                fileStreamWriter.WriteLine(resp.Data.data.Replace("\r", "").Replace("\n", ""));
+
+                if (applicationState == this.currentApplicationState)
+                {
+                    int count;
+                    var result = int.TryParse(resp.Data.item_count, out count);
+
+                    if (result)
+                    {
+                        currentCount += count;
+                    }
+
+                    var message = string.Format("Downloading {0}%", currentCount / totalCount * 100);
+                    this.Invoke(new UpdateStatusText(this.UpdateTreeNodeStatus), node, message);
+
+                    // Continue getting the rest of the associated pages.
+                    this.GetPages(node, resp.Data.next_paging_id, applicationState, totalCount, currentCount, layerName, fileStreamWriter);
+                }
+                else
+                {
+                    // application states changed mid download so stop future paging and delete the temp file.
+                    var filepath = GetFileNameCloseStream(fileStreamWriter);
+
+                    if (File.Exists(filepath))
+                    {
+                        File.Delete(filepath);
+                    }
+                }
+            }
+            else
+            {
+                var filepath = GetFileNameCloseStream(fileStreamWriter);
+
+                // make sure that the application state matches before proceeding with creating the feature class
+                if (applicationState == this.currentApplicationState)
+                {
+                    var message = "Processing";
+                    this.Invoke(new UpdateStatusText(this.UpdateTreeNodeStatus), node, message);
+
+                    var tableName = Jarvis.ConvertPagesToFeatureClass(filepath, layerName);
+
+                    if (!string.IsNullOrEmpty(tableName))
+                    {
+                        this.Invoke(new AddLayerToMapDelegate(AddLayerToMap), tableName, layerName);
+                        message = "Complete";
+                        this.Invoke(new UpdateStatusText(this.UpdateTreeNodeStatus), node, message);
+                    }
+                }
+
+                // delete the file after everything has finished processing
+                if (File.Exists(filepath))
+                {
+                    File.Delete(filepath);
+                }
+            }
+        }
+
+        private void ProcessPagingId(IRestResponse<PageId> resp, int attempts, TreeNode node, int applicationState)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            {
+                this.GetPagingId(node, attempts);
+                return;
+            }
+
+            var typeNode = (VectorIndexTypeNode)node;
+            var tempFile = Path.GetTempFileName();
+            var fileStream = File.Open(tempFile, FileMode.Append);
+            var fileStreamWriter = new StreamWriter(fileStream);
+
+            if (applicationState == this.currentApplicationState)
+            {
+                this.GetPages(node, resp.Data.pagingId, applicationState, resp.Data.itemCount,0, typeNode.Type.Name, fileStreamWriter);
+            }
+        }
+
+        /// <summary>
+        ///     Process a Source Node Click
+        /// </summary>
+        /// <param name="sourceNode">
+        ///     the source node that was clicked
+        /// </param>
+        private void ProcessSourceNodeClick(TreeNode sourceNode)
+        {
+            sourceNode.Text = sourceNode.Text.Replace(GbdxResources.Source_ErrorMessage, string.Empty);
+            sourceNode.Text += GbdxResources.SearchingText;
+
+            this.GetGeometries(sourceNode as VectorIndexSourceNode, this.currentApplicationState);
+        }
+
+        private void ProcessSources(IRestResponse<SourceTypeResponseObject> resp, int applicationState, int attempts)
+        {
+            Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            {
+                this.GetSources(applicationState, attempts);
+            }
+
+            if (applicationState == this.currentApplicationState)
+            {
+                this.Invoke(new UpdateTreeSources(this.UpdateTreeViewWithSources), resp);
+            }
+        }
+
+        /// <summary>
+        ///     Resets the vector index.  Deletes the element from the graphic container, clears the the treeview and search
+        ///     textbox
+        ///     and changes the current applications tate.
+        /// </summary>
+        private void ResetVectorServices()
+        {
+            this.treeView1.Nodes.Clear();
+            this.textBoxSearch.Clear();
+
+            // Clear any current drawn images
+            if (this.boundingBoxGraphicElement != null)
+            {
+                ArcUtility.DeleteElementFromGraphicContainer(
+                    ArcMap.Document.ActivatedView,
+                    this.boundingBoxGraphicElement);
+                this.boundingBoxGraphicElement = null;
+            }
+
+            this.currentApplicationState = this.applicationStateGenerator.Next();
+        }
+
         private void ShapeAoi(IPolygon poly = null)
         {
             this.query = string.Empty;
@@ -451,7 +993,7 @@ namespace Gbdx.Vector_Index.Forms
 
             this.treeView1.CheckBoxes = false;
             this.treeView1.Nodes.Clear();
-            var searchingNode = new VectorIndexSourceNode {Text = GbdxResources.SearchingText};
+            var searchingNode = new VectorIndexSourceNode { Text = GbdxResources.SearchingText };
             this.treeView1.Nodes.Add(searchingNode);
 
             this.currentApplicationState = this.applicationStateGenerator.Next();
@@ -469,441 +1011,7 @@ namespace Gbdx.Vector_Index.Forms
             }
         }
 
-        private void ProcessGeometries(IRestResponse<SourceTypeResponseObject> resp, VectorIndexSourceNode source, int applicationState, int attempts)
-        {
-            Jarvis.Logger.Info(resp.ResponseUri.ToString());
-
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
-            {
-                this.GetGeometries(source, applicationState, attempts);
-            }
-
-            if(applicationState == this.currentApplicationState)
-            {
-                this.Invoke(new UpdateTreeGeometries(this.UpdateTreeviewWithGeometryTypes), resp, source);
-            }
-        }
-
-        /// <summary>
-        ///     Process a geometry node click.  (Polygon, Polyline, Point)
-        /// </summary>
-        /// <param name="geometryNode">
-        ///     The node that was checked
-        /// </param>
-        private void ProcessGeometryNodeClick(TreeNode geometryNode)
-        {
-            this.GetTypes(geometryNode, this.currentApplicationState);
-        }
-
-        private void ProcessGetTypesResponse(IRestResponse<SourceTypeResponseObject> resp, TreeNode geometryNode, int applicationState, int attempts)
-        {
-            Jarvis.Logger.Info(resp.ResponseUri.ToString());
-
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
-            {
-                this.GetTypes(geometryNode,applicationState, attempts);
-                return;
-            }
-
-            if(applicationState == this.currentApplicationState)
-            {
-                this.Invoke(new UpdateTreeTypes(this.UpdateTreeviewWithTypes2), resp, geometryNode);
-            }
-        }
-
-        /// <summary>
-        ///     Process a Source Node Click
-        /// </summary>
-        /// <param name="sourceNode">
-        ///     the source node that was clicked
-        /// </param>
-        private void ProcessSourceNodeClick(TreeNode sourceNode)
-        {
-            sourceNode.Text = sourceNode.Text.Replace(GbdxResources.Source_ErrorMessage, string.Empty);
-            sourceNode.Text += GbdxResources.SearchingText;
-
-            this.GetGeometries(sourceNode as VectorIndexSourceNode, this.currentApplicationState);
-        }
-
-        private void ProcessSources(IRestResponse<SourceTypeResponseObject> resp, int applicationState, int attempts)
-        {
-             Jarvis.Logger.Info(resp.ResponseUri.ToString());
-
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
-            {
-                this.GetSources(applicationState, attempts);
-            }
-
-            if(applicationState == this.currentApplicationState)
-            {
-                this.Invoke(new UpdateTreeSources(this.UpdateTreeViewWithSources), resp);
-            }
-        }
-
-        private void GetPagingId(TreeNode node, int applicationState, int attempts = 0)
-        {
-            var sourceNode = (VectorIndexSourceNode) node.Parent.Parent;
-            var geometryNode = (VectorIndexGeometryNode) node.Parent;
-            var typeNode = (VectorIndexTypeNode) node;
-
-            var addressUrl = string.Empty;
-
-            if (string.IsNullOrEmpty(this.query))
-            {
-                addressUrl = string.Format(
-                    "/insight-vector/api/shape/{0}/{1}/{2}/paging",
-                    sourceNode.Source.Name,
-                    geometryNode.GeometryType.Name,
-                    typeNode.Type.Name);
-            }
-            else
-            {
-                addressUrl = string.Format(
-                    "/insight-vector/api/shape/query/{0}/{1}/paging?q={2}",
-                    geometryNode.GeometryType.Name,
-                    typeNode.Type.Name, this.query);
-            }
-
-            var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
-
-            var request = new RestRequest(addressUrl, Method.POST);
-            request.AddHeader("Authorization", "Bearer " + this.token);
-            request.AddHeader("Content-Type", "application/json");
-            request.AddParameter("application/json", this.Aoi, ParameterType.RequestBody);
-
-            attempts++;
-
-            client.ExecuteAsync<PageId>(request, resp => this.ProcessPagingId(resp, attempts, node, applicationState));
-        }
-
-        private void ProcessPagingId(IRestResponse<PageId> resp, int attempts, TreeNode node, int applicationState)
-        {
-            Jarvis.Logger.Info(resp.ResponseUri.ToString());
-
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
-            {
-                this.GetPagingId(node, attempts);
-                return;
-            }
-
-            var typeNode = (VectorIndexTypeNode) node;
-            var tempFile = Path.GetTempFileName();
-            var fileStream = File.Open(tempFile, FileMode.Append);
-            var fileStreamWriter = new StreamWriter(fileStream);
-
-            if(applicationState == attempts)
-            {
-                this.GetPages(resp.Data.pagingId, typeNode.Type.Name, fileStreamWriter);
-            }
-        }
-
-        private static void AddLayerToMap(string tableName, string layerName)
-        {
-            try
-            {
-                lock (Jarvis.FeatureClassLockerObject)
-                {
-                    var featureWorkspace = (IFeatureWorkspace) Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
-                    var featureClass = featureWorkspace.OpenFeatureClass(tableName);
-                    ILayer featureLayer;
-                    featureLayer = VectorIndexHelper.CreateFeatureLayer(featureClass, layerName);
-                    VectorIndexHelper.AddFeatureLayerToMap(featureLayer);
-                }
-            }
-            catch (Exception error)
-            {
-                Jarvis.Logger.Error(error);
-            }
-        }
-
-        private void GetPages(string pageId, string layerName, StreamWriter fileStreamWriter, int attempts = 0)
-        {
-            var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
-            var request = new RestRequest("/insight-vector/api/esri/paging", Method.POST);
-
-            request.AddHeader("Authorization", "Bearer " + this.token);
-            request.AddHeader("Content-Type", "application/json");
-
-            request.AddParameter("ttl", "5m");
-            request.AddParameter("fields", "attributes");
-            request.AddParameter("pagingId", pageId);
-
-            attempts++;
-            client.ExecuteAsync<PagedData2>(
-                request,
-                resp => this.ProcessPage(resp, pageId, layerName, fileStreamWriter, attempts));
-        }
-
-
-        private void ProcessPage(
-            IRestResponse<PagedData2> resp,
-            string pageId,
-            string layerName,
-            StreamWriter fileStreamWriter,
-            int attempts)
-        {
-            Jarvis.Logger.Info(resp.ResponseUri.ToString());
-
-            // If we have a problem getting the page try again up to max attempts
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
-            {
-                this.GetPages(pageId, layerName, fileStreamWriter, attempts);
-                return;
-            }
-
-            if (resp.Data.item_count != "0")
-            {
-                // Write entire page of data to one line in the temp file
-                fileStreamWriter.WriteLine(resp.Data.data.Replace("\r", "").Replace("\n", ""));
-
-                // Continue getting the rest of the associated pages.
-                this.GetPages(resp.Data.next_paging_id, layerName, fileStreamWriter);
-            }
-            else
-            {
-                var fs = (FileStream) fileStreamWriter.BaseStream;
-                var filepath = fs.Name;
-                fileStreamWriter.Close();
-
-                var tableName = Jarvis.ConvertPagesToFeatureClass(filepath, layerName);
-
-                if (!string.IsNullOrEmpty(tableName))
-                {
-                    this.Invoke(new AddLayerToMapDelegate(AddLayerToMap), tableName, layerName);
-                }
-            }
-        }
-
-        /// <summary>
-        ///     Resets the vector index.  Deletes the element from the graphic container, clears the the treeview and search
-        ///     textbox
-        ///     and changes the current applications tate.
-        /// </summary>
-        private void ResetVectorIndex()
-        {
-            this.treeView1.Nodes.Clear();
-            this.textBoxSearch.Clear();
-
-            // Clear any current drawn images
-            if (this.boundingBoxGraphicElement != null)
-            {
-                ArcUtility.DeleteElementFromGraphicContainer(
-                    ArcMap.Document.ActivatedView,
-                    this.boundingBoxGraphicElement);
-                this.boundingBoxGraphicElement = null;
-            }
-
-            this.currentApplicationState = this.applicationStateGenerator.Next();
-        }
-
-        /// <summary>
-        ///     Event handler for when the select area button is clicked.
-        /// </summary>
-        /// <param name="sender">
-        ///     the button that is clicked
-        /// </param>
-        /// <param name="e">
-        ///     event arguments that get sent by the button
-        /// </param>
-        private void SelectAreaButtonClick(object sender, EventArgs e)
-        {
-            // Draw Rectangle option
-            if (this.aoiTypeComboBox.SelectedIndex == 0)
-            {
-                // Reset this variable to allow the user to differentiate between normal and query search.
-                this.usingQuerySource = false;
-                this.treeView1.CheckBoxes = true;
-
-                if (ArcMap.Application.CurrentTool.Name != "DigitalGlobe_Inc_sma_VectorIndex")
-                {
-                    // Unsubscribe from any previous events.  Prevents awesome mode
-                    VectorIndexRelay.Instance.PolygonHasBeenSet -= this.InstancePolygonHasBeenSet;
-
-                    // Subscribe to the event
-                    VectorIndexRelay.Instance.PolygonHasBeenSet += this.InstancePolygonHasBeenSet;
-
-                    // Clear any current drawn images
-                    if (this.boundingBoxGraphicElement != null)
-                    {
-                        ArcUtility.DeleteElementFromGraphicContainer(
-                            ArcMap.Document.ActivatedView,
-                            this.boundingBoxGraphicElement);
-                        this.boundingBoxGraphicElement = null;
-                    }
-
-                    // Clear the treeview
-                    this.treeView1.Nodes.Clear();
-                    this.textBoxSearch.Clear();
-
-                    this.currentApplicationState = this.applicationStateGenerator.Next();
-                    var commandBars = ArcMap.Application.Document.CommandBars;
-                    var commandId = new UIDClass {Value = "DigitalGlobe_Inc_sma_VectorIndex"};
-
-                    var commandItem = commandBars.Find(commandId, false, false);
-                    if (commandItem != null)
-                    {
-                        this.originallySelectedItem = ArcMap.Application.CurrentTool;
-                        ArcMap.Application.CurrentTool = commandItem;
-                    }
-                }
-            }
-
-            // Use selected AOI 
-            else if (this.aoiTypeComboBox.SelectedIndex == 1)
-            {
-                // Clear any current drawn images
-                if (this.boundingBoxGraphicElement != null)
-                {
-                    ArcUtility.DeleteElementFromGraphicContainer(
-                        ArcMap.Document.ActivatedView,
-                        this.boundingBoxGraphicElement);
-                    this.boundingBoxGraphicElement = null;
-                }
-
-                this.ShapeAoi();
-            }
-        }
-
-        /// <summary>
-        ///     Event handler for when the search textbox gets focus
-        /// </summary>
-        /// <param name="sender">
-        ///     the textbox
-        /// </param>
-        /// <param name="e">
-        ///     event arguments
-        /// </param>
-        private void TextBoxSearchEnter(object sender, EventArgs e)
-        {
-            if (this.textBoxSearch.Text.Equals(GbdxResources.EnterSearchTerms))
-            {
-                this.textBoxSearch.Clear();
-                this.textBoxSearch.ForeColor = Color.Black;
-            }
-        }
-
-        /// <summary>
-        ///     The event handler for when the key up event for the search textbox is triggered.
-        /// </summary>
-        /// <param name="sender">
-        ///     textbox listening for the key up event.
-        /// </param>
-        /// <param name="e">
-        ///     Event arguments
-        /// </param>
-        private void TextBoxSearchKeyUp(object sender, KeyEventArgs e)
-        {
-            // Only care about the enter key
-            if (e.KeyCode != Keys.Enter)
-            {
-                return;
-            }
-
-            this.currentApplicationState = this.applicationStateGenerator.Next();
-            this.treeView1.Nodes.Clear();
-            this.checkedNodes.Clear();
-            this.treeView1.CheckBoxes = true;
-            this.usingQuerySource = false;
-
-            if (this.aoiTypeComboBox.SelectedIndex == 0)
-            {
-                // if the boundingbox graphic element hasn't been pressed then
-                // lets assume that we use the curren't active views extent as the envelope.
-                if (this.boundingBoxGraphicElement == null)
-                {
-                    var poly = VectorIndexHelper.DisplayRectangle(
-                        ArcMap.Document.ActiveView,
-                        out this.boundingBoxGraphicElement);
-
-                    // Kick off vector index functionality
-                    this.ShapeAoi(poly);
-                    return;
-                }
-
-                // We already have a bounding box drawn so lets re-use that without redrawing the aoi.
-                var tempPolygon = (IPolygon) this.boundingBoxGraphicElement.Geometry;
-                this.ShapeAoi(tempPolygon);
-            }
-            else
-            {
-                // Clear any current drawn images
-                if (this.boundingBoxGraphicElement != null)
-                {
-                    ArcUtility.DeleteElementFromGraphicContainer(
-                        ArcMap.Document.ActivatedView,
-                        this.boundingBoxGraphicElement);
-                    this.boundingBoxGraphicElement = null;
-                }
-
-                this.ShapeAoi();
-            }
-        }
-
-        /// <summary>
-        ///     Event handler for when the search textbox loses focus
-        /// </summary>
-        /// <param name="sender">
-        ///     the textbox
-        /// </param>
-        /// <param name="e">
-        ///     Event arguments
-        /// </param>
-        private void TextBoxSearchLeave(object sender, EventArgs e)
-        {
-            if (string.IsNullOrEmpty(this.textBoxSearch.Text))
-            {
-                this.textBoxSearch.Text = GbdxResources.EnterSearchTerms;
-                this.textBoxSearch.ForeColor = Color.DarkGray;
-            }
-        }
-
-        /// <summary>
-        ///     Event handler that fires every time a item is checked in the tree view.
-        /// </summary>
-        /// <param name="sender">
-        ///     Tree view
-        /// </param>
-        /// <param name="e">
-        ///     Tree view Arguments
-        /// </param>
-        private void TreeView1AfterCheck(object sender, TreeViewEventArgs e)
-        {
-            var nodes = this.GetCheckedNodes(this.treeView1.Nodes);
-            foreach (var item in nodes)
-            {
-                // if we already have the node as Checked stop processing.
-                if (this.checkedNodes.Contains(item))
-                {
-                    continue;
-                }
-
-                // Add the item to the list of checked items
-                this.checkedNodes.Add(item);
-
-                // Check to see if the node type is a source node.
-                if (item.GetType() == typeof (VectorIndexSourceNode))
-                {
-                    this.ProcessSourceNodeClick(item);
-                    return;
-                }
-
-                // Check to see if the node type is a geometry node.
-                if (item.GetType() == typeof (VectorIndexGeometryNode))
-                {
-                    this.ProcessGeometryNodeClick(item);
-                    return;
-                }
-
-                // Check to see if the node type is a type node.
-                if (item.GetType() == typeof (VectorIndexTypeNode))
-                {
-                    this.GetPagingId(item, this.currentApplicationState);
-                    return;
-                }
-            }
-        }
-
-        private void UpdateTreeviewWithGeometryTypes(
+        private void UpdateTreeviewWithGeometry(
             IRestResponse<SourceTypeResponseObject> resp,
             VectorIndexSourceNode source)
         {
@@ -930,13 +1038,15 @@ namespace Gbdx.Vector_Index.Forms
                 foreach (var geoType in resp.Data.Data)
                 {
                     var newItem = new VectorIndexGeometryNode
-                    {
-                        Source = source.Source,
-                        GeometryType = geoType,
-                        Text =
-                            string.Format("{0} ({1})", geoType.Name, geoType.Count)
-                    };
-
+                                      {
+                                          Source = source.Source,
+                                          GeometryType = geoType,
+                                          Text =
+                                              string.Format(
+                                                  "{0} ({1})",
+                                                  geoType.Name,
+                                                  geoType.Count)
+                                      };
 
                     this.treeView1.Nodes[source.Index].Nodes.Add(newItem);
                 }
@@ -949,11 +1059,15 @@ namespace Gbdx.Vector_Index.Forms
                 foreach (var geoType in resp.Data.Data)
                 {
                     var newItem = new VectorIndexGeometryNode
-                    {
-                        Source = null,
-                        GeometryType = geoType,
-                        Text = string.Format("{0} ({1})", geoType.Name, geoType.Count)
-                    };
+                                      {
+                                          Source = null,
+                                          GeometryType = geoType,
+                                          Text =
+                                              string.Format(
+                                                  "{0} ({1})",
+                                                  geoType.Name,
+                                                  geoType.Count)
+                                      };
                     this.treeView1.Nodes.Add(newItem);
 
                     // If we are using querysource then the source node needs to have the "download all" option in the context menu.
@@ -973,7 +1087,7 @@ namespace Gbdx.Vector_Index.Forms
             // An error occurred
             if (resp.Data == null || resp.Data.Data == null)
             {
-                var newItem = new VectorIndexSourceNode {Text = GbdxResources.Source_ErrorMessage};
+                var newItem = new VectorIndexSourceNode { Text = GbdxResources.Source_ErrorMessage };
                 this.treeView1.Nodes.Clear();
                 this.treeView1.Nodes.Add(newItem);
                 this.treeView1.CheckBoxes = false;
@@ -985,7 +1099,7 @@ namespace Gbdx.Vector_Index.Forms
             // If no sources found.
             if (resp.Data.Data.Count == 0)
             {
-                var newItem = new VectorIndexSourceNode {Text = GbdxResources.NoDataFound};
+                var newItem = new VectorIndexSourceNode { Text = GbdxResources.NoDataFound };
                 this.treeView1.Nodes.Add(newItem);
                 this.treeView1.CheckBoxes = false;
 
@@ -1000,10 +1114,10 @@ namespace Gbdx.Vector_Index.Forms
             foreach (var item in resp.Data.Data)
             {
                 var newItem = new VectorIndexSourceNode
-                {
-                    Text = string.Format("{0} ({1})", item.Name, item.Count),
-                    Source = item
-                };
+                                  {
+                                      Text = string.Format("{0} ({1})", item.Name, item.Count),
+                                      Source = item
+                                  };
 
                 this.treeView1.Nodes.Add(newItem);
             }
@@ -1011,11 +1125,11 @@ namespace Gbdx.Vector_Index.Forms
             this.treeView1.Sort();
         }
 
-        private void UpdateTreeviewWithTypes2(
+        private void UpdateTreeviewWithTypes(
             IRestResponse<SourceTypeResponseObject> resp,
             VectorIndexGeometryNode geometryNode)
         {
-            var sourceNode = (VectorIndexSourceNode) geometryNode.Parent;
+            var sourceNode = (VectorIndexSourceNode)geometryNode.Parent;
 
             if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK)
             {
@@ -1041,9 +1155,8 @@ namespace Gbdx.Vector_Index.Forms
             }
             else // if using a query
             {
-                this.treeView1.Nodes[geometryNode.Index].Text = this.treeView1.Nodes[geometryNode.Index].Text.Replace(
-                    GbdxResources.SearchingText,
-                    string.Empty);
+                this.treeView1.Nodes[geometryNode.Index].Text =
+                    this.treeView1.Nodes[geometryNode.Index].Text.Replace(GbdxResources.SearchingText, string.Empty);
             }
 
             foreach (var type in resp.Data.Data)
@@ -1054,11 +1167,13 @@ namespace Gbdx.Vector_Index.Forms
                 }
 
                 var newItem = new VectorIndexTypeNode
-                {
-                    Geometry = geometryNode.GeometryType,
-                    Type = type,
-                    Text = string.Format("{0} ({1})", type.Name, type.Count)
-                };
+                                  {
+                                      Geometry = geometryNode.GeometryType,
+                                      Type = type,
+                                      Text = string.Format("{0} ({1})", type.Name, type.Count)
+                                  };
+
+                newItem.Name = Guid.NewGuid().ToString();
 
                 if (string.IsNullOrEmpty(this.query))
                 {
@@ -1082,20 +1197,6 @@ namespace Gbdx.Vector_Index.Forms
             }
 
             this.treeView1.Sort();
-        }
-
-        /// <summary>
-        ///     Event handler to handle the events of when the form's visibility changes.
-        /// </summary>
-        /// <param name="sender">
-        ///     sender of the event
-        /// </param>
-        /// <param name="e">
-        ///     event arguments
-        /// </param>
-        private void VectorIndexDockableVisibleChanged(object sender, EventArgs e)
-        {
-            this.ResetVectorIndex();
         }
 
         /// <summary>

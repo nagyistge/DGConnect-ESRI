@@ -693,14 +693,7 @@
                 fieldChecker.ValidateTableName(proposedTableName, out tableName);
 
                 WriteToTable(workspace, jsonOutput, tableName);
-
-                //this.Invoke((MethodInvoker)(() => { AddLayerToMap(tableName, layerName); }));
-
-                if (File.Exists(filepath))
-                {
-                    File.Delete(filepath);
-                }
-
+                
                 return tableName;
             }
             catch (Exception error)
