@@ -1069,13 +1069,6 @@ namespace Gbdx.Vector_Index.Forms
                                                   geoType.Count)
                                       };
                     this.treeView1.Nodes.Add(newItem);
-
-                    // If we are using querysource then the source node needs to have the "download all" option in the context menu.
-                    if (!string.IsNullOrEmpty(this.query))
-                    {
-                        this.treeView1.Nodes[newItem.Index].ContextMenuStrip =
-                            this.CreateContextMenuStrip(this.treeView1.Nodes[newItem.Index]);
-                    }
                 }
             }
 
@@ -1170,11 +1163,10 @@ namespace Gbdx.Vector_Index.Forms
                                   {
                                       Geometry = geometryNode.GeometryType,
                                       Type = type,
-                                      Text = string.Format("{0} ({1})", type.Name, type.Count)
+                                      Text = string.Format("{0} ({1})", type.Name, type.Count),
+                                      Name = Guid.NewGuid().ToString()
                                   };
-
-                newItem.Name = Guid.NewGuid().ToString();
-
+                
                 if (string.IsNullOrEmpty(this.query))
                 {
                     // non query
