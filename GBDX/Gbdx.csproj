@@ -140,6 +140,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aggregations\AggregationButton.cs" />
+    <Compile Include="Aggregations\Aggregations.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Aggregations\Aggregations.Designer.cs">
+      <DependentUpon>Aggregations.cs</DependentUpon>
+    </Compile>
     <Compile Include="Aggregations\AggregationSelector.cs" />
     <Compile Include="Aggregations\AggregationWindow.xaml.cs">
       <DependentUpon>AggregationWindow.xaml</DependentUpon>
@@ -251,6 +257,9 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Aggregations\Aggregations.resx">
+      <DependentUpon>Aggregations.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Answer Factory\AnswerFactoryDockableWindow.resx">
       <DependentUpon>AnswerFactoryDockableWindow.cs</DependentUpon>
     </EmbeddedResource>
@@ -361,6 +370,9 @@
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\AnswerFactorySelector.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\Aggregations.png" />
   </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>

@@ -60,6 +60,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CheckGroupBox.cs" />
+    <Compile Include="CheckGroupBox.Designer.cs" />
     <Compile Include="DataGridViewDisableCheckBoxCell.cs" />
     <Compile Include="FieldDefinition.cs" />
     <Compile Include="Jarvis.cs" />
@@ -81,6 +83,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="CheckGroupBox.resx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
