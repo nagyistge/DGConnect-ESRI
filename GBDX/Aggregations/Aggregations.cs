@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Net;
     using System.Runtime.InteropServices;
-    using System.Windows.Controls;
     using System.Windows.Forms;
 
     using Encryption;
@@ -27,7 +26,6 @@
     using RestSharp;
 
     using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
-    using UserControl = System.Windows.Forms.UserControl;
 
     /// <summary>
     ///     Designer class of the dockable window add-in. It contains user interfaces that
@@ -37,7 +35,7 @@
     {
         #region Fields & Properties
 
-        const int MaxAttempts = 3;
+        private const int MaxAttempts = 3;
 
         /// <summary>
         ///     GBDX Authentication Token
@@ -76,7 +74,7 @@
             this.InitializeComponent();
             this.Hook = hook;
 
-            GetAuthenticationToken();
+            this.GetAuthenticationToken();
 
             this.startDatePicker.Value = DateTime.Now.AddMonths(-1);
             this.endDatePicker.Value = DateTime.Now;
@@ -87,43 +85,6 @@
             this.selectionTypeComboBox.SelectedIndex = 0;
 
             AggregationRelay.Instance.AoiHasBeenDrawn += this.EventHandlerInstanceAoiHasBeenDrawn;
-        }
-
-        private void GetAuthenticationToken()
-        {
-            IRestClient restClient = new RestClient(Settings.Default.AuthBase);
-            string password;
-            var result = Aes.Instance.Decrypt128(Settings.Default.password, out password);
-
-            if (!result)
-            {
-                Jarvis.Logger.Warning("PASSWORD FAILED DECRYPTION");
-                MessageBox.Show("Error decrypting password");
-                return;
-            }
-
-            var request = new RestRequest(Settings.Default.authenticationServer, Method.POST);
-            request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
-            request.AddHeader("Authorization", string.Format("Basic {0}", Settings.Default.apiKey));
-            request.AddParameter("grant_type", "password");
-            request.AddParameter("username", Settings.Default.username);
-            request.AddParameter("password", password);
-
-            restClient.ExecuteAsync<AccessToken>(
-                request,
-                resp =>
-                {
-                    Jarvis.Logger.Info(resp.ResponseUri.ToString());
-
-                    if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
-                    {
-                        this.token = resp.Data.access_token;
-                    }
-                    else
-                    {
-                        this.token = string.Empty;
-                    }
-                });
         }
 
         /// <summary>
@@ -180,7 +141,6 @@
                 }
 
                 FieldChecker checker = new FieldCheckerClass();
-                
 
                 // Create a unique name for the feature class based on name.
                 var featureClassName = "Agg_" + Guid.NewGuid();
@@ -232,10 +192,7 @@
             this.SearchItem = argument;
 
             // create the aggregation that is about to be processed.
-            var agg = string.Format(
-                "geohash:{0};{1}",
-                this.detailLevelComboBox.SelectedItem,
-                argument);
+            var agg = string.Format("geohash:{0};{1}", this.detailLevelComboBox.SelectedItem, argument);
             request.AddParameter("aggs", agg, ParameterType.QueryString);
 
             if (this.queryTextBox != null && this.queryTextBox.Text != null && this.queryTextBox.Text != "")
@@ -364,6 +321,43 @@
                 this.PreviouslySelectedItem = ArcMap.Application.CurrentTool;
                 ArcMap.Application.CurrentTool = commandItem;
             }
+        }
+
+        private void GetAuthenticationToken()
+        {
+            IRestClient restClient = new RestClient(Settings.Default.AuthBase);
+            string password;
+            var result = Aes.Instance.Decrypt128(Settings.Default.password, out password);
+
+            if (!result)
+            {
+                Jarvis.Logger.Warning("PASSWORD FAILED DECRYPTION");
+                MessageBox.Show("Error decrypting password");
+                return;
+            }
+
+            var request = new RestRequest(Settings.Default.authenticationServer, Method.POST);
+            request.AddHeader("Content-Type", "application/x-www-form-urlencoded");
+            request.AddHeader("Authorization", string.Format("Basic {0}", Settings.Default.apiKey));
+            request.AddParameter("grant_type", "password");
+            request.AddParameter("username", Settings.Default.username);
+            request.AddParameter("password", password);
+
+            restClient.ExecuteAsync<AccessToken>(
+                request,
+                resp =>
+                    {
+                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
+
+                        if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
+                        {
+                            this.token = resp.Data.access_token;
+                        }
+                        else
+                        {
+                            this.token = string.Empty;
+                        }
+                    });
         }
 
         /// <summary>
