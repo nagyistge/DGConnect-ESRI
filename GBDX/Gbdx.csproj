@@ -176,6 +176,11 @@
     </Compile>
     <Compile Include="Gbd\GbdRelay.cs" />
     <Compile Include="Gbd\Selector.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Utilities and Configuration\Forms\MappingForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -265,6 +270,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Gbd\GbdDockableWindow.resx">
       <DependentUpon>GbdDockableWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Utilities and Configuration\Forms\MappingForm.resx">
       <DependentUpon>MappingForm.cs</DependentUpon>
@@ -373,6 +382,9 @@
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\Aggregations.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\information.png" />
   </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>

@@ -21,7 +21,20 @@
 
 namespace Gbdx
 {
+    using System.Net;
+    using System.Windows;
+
+    using Encryption;
+
     using Gbdx;
+
+    using GbdxSettings.Properties;
+
+    using GbdxTools;
+
+    using NetworkConnections;
+
+    using RestSharp;
 
     /// <summary>
     /// The gbdx cloud helper.

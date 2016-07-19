@@ -60,7 +60,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CheckGroupBox.cs" />
+    <Compile Include="CheckGroupBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="CheckGroupBox.Designer.cs" />
     <Compile Include="DataGridViewDisableCheckBoxCell.cs" />
     <Compile Include="FieldDefinition.cs" />

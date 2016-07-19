@@ -83,14 +83,14 @@
                 <ComboBoxItem Content="What is the twitter sentiment in the region?"/>
                 <ComboBoxItem Content="What type of data is available in the region?"/>
             </ComboBox>
-            <Button Name="selectAreaButton" Content="Select Area" HorizontalAlignment="Left" Margin="27.285,335.053,0,0" VerticalAlignment="Top" Width="75" Height="21.6" Click="SelectAreaButtonClick"/>
+            <Button Name="selectAreaButton" HorizontalAlignment="Left" Margin="27.285,335.053,0,0" VerticalAlignment="Top" Width="75" Height="21.6" Click="SelectAreaButtonClick"/>
             <TextBox Name="tbFilter" Height="55.935" Margin="19.022,237.645,0.978,0" TextWrapping="Wrap" VerticalAlignment="Top" AcceptsReturn="True" 
 VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;value&gt; AND|OR ..."/>
 
             <ProgressBar x:Name="pbarChangeDet" Height="17.938" Margin="18.044,218.287,0.978,0" VerticalAlignment="Top" Grid.Row="2"/>
             <TabControl x:Name="tabAggAnalytics" Height="187.54" Margin="27.285,383.253,18.508,0"
                         VerticalAlignment="Top" Grid.RowSpan="3">
-                <TabItem Header="Multi Change Detection" Margin="-8,0,4,-3" Visibility="Visible">
+                <TabItem Header="MButtonulti Change Detection" Margin="-8,0,4,-3" Visibility="Visible">
                     <Grid Background="#FFE5E5E5" Margin="-8,0,4,-3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="15*" />
@@ -116,23 +116,24 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="15*" />
                             <ColumnDefinition Width="104*" />
-                            <ColumnDefinition Width="108.003" />
+                            <ColumnDefinition Width="83.676" />
+                            <ColumnDefinition Width="24.327"/>
                         </Grid.ColumnDefinitions>
                         <Button x:Name="buttAnalyzeAgg" Content="Refresh drop down lists" HorizontalAlignment="Left"
                                 Margin="10,12.805,0,0" VerticalAlignment="Top" Width="131.972"
                                 Click="ButtAnalyzeAggClick" Grid.ColumnSpan="3" />
                         <ComboBox x:Name="cbAggLayerA" Margin="10,39.765,10.228,0"
-                                  VerticalAlignment="Top" SelectedIndex="0" Grid.ColumnSpan="3" />
+                                  VerticalAlignment="Top" SelectedIndex="0" Grid.ColumnSpan="4" />
                         <ComboBox x:Name="cbAggLayerB" Margin="10,66.725,10.228,0"
-                                  VerticalAlignment="Top" SelectedIndex="0" Grid.ColumnSpan="3" />
+                                  VerticalAlignment="Top" SelectedIndex="0" Grid.ColumnSpan="4" />
                         <Button x:Name="buttAnalyzeDiff" Content="Generate" HorizontalAlignment="Right"
                                 Margin="0,93.685,8.614,0" VerticalAlignment="Top" Width="75"
-                                Click="ButtAnalyzeDiffClick" Grid.Column="2" />
+                                Click="ButtAnalyzeDiffClick" Grid.Column="2" Grid.ColumnSpan="2" />
                         <Button x:Name="butChangeInfo" Content="i" HorizontalAlignment="Left" Margin="77.551,5.5,0,0"
                                 VerticalAlignment="Top" Width="20.6" RenderTransformOrigin="0.604,-0.039"
-                                Click="ButChangeInfoClick" Grid.Column="2" />
+                                Click="ButChangeInfoClick" Grid.Column="2" Grid.ColumnSpan="2" />
                         <CheckBox Name="cbCalcDiffs" Content="Include % Diffs" Grid.Column="1"
-                                  HorizontalAlignment="Left" Margin="8,98.885,0,13.515" />
+                                  HorizontalAlignment="Left" Margin="7.999,98.885,0,13.515" />
                     </Grid>
                 </TabItem>
                 <TabItem Header="MLTC" Margin="-8,0,4,-3">
@@ -161,6 +162,7 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
                       " SelectionChanged="SelectionTypeComboBoxSelectionChanged" HorizontalAlignment="Right" Width="146.702">
                 <ComboBoxItem>Draw Rectangle</ComboBoxItem>
                 <ComboBoxItem>Use Selected Polygons</ComboBoxItem>
+                <Label Content="Label"/>
             </ComboBox>
             <Label Content="Selection Type" Margin="27.285,304.091,164.465,0" VerticalAlignment="Top"/>
             <Label Content="Label" HorizontalAlignment="Left" Height="3.602" Margin="116.139,260.6,0,0" VerticalAlignment="Top" Width="7.461" Grid.Row="2"/>

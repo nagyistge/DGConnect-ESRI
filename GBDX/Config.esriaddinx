@@ -51,7 +51,7 @@
         <DockableWindow id="DigitalGlobe_Inc_Gbdx_AnswerFactoryDockableWindow" class="Gbdx.Answer_Factory.AnswerFactoryDockableWindow+AddinImpl" caption="AnswerFactory" image="Images\AnswerFactoryDockableWindow.png">
           <InitialPlacement height="398" width="564" state="pinned" position="right" />
         </DockableWindow>
-        <DockableWindow id="DigitalGlobe_Inc_Gbdx_Aggregations" class="Gbdx.Aggregations.Aggregations+AddinImpl" caption="My Dockable Window" image="Images\Aggregations.png">
+        <DockableWindow id="DigitalGlobe_Inc_Gbdx_Aggregations" class="Gbdx.Aggregations.Aggregations+AddinImpl" caption="Aggregations and Analysis" image="Images\Aggregations.png">
           <InitialPlacement height="300" width="300" state="pinned" position="left" />
         </DockableWindow>
       </DockableWindows>
