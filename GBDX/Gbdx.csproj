@@ -197,7 +197,6 @@
     <Compile Include="Vector Index\BoundingBox.cs" />
     <Compile Include="Vector Index\ESRI Tools\VectorIndex.cs" />
     <Compile Include="Vector Index\ESRI Tools\VectorIndexButton.cs" />
-    <Compile Include="Vector Index\FieldDefinition.cs" />
     <Compile Include="Vector Index\Forms\UviContextMenuStrip.cs">
       <SubType>Component</SubType>
     </Compile>

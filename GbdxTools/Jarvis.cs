@@ -19,6 +19,7 @@
     using Logging;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
 
     using Polygon = DataInterop.Polygon;
 
@@ -30,6 +31,8 @@
         ///     The base 32 codes.
         /// </summary>
         private const string Base32Codes = "0123456789bcdefghjkmnpqrstuvwxyz";
+
+        public static object FeatureClassLockerObject = new object();
 
         /// <summary>
         ///     Log file where all information should be written too.
@@ -668,5 +671,175 @@
             // Return the validated fields.
             return validatedFields;
         }
+
+        public static string ConvertPagesToFeatureClass(string filepath, string layerName, string prefix="GBDX")
+        {
+            try
+            {
+                var json = MergeJsonStrings(filepath);
+
+                json = MergeProperties(json);
+
+                var jsonOutput = json.ToString(Formatting.None);
+
+                var workspace = Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+
+                IFieldChecker fieldChecker = new FieldCheckerClass();
+                fieldChecker.ValidateWorkspace = workspace;
+
+                var proposedTableName = string.Format("{0}{1}",prefix, Guid.NewGuid());
+                string tableName;
+
+                fieldChecker.ValidateTableName(proposedTableName, out tableName);
+
+                WriteToTable(workspace, jsonOutput, tableName);
+                
+                return tableName;
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
+            return string.Empty;
+        }
+
+        /// <summary>
+        /// Takes a JSON string and converts into a RecordSet.  From there the record set can be transformed into tables or feature classes as needed
+        /// </summary>
+        /// <param name="json">
+        /// JSON string
+        /// </param>
+        /// <returns>
+        /// ESRI IRecordSet2
+        /// </returns>
+        public static IRecordSet2 GetTable(string json)
+        {
+            try
+            {
+                // Establish the Json Reader for ESRI
+                var jsonReader = new JSONReaderClass();
+                jsonReader.ReadFromString(json);
+
+                var jsonConverterGdb = new JSONConverterGdbClass();
+                IPropertySet originalToNewFieldMap;
+                IRecordSet recorset;
+
+                // Convert the JSON to RecordSet
+                jsonConverterGdb.ReadRecordSet(jsonReader, null, null, out recorset, out originalToNewFieldMap);
+
+                // Cast the Recordset as RecordSet2
+                var recordSet2 = recorset as IRecordSet2;
+
+                return recordSet2;
+            }
+            catch (Exception error)
+            {
+                Logger.Error(error);
+                return null;
+            }
+        }
+
+        private static bool WriteToTable(IWorkspace workspace, string featureClassJson, string tableName)
+        {
+            var success = true;
+            if (string.IsNullOrEmpty(featureClassJson))
+            {
+                return false;
+            }
+
+            try
+            {
+                var outputTable = GetTable(featureClassJson);
+                lock (FeatureClassLockerObject)
+                {
+                    outputTable.SaveAsTable(workspace, tableName);
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+                success = false;
+            }
+
+            return success;
+        }
+
+        private static JObject MergeJsonStrings(string filePath)
+        {
+            var mergeSettings = new JsonMergeSettings { MergeArrayHandling = MergeArrayHandling.Union };
+
+            JObject jsonObject = null;
+            try
+            {
+                string line;
+                using (var file = new StreamReader(filePath))
+                {
+                    while ((line = file.ReadLine()) != null)
+                    {
+                        if (jsonObject != null)
+                        {
+                            jsonObject.Merge(JObject.Parse(line), mergeSettings);
+                        }
+                        else
+                        {
+                            jsonObject = JObject.Parse(line);
+                        }
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+                return null;
+            }
+
+            return jsonObject;
+        }
+
+        private static JObject MergeProperties(JObject jsonObject)
+        {
+            try
+            {
+                var fields = new Dictionary<string, FieldDefinition>();
+                if (jsonObject != null)
+                {
+                    var jsonFields = (JArray)jsonObject["fields"];
+
+                    // This for loops looks through all of the fields and updtes the max length for the fields
+                    foreach (var t in jsonFields)
+                    {
+                        var tempFieldDefintion = JsonConvert.DeserializeObject<FieldDefinition>(t.ToString());
+                        FieldDefinition value;
+
+                        // Attempt to get the value if one is received will evaluate to true and return the object.
+                        if (fields.TryGetValue(tempFieldDefintion.Alias, out value))
+                        {
+                            if (value.Length < tempFieldDefintion.Length)
+                            {
+                                value.Length = tempFieldDefintion.Length;
+                            }
+                        }
+                        else
+                        {
+                            fields.Add(tempFieldDefintion.Alias, tempFieldDefintion);
+                        }
+                    }
+
+                    jsonFields.RemoveAll();
+                    foreach (var defintion in fields.Values)
+                    {
+                        jsonFields.Add(JObject.FromObject(defintion));
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+                return null;
+            }
+
+            return jsonObject;
+        }
+
     }
 }

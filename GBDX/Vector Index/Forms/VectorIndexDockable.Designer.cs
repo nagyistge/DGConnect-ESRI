@@ -85,7 +85,7 @@
             this.clearButton.TabIndex = 2;
             this.clearButton.Text = "Clear";
             this.clearButton.UseVisualStyleBackColor = true;
-            this.clearButton.Click += new System.EventHandler(this.ClearButtonClick);
+            this.clearButton.Click += new System.EventHandler(this.EventHandlerClearButtonClick);
             // 
             // selectAreaButton
             // 
@@ -96,7 +96,7 @@
             this.selectAreaButton.TabIndex = 0;
             this.selectAreaButton.Text = "Select Area";
             this.selectAreaButton.UseVisualStyleBackColor = true;
-            this.selectAreaButton.Click += new System.EventHandler(this.SelectAreaButtonClick);
+            this.selectAreaButton.Click += new System.EventHandler(this.EventHandlerSelectAreaButtonClick);
             // 
             // label1
             // 
