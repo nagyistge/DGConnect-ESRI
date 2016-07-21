@@ -419,7 +419,7 @@ namespace Gbdx.Aggregations
                 "This tool calculates the change between two aggregations over the same area that represent different time slices. Geohash size must be consistent in order to obtain valid results from this algorithm."
                 +
                 " The algorithm performs a sparse cosine similarity based on all field values for each row, and calculates the diff between all fields individually. The output feature class will have the union of fields from both input features. Any pivot table will work.",
-                "info");
+                "About");
         }
 
         private void EventHandlerInstanceAoiHasBeenDrawn(IPolygon poly, IElement elm)
@@ -439,7 +439,7 @@ namespace Gbdx.Aggregations
                 "This tool calculates the change between two or more aggregation layers over the same area that represent different time slices. Geohash size must be consistent in order to obtain valid results from this algorithm."
                 +
                 " The algorithm performs a sparse cosine similarity based on all field values for each row, and produces a pivot table of pairwise cell by cell comparisons. For percent diff on a field by field basis, use the Pairwise Change Detection tool.",
-                "info");
+                "About");
         }
 
         /// <summary>
