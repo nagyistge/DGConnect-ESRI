@@ -198,10 +198,10 @@ Only letters and the '.' are allowed.</value>
     <value>Total Items: </value>
   </data>
   <data name="noAggregationSelected" xml:space="preserve">
-    <value>No Aggregation has been selected.  Please select a aggregation and try again.</value>
+    <value>Please select an aggregation and try again.</value>
   </data>
   <data name="pleaseChooseDetailsGranularity" xml:space="preserve">
-    <value>Please choose detail granularity</value>
+    <value>Please choose detail granularity and try again.</value>
   </data>
   <data name="upgradeRequired" xml:space="preserve">
     <value>In order to access this functionality, upgrade your account.</value>
