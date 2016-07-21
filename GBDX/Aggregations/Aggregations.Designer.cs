@@ -30,12 +30,6 @@
         {
             this.aggregationsMainTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.label1 = new System.Windows.Forms.Label();
-            this.dateRangeCheckGroupBox = new UIToolbox.CheckGroupBox();
-            this.dateRangeTableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.endDatePicker = new System.Windows.Forms.DateTimePicker();
-            this.startDatePicker = new System.Windows.Forms.DateTimePicker();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
             this.QuerySelectionComboBox = new System.Windows.Forms.ComboBox();
             this.label2 = new System.Windows.Forms.Label();
             this.detailLevelComboBox = new System.Windows.Forms.ComboBox();
@@ -50,6 +44,15 @@
             this.analysisTabPage = new System.Windows.Forms.TabPage();
             this.analysisMainTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.refreshButton = new System.Windows.Forms.Button();
+            this.generateButton = new System.Windows.Forms.Button();
+            this.statusLabel = new System.Windows.Forms.Label();
+            this.analysisProgressBar = new System.Windows.Forms.ProgressBar();
+            this.dateRangeCheckGroupBox = new UIToolbox.CheckGroupBox();
+            this.dateRangeTableLayout = new System.Windows.Forms.TableLayoutPanel();
+            this.endDatePicker = new System.Windows.Forms.DateTimePicker();
+            this.startDatePicker = new System.Windows.Forms.DateTimePicker();
+            this.label4 = new System.Windows.Forms.Label();
+            this.label3 = new System.Windows.Forms.Label();
             this.changeDetectionGroupBox = new UIToolbox.CheckGroupBox();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.infoButton = new System.Windows.Forms.Button();
@@ -60,20 +63,17 @@
             this.multiChangeDetectionTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.multiChangeDetectionInfoButton = new System.Windows.Forms.Button();
             this.changeLayersListBox = new System.Windows.Forms.ListBox();
-            this.generateButton = new System.Windows.Forms.Button();
             this.mltcGroupBox = new UIToolbox.CheckGroupBox();
             this.mltcTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.mltcInfoButton = new System.Windows.Forms.Button();
             this.focusLayerComboBox = new System.Windows.Forms.ComboBox();
-            this.statusLabel = new System.Windows.Forms.Label();
-            this.analysisProgressBar = new System.Windows.Forms.ProgressBar();
             this.aggregationsMainTableLayout.SuspendLayout();
-            this.dateRangeCheckGroupBox.SuspendLayout();
-            this.dateRangeTableLayout.SuspendLayout();
             this.mainFormTabControl.SuspendLayout();
             this.aggregationsTabPage.SuspendLayout();
             this.analysisTabPage.SuspendLayout();
             this.analysisMainTableLayout.SuspendLayout();
+            this.dateRangeCheckGroupBox.SuspendLayout();
+            this.dateRangeTableLayout.SuspendLayout();
             this.changeDetectionGroupBox.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.multiChangeDetectionGroupBox.SuspendLayout();
@@ -128,83 +128,6 @@
             this.label1.Size = new System.Drawing.Size(129, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "What are you looking for?";
-            // 
-            // dateRangeCheckGroupBox
-            // 
-            this.dateRangeCheckGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dateRangeCheckGroupBox.CheckBoxText = "Date Range";
-            this.dateRangeCheckGroupBox.Checked = false;
-            this.dateRangeCheckGroupBox.CheckState = System.Windows.Forms.CheckState.Unchecked;
-            this.aggregationsMainTableLayout.SetColumnSpan(this.dateRangeCheckGroupBox, 3);
-            this.dateRangeCheckGroupBox.Controls.Add(this.dateRangeTableLayout);
-            this.dateRangeCheckGroupBox.Location = new System.Drawing.Point(3, 114);
-            this.dateRangeCheckGroupBox.Name = "dateRangeCheckGroupBox";
-            this.dateRangeCheckGroupBox.Size = new System.Drawing.Size(366, 104);
-            this.dateRangeCheckGroupBox.TabIndex = 8;
-            this.dateRangeCheckGroupBox.TabStop = false;
-            this.dateRangeCheckGroupBox.Text = "Date Range";
-            // 
-            // dateRangeTableLayout
-            // 
-            this.dateRangeTableLayout.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dateRangeTableLayout.ColumnCount = 2;
-            this.dateRangeTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 36.61017F));
-            this.dateRangeTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 63.38983F));
-            this.dateRangeTableLayout.Controls.Add(this.endDatePicker, 1, 1);
-            this.dateRangeTableLayout.Controls.Add(this.startDatePicker, 1, 0);
-            this.dateRangeTableLayout.Controls.Add(this.label4, 0, 1);
-            this.dateRangeTableLayout.Controls.Add(this.label3, 0, 0);
-            this.dateRangeTableLayout.Location = new System.Drawing.Point(9, 21);
-            this.dateRangeTableLayout.Name = "dateRangeTableLayout";
-            this.dateRangeTableLayout.RowCount = 2;
-            this.dateRangeTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.dateRangeTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.dateRangeTableLayout.Size = new System.Drawing.Size(351, 77);
-            this.dateRangeTableLayout.TabIndex = 1;
-            // 
-            // endDatePicker
-            // 
-            this.endDatePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.endDatePicker.CustomFormat = "";
-            this.endDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.endDatePicker.Location = new System.Drawing.Point(131, 47);
-            this.endDatePicker.Name = "endDatePicker";
-            this.endDatePicker.Size = new System.Drawing.Size(217, 20);
-            this.endDatePicker.TabIndex = 3;
-            // 
-            // startDatePicker
-            // 
-            this.startDatePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.startDatePicker.CustomFormat = "";
-            this.startDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.startDatePicker.Location = new System.Drawing.Point(131, 9);
-            this.startDatePicker.Name = "startDatePicker";
-            this.startDatePicker.Size = new System.Drawing.Size(217, 20);
-            this.startDatePicker.TabIndex = 2;
-            // 
-            // label4
-            // 
-            this.label4.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(31, 51);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(66, 13);
-            this.label4.TabIndex = 1;
-            this.label4.Text = "Ending Date";
-            // 
-            // label3
-            // 
-            this.label3.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(29, 12);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(69, 13);
-            this.label3.TabIndex = 0;
-            this.label3.Text = "Starting Date";
             // 
             // QuerySelectionComboBox
             // 
@@ -264,6 +187,7 @@
             // 
             // queryTextBox
             // 
+            this.queryTextBox.AcceptsReturn = true;
             this.queryTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -271,6 +195,7 @@
             this.queryTextBox.Location = new System.Drawing.Point(3, 272);
             this.queryTextBox.Multiline = true;
             this.queryTextBox.Name = "queryTextBox";
+            this.queryTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.queryTextBox.Size = new System.Drawing.Size(366, 145);
             this.queryTextBox.TabIndex = 6;
             // 
@@ -394,6 +319,113 @@
             this.refreshButton.Text = "Refresh";
             this.refreshButton.UseVisualStyleBackColor = true;
             this.refreshButton.Click += new System.EventHandler(this.EventHandlerRefreshButtonClick);
+            // 
+            // generateButton
+            // 
+            this.generateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.generateButton.Location = new System.Drawing.Point(287, 485);
+            this.generateButton.Name = "generateButton";
+            this.generateButton.Size = new System.Drawing.Size(82, 28);
+            this.generateButton.TabIndex = 3;
+            this.generateButton.Text = "Generate";
+            this.generateButton.UseVisualStyleBackColor = true;
+            this.generateButton.Click += new System.EventHandler(this.EventHandlerGenerateButtonClick);
+            // 
+            // statusLabel
+            // 
+            this.statusLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
+            this.statusLabel.AutoSize = true;
+            this.statusLabel.Location = new System.Drawing.Point(3, 423);
+            this.statusLabel.Name = "statusLabel";
+            this.statusLabel.Size = new System.Drawing.Size(43, 13);
+            this.statusLabel.TabIndex = 5;
+            this.statusLabel.Text = "Status: ";
+            // 
+            // analysisProgressBar
+            // 
+            this.analysisProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.analysisMainTableLayout.SetColumnSpan(this.analysisProgressBar, 3);
+            this.analysisProgressBar.Location = new System.Drawing.Point(3, 445);
+            this.analysisProgressBar.Name = "analysisProgressBar";
+            this.analysisProgressBar.Size = new System.Drawing.Size(366, 21);
+            this.analysisProgressBar.TabIndex = 6;
+            // 
+            // dateRangeCheckGroupBox
+            // 
+            this.dateRangeCheckGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dateRangeCheckGroupBox.CheckBoxText = "Date Range";
+            this.dateRangeCheckGroupBox.Checked = false;
+            this.dateRangeCheckGroupBox.CheckState = System.Windows.Forms.CheckState.Unchecked;
+            this.aggregationsMainTableLayout.SetColumnSpan(this.dateRangeCheckGroupBox, 3);
+            this.dateRangeCheckGroupBox.Controls.Add(this.dateRangeTableLayout);
+            this.dateRangeCheckGroupBox.Location = new System.Drawing.Point(3, 114);
+            this.dateRangeCheckGroupBox.Name = "dateRangeCheckGroupBox";
+            this.dateRangeCheckGroupBox.Size = new System.Drawing.Size(366, 104);
+            this.dateRangeCheckGroupBox.TabIndex = 8;
+            this.dateRangeCheckGroupBox.TabStop = false;
+            this.dateRangeCheckGroupBox.Text = "Date Range";
+            // 
+            // dateRangeTableLayout
+            // 
+            this.dateRangeTableLayout.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dateRangeTableLayout.ColumnCount = 2;
+            this.dateRangeTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 36.61017F));
+            this.dateRangeTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 63.38983F));
+            this.dateRangeTableLayout.Controls.Add(this.endDatePicker, 1, 1);
+            this.dateRangeTableLayout.Controls.Add(this.startDatePicker, 1, 0);
+            this.dateRangeTableLayout.Controls.Add(this.label4, 0, 1);
+            this.dateRangeTableLayout.Controls.Add(this.label3, 0, 0);
+            this.dateRangeTableLayout.Location = new System.Drawing.Point(9, 21);
+            this.dateRangeTableLayout.Name = "dateRangeTableLayout";
+            this.dateRangeTableLayout.RowCount = 2;
+            this.dateRangeTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.dateRangeTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
+            this.dateRangeTableLayout.Size = new System.Drawing.Size(351, 77);
+            this.dateRangeTableLayout.TabIndex = 1;
+            // 
+            // endDatePicker
+            // 
+            this.endDatePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.endDatePicker.CustomFormat = "";
+            this.endDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.endDatePicker.Location = new System.Drawing.Point(131, 47);
+            this.endDatePicker.Name = "endDatePicker";
+            this.endDatePicker.Size = new System.Drawing.Size(217, 20);
+            this.endDatePicker.TabIndex = 3;
+            // 
+            // startDatePicker
+            // 
+            this.startDatePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.startDatePicker.CustomFormat = "";
+            this.startDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
+            this.startDatePicker.Location = new System.Drawing.Point(131, 9);
+            this.startDatePicker.Name = "startDatePicker";
+            this.startDatePicker.Size = new System.Drawing.Size(217, 20);
+            this.startDatePicker.TabIndex = 2;
+            // 
+            // label4
+            // 
+            this.label4.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(31, 51);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(66, 13);
+            this.label4.TabIndex = 1;
+            this.label4.Text = "Ending Date";
+            // 
+            // label3
+            // 
+            this.label3.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label3.AutoSize = true;
+            this.label3.Location = new System.Drawing.Point(29, 12);
+            this.label3.Name = "label3";
+            this.label3.Size = new System.Drawing.Size(69, 13);
+            this.label3.TabIndex = 0;
+            this.label3.Text = "Starting Date";
             // 
             // changeDetectionGroupBox
             // 
@@ -543,17 +575,6 @@
             this.changeLayersListBox.Size = new System.Drawing.Size(345, 82);
             this.changeLayersListBox.TabIndex = 6;
             // 
-            // generateButton
-            // 
-            this.generateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.generateButton.Location = new System.Drawing.Point(287, 485);
-            this.generateButton.Name = "generateButton";
-            this.generateButton.Size = new System.Drawing.Size(82, 28);
-            this.generateButton.TabIndex = 3;
-            this.generateButton.Text = "Generate";
-            this.generateButton.UseVisualStyleBackColor = true;
-            this.generateButton.Click += new System.EventHandler(this.EventHandlerGenerateButtonClick);
-            // 
             // mltcGroupBox
             // 
             this.mltcGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -613,25 +634,6 @@
             this.focusLayerComboBox.Size = new System.Drawing.Size(348, 21);
             this.focusLayerComboBox.TabIndex = 6;
             // 
-            // statusLabel
-            // 
-            this.statusLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(3, 423);
-            this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(43, 13);
-            this.statusLabel.TabIndex = 5;
-            this.statusLabel.Text = "Status: ";
-            // 
-            // analysisProgressBar
-            // 
-            this.analysisProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.analysisMainTableLayout.SetColumnSpan(this.analysisProgressBar, 3);
-            this.analysisProgressBar.Location = new System.Drawing.Point(3, 445);
-            this.analysisProgressBar.Name = "analysisProgressBar";
-            this.analysisProgressBar.Size = new System.Drawing.Size(366, 21);
-            this.analysisProgressBar.TabIndex = 6;
-            // 
             // Aggregations
             // 
             this.Controls.Add(this.mainFormTabControl);
@@ -639,15 +641,15 @@
             this.Size = new System.Drawing.Size(398, 560);
             this.aggregationsMainTableLayout.ResumeLayout(false);
             this.aggregationsMainTableLayout.PerformLayout();
-            this.dateRangeCheckGroupBox.ResumeLayout(false);
-            this.dateRangeCheckGroupBox.PerformLayout();
-            this.dateRangeTableLayout.ResumeLayout(false);
-            this.dateRangeTableLayout.PerformLayout();
             this.mainFormTabControl.ResumeLayout(false);
             this.aggregationsTabPage.ResumeLayout(false);
             this.analysisTabPage.ResumeLayout(false);
             this.analysisMainTableLayout.ResumeLayout(false);
             this.analysisMainTableLayout.PerformLayout();
+            this.dateRangeCheckGroupBox.ResumeLayout(false);
+            this.dateRangeCheckGroupBox.PerformLayout();
+            this.dateRangeTableLayout.ResumeLayout(false);
+            this.dateRangeTableLayout.PerformLayout();
             this.changeDetectionGroupBox.ResumeLayout(false);
             this.changeDetectionGroupBox.PerformLayout();
             this.tableLayoutPanel1.ResumeLayout(false);
