@@ -434,6 +434,11 @@ namespace Gbdx.Aggregations
 
         private void EventHandlerInstanceAoiHasBeenDrawn(IPolygon poly, IElement elm)
         {
+            // Now that the event has been heard stop listening for future events.
+            AggregationRelay.Instance.AoiHasBeenDrawn -= this.EventHandlerInstanceAoiHasBeenDrawn;
+
+            // re-select the previously enabled tool
+            ArcMap.Application.CurrentTool = this.PreviouslySelectedItem;
             poly.Project(Jarvis.ProjectedCoordinateSystem);
             this.ShapeAoi = poly;
         }
