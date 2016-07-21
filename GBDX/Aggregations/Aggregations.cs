@@ -71,8 +71,18 @@ namespace Gbdx.Aggregations
             // Get GBDX authentication token
             this.GetAuthenticationToken();
 
-            this.startDatePicker.Value = DateTime.Now.AddMonths(-1);
-            this.endDatePicker.Value = DateTime.Now;
+            try
+            {
+                this.startDatePicker.Value = DateTime.Now.AddMonths(-1);
+                this.startDatePicker.MaxDate = this.endDatePicker.Value.Date;
+                this.endDatePicker.Value = DateTime.Now.Date;
+                this.endDatePicker.MinDate = this.startDatePicker.Value.Date;
+                this.endDatePicker.MaxDate = DateTime.Now.Date;
+            }
+            catch (Exception e)
+            {
+                Jarvis.Logger.Error(e);
+            }
 
             // Event handlers for when the group boxes are checked
             this.changeDetectionGroupBox.CheckedChanged += this.EventHandlerCheckBoxGroupCheckChanged;
@@ -384,7 +394,7 @@ namespace Gbdx.Aggregations
                 MessageBox.Show(GbdxResources.pleaseChooseDetailsGranularity);
                 return;
             }
-
+            this.goButton.Enabled = false;
             var request = new RestRequest("insight-vector/api/aggregation", Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
