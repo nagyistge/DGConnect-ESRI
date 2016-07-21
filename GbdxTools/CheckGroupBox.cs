@@ -86,6 +86,12 @@ namespace UIToolbox
             }
         }
 
+        public string CheckBoxText
+        {
+            get { return this.m_checkBox.Text; }
+            set { this.m_checkBox.Text = value; }
+        }
+
         /// <summary>
         /// Indicates whether the component is checked or not.
         /// </summary>

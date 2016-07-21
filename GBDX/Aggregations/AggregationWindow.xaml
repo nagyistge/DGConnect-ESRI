@@ -103,8 +103,8 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
                         <Button x:Name="buttAnalyzeDiffM" Content="Generate"
                                 Margin="0,106.66,9.849,0" VerticalAlignment="Top"
                                 Click="ButtMultiAnalyzeDiffClick" Grid.Column="2" HorizontalAlignment="Right" Width="75" />
-                        <Button x:Name="butChangeInfoM" Content="i" HorizontalAlignment="Right" Margin="0,5.5,9.849,0"
-                                VerticalAlignment="Top" Width="20.6" RenderTransformOrigin="0.604,-0.039"
+                        <Button x:Name="butChangeInfoM" Content="i" HorizontalAlignment="Right" Margin="0,0,9.849,117.16"
+                                VerticalAlignment="Bottom" Width="20.6" RenderTransformOrigin="0.604,-0.039"
                                 Click="ButChangeInfoMultiClick" Grid.Column="2" />
                         <ListBox Visibility="Visible" SelectionMode="Multiple" x:Name="lbChangeLayers"
                                  Grid.ColumnSpan="3" Height="69.2" Margin="10,32.46,15.793,0"
@@ -140,18 +140,20 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
                     <Grid Background="#FFE5E5E5" Margin="0,-2.4,0,5.2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="11*" />
-                            <ColumnDefinition Width="25*" />
+                            <ColumnDefinition Width="14*" />
+                            <ColumnDefinition Width="11*"/>
                             <ColumnDefinition Width="18*" />
                             <ColumnDefinition Width="17*" />
-                            <ColumnDefinition Width="45*" />
-                            <ColumnDefinition Width="95*" />
+                            <ColumnDefinition Width="46*" />
+                            <ColumnDefinition Width="9*" />
+                            <ColumnDefinition Width="89*"/>
                             <ColumnDefinition Width="17*" />
                         </Grid.ColumnDefinitions>
 
-                        <ComboBox x:Name="cbFocusLayer" Margin="10,45.137,10,0" VerticalAlignment="Top" Grid.ColumnSpan="7"/>
-                        <Button x:Name="butPopFocLyrCb" Content="Refresh drop down lists" HorizontalAlignment="Left" Margin="10,18.177,0,0" VerticalAlignment="Top" Width="143.4" RenderTransformOrigin="0.272,-0.055" Click="ButPopFocLyrCbClick" Grid.ColumnSpan="6"/>
-                        <Button x:Name="butRunSignature" Content="Generate" Grid.Column="5" Margin="0,85.937,10.295,0" VerticalAlignment="Top" Click="ButRunSignatureClick" HorizontalAlignment="Right" Width="75"/>
-                        <Button Content="i" Grid.Column="5" HorizontalAlignment="Right" Margin="0,10,20.695,0" VerticalAlignment="Top" Width="19.807" Height="16.36" Click="ButtonClick1"/>
+                        <ComboBox x:Name="cbFocusLayer" Margin="10,45.137,10,0" VerticalAlignment="Top" Grid.ColumnSpan="9"/>
+                        <Button x:Name="butPopFocLyrCb" Content="Refresh drop down lists" HorizontalAlignment="Left" Margin="10,18.177,0,0" VerticalAlignment="Top" Width="143.4" RenderTransformOrigin="0.272,-0.055" Click="ButPopFocLyrCbClick" Grid.ColumnSpan="8"/>
+                        <Button x:Name="butRunSignature" Content="Generate" Grid.Column="7" Margin="0,85.937,10.295,0" VerticalAlignment="Top" Click="ButRunSignatureClick" HorizontalAlignment="Right" Width="75"/>
+                        <Button Content="i" Grid.Column="7" HorizontalAlignment="Right" Margin="0,10,20.695,0" VerticalAlignment="Top" Width="19.807" Height="16.36" Click="ButtonClick1"/>
                     </Grid>
                 </TabItem>
             </TabControl>
