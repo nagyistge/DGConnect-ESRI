@@ -133,7 +133,7 @@
                     response.Request,
                     resp => this.AggregationResponse(response, attempts + 1));
 
-                Jarvis.Logger.Warning(string.Format("{0} :: {1}",response.StatusCode, response.ResponseUri));
+                Jarvis.Logger.Warning(string.Format("{0} :: {1}", response.StatusCode, response.ResponseUri));
                 return;
             }
 
@@ -267,18 +267,6 @@
             }
         }
 
-        private string CreateQueryString()
-        {
-            var builder = new StringBuilder();
-            foreach (var line in this.queryTextBox.Lines)
-            {
-                builder.Append(line);
-                builder.Append(" ");
-            }
-            var output = builder.ToString().Trim();
-            return output;
-        }
-
         /// <summary>
         ///     Create the aggregation AGGS argument
         /// </summary>
@@ -296,10 +284,7 @@
 
             if (this.queryTextBox != null && this.queryTextBox.Text != null && this.queryTextBox.Text != "")
             {
-                request.AddParameter(
-                    "query",
-                    this.CreateQueryString(),
-                    ParameterType.QueryString);
+                request.AddParameter("query", this.CreateQueryString(), ParameterType.QueryString);
             }
 
             // If the user setup a custom date range then use that otherwise assume no date range has been specified.
@@ -342,6 +327,18 @@
 
             // Default to return available source in AOI.
             return "terms:ingest_source";
+        }
+
+        private string CreateQueryString()
+        {
+            var builder = new StringBuilder();
+            foreach (var line in this.queryTextBox.Lines)
+            {
+                builder.Append(line);
+                builder.Append(" ");
+            }
+            var output = builder.ToString().Trim();
+            return output;
         }
 
         /// <summary>
@@ -482,12 +479,12 @@
         {
             if (e.KeyCode == Keys.Return || e.KeyCode == Keys.Enter)
             {
-                ((TextBox) sender).AppendText("\r\n");
+                ((TextBox)sender).AppendText("\r\n");
                 e.Handled = true;
             }
             else if (e.Control && e.KeyCode == Keys.A)
             {
-                ((TextBox) sender).SelectAll();
+                ((TextBox)sender).SelectAll();
                 e.Handled = true;
             }
         }
