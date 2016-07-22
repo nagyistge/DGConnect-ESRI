@@ -140,6 +140,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aggregations\AggregationButton.cs" />
+    <Compile Include="Aggregations\Aggregations.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Aggregations\Aggregations.Designer.cs">
+      <DependentUpon>Aggregations.cs</DependentUpon>
+    </Compile>
     <Compile Include="Aggregations\AggregationSelector.cs" />
     <Compile Include="Aggregations\AggregationWindow.xaml.cs">
       <DependentUpon>AggregationWindow.xaml</DependentUpon>
@@ -170,6 +176,11 @@
     </Compile>
     <Compile Include="Gbd\GbdRelay.cs" />
     <Compile Include="Gbd\Selector.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Utilities and Configuration\Forms\MappingForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -251,11 +262,18 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Aggregations\Aggregations.resx">
+      <DependentUpon>Aggregations.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Answer Factory\AnswerFactoryDockableWindow.resx">
       <DependentUpon>AnswerFactoryDockableWindow.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Gbd\GbdDockableWindow.resx">
       <DependentUpon>GbdDockableWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="Utilities and Configuration\Forms\MappingForm.resx">
       <DependentUpon>MappingForm.cs</DependentUpon>
@@ -361,6 +379,12 @@
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\AnswerFactorySelector.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\Aggregations.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\information.png" />
   </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>

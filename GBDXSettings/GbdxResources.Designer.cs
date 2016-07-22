@@ -196,7 +196,7 @@ namespace GbdxSettings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to No Aggregation has been selected.  Please select a aggregation and try again..
+        ///   Looks up a localized string similar to Please select an aggregation and try again..
         /// </summary>
         public static string noAggregationSelected {
             get {
@@ -233,7 +233,7 @@ namespace GbdxSettings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please choose detail granularity.
+        ///   Looks up a localized string similar to Please choose detail granularity and try again..
         /// </summary>
         public static string pleaseChooseDetailsGranularity {
             get {

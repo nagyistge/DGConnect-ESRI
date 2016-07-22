@@ -405,7 +405,7 @@
             fields = fieldsEdit;
 
             fieldChecker.Validate(fields, out enumFieldError, out validatedFields);
-
+            fieldChecker.ValidateTableName(featureClassName, out featureClassName);
             // The enumFieldError enumerator can be inspected at this point to determine 
             // which fields were modified during validation.
             try

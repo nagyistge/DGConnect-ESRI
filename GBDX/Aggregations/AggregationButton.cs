@@ -18,6 +18,8 @@
 
 namespace Gbdx.Aggregations
 {
+    using System;
+
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Framework;
@@ -44,12 +46,27 @@ namespace Gbdx.Aggregations
         /// </summary>
         protected override void OnClick()
         {
-            if (ArcMap.Application.CurrentTool.Name != ThisAddIn.IDs.Gbdx_Aggregations_AggregationSelector)
+//            if (ArcMap.Application.CurrentTool.Name != ThisAddIn.IDs.Gbdx_Aggregations_AggregationSelector)
+//            {
+//                UID theUid = new UIDClass();
+//                theUid.Value = ThisAddIn.IDs.Gbdx_Aggregations_AggregationWindow;
+//                var window = ArcMap.DockableWindowManager.GetDockableWindow(theUid);
+//                window.Show(!window.IsVisible());
+//            }
+
+            try
             {
-                UID theUid = new UIDClass();
-                theUid.Value = ThisAddIn.IDs.Gbdx_Aggregations_AggregationWindow;
-                var window = ArcMap.DockableWindowManager.GetDockableWindow(theUid);
-                window.Show(!window.IsVisible());
+                if (ArcMap.Application.CurrentTool.Name != ThisAddIn.IDs.Gbdx_Aggregations_AggregationSelector)
+                {
+                    UID theUid = new UIDClass();
+                    theUid.Value = ThisAddIn.IDs.Gbdx_Aggregations_Aggregations;
+                    var window = ArcMap.DockableWindowManager.GetDockableWindow(theUid);
+                    window.Show(!window.IsVisible());
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
 

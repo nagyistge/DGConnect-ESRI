@@ -6,7 +6,7 @@
   <Image>Images\Atlas_Icon.ico</Image>
   <Author>DigitalGlobe Inc.</Author>
   <Company>DigitalGlobe Inc.</Company>
-  <Date>4/27/2016</Date>
+  <Date>7/18/2016</Date>
   <Targets>
     <Target name="Desktop" version="10.2" />
   </Targets>
@@ -50,6 +50,9 @@
         </DockableWindow>
         <DockableWindow id="DigitalGlobe_Inc_Gbdx_AnswerFactoryDockableWindow" class="Gbdx.Answer_Factory.AnswerFactoryDockableWindow+AddinImpl" caption="AnswerFactory" image="Images\AnswerFactoryDockableWindow.png">
           <InitialPlacement height="398" width="564" state="pinned" position="right" />
+        </DockableWindow>
+        <DockableWindow id="DigitalGlobe_Inc_Gbdx_Aggregations" class="Gbdx.Aggregations.Aggregations+AddinImpl" caption="Aggregations and Analysis" image="Images\Aggregations.png">
+          <InitialPlacement height="300" width="300" state="pinned" position="left" />
         </DockableWindow>
       </DockableWindows>
     </ArcMap>
