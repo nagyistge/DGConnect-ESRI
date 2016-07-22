@@ -277,6 +277,7 @@
             this.queryTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.queryTextBox.Size = new System.Drawing.Size(366, 142);
             this.queryTextBox.TabIndex = 6;
+            this.queryTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EventHandlerQueryTextBoxKeyDown);
             // 
             // goButton
             // 

@@ -1,24 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using Aggregations;
-using Encryption;
-using ESRI.ArcGIS.Carto;
-using ESRI.ArcGIS.esriSystem;
-using ESRI.ArcGIS.Framework;
-using ESRI.ArcGIS.Geodatabase;
-using ESRI.ArcGIS.Geometry;
-using GbdxSettings;
-using GbdxSettings.Properties;
-using GbdxTools;
-using NetworkConnections;
-using RestSharp;
-using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
-
-namespace Gbdx.Aggregations
+﻿namespace Gbdx.Aggregations
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Net;
+    using System.Runtime.InteropServices;
+    using System.Text;
+    using System.Windows.Forms;
+
+    using Encryption;
+
+    using ESRI.ArcGIS.Carto;
+    using ESRI.ArcGIS.esriSystem;
+    using ESRI.ArcGIS.Framework;
+    using ESRI.ArcGIS.Geodatabase;
+    using ESRI.ArcGIS.Geometry;
+
+    using global::Aggregations;
+
+    using GbdxSettings;
+    using GbdxSettings.Properties;
+
+    using GbdxTools;
+
+    using NetworkConnections;
+
+    using RestSharp;
+
+    using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
+
     /// <summary>
     ///     Designer class of the dockable window add-in. It contains user interfaces that
     ///     make up the dockable window.
@@ -29,7 +38,7 @@ namespace Gbdx.Aggregations
 
         private const string StatusLabelPrefix = "Status: ";
 
-        private const int MaxAttempts = 3;
+        private const int MaxAttempts = 5;
 
         /// <summary>
         ///     GBDX Authentication Token
@@ -103,11 +112,11 @@ namespace Gbdx.Aggregations
         /// </param>
         private void AddLayerToArcMap(string featureClassName)
         {
-            var featureWorkspace = (IFeatureWorkspace) Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
+            var featureWorkspace = (IFeatureWorkspace)Jarvis.OpenWorkspace(Settings.Default.geoDatabase);
             var openMe = featureWorkspace.OpenFeatureClass(featureClassName);
             IFeatureLayer featureLayer = new FeatureLayerClass();
             featureLayer.FeatureClass = openMe;
-            var layer = (ILayer) featureLayer;
+            var layer = (ILayer)featureLayer;
             layer.Name = featureClassName;
             ArcMap.Document.AddLayer(layer);
         }
@@ -116,13 +125,15 @@ namespace Gbdx.Aggregations
         {
             Jarvis.Logger.Info(response.ResponseUri.ToString());
 
-            // 
+            // If we are getting timeouts retry up to MAX ATTEMPTS and log that a timeout occurred attempting the following URL
             if (response.StatusCode == HttpStatusCode.GatewayTimeout && attempts <= MaxAttempts)
             {
                 IRestClient restClient = new RestClient(Settings.Default.AuthBase);
                 restClient.ExecuteAsync<MotherOfGodAggregations>(
                     response.Request,
                     resp => this.AggregationResponse(response, attempts + 1));
+
+                Jarvis.Logger.Warning(string.Format("{0} :: {1}",response.StatusCode, response.ResponseUri));
                 return;
             }
 
@@ -143,7 +154,7 @@ namespace Gbdx.Aggregations
                 if (resultDictionary.Count == 0 && uniqueFieldNames.Count == 0)
                 {
                     MessageBox.Show(GbdxResources.NoDataFound);
-                    this.Invoke((MethodInvoker) delegate { this.goButton.Enabled = true; });
+                    this.Invoke((MethodInvoker)delegate { this.goButton.Enabled = true; });
 
                     return;
                 }
@@ -167,11 +178,11 @@ namespace Gbdx.Aggregations
 
                 // Use the dispatcher to make sure the following calls occur on the MAIN thread.
                 this.Invoke(
-                    (MethodInvoker) delegate
-                    {
-                        this.AddLayerToArcMap(featureClassName);
-                        this.goButton.Enabled = true;
-                    });
+                    (MethodInvoker)delegate
+                        {
+                            this.AddLayerToArcMap(featureClassName);
+                            this.goButton.Enabled = true;
+                        });
             }
             else
             {
@@ -182,7 +193,7 @@ namespace Gbdx.Aggregations
                     response.Content);
                 Jarvis.Logger.Error(error);
 
-                this.Invoke((MethodInvoker) delegate { this.goButton.Enabled = true; });
+                this.Invoke((MethodInvoker)delegate { this.goButton.Enabled = true; });
 
                 MessageBox.Show(GbdxResources.Source_ErrorMessage);
             }
@@ -209,7 +220,7 @@ namespace Gbdx.Aggregations
 
                 Application.DoEvents();
 
-                var ignoreCols = new List<string> {"OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area"};
+                var ignoreCols = new List<string> { "OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area" };
 
                 var ptA = this.FeatureLayerToPivotTable(flayerA, "GeoHash", ignoreCols);
 
@@ -256,6 +267,18 @@ namespace Gbdx.Aggregations
             }
         }
 
+        private string CreateQueryString()
+        {
+            var builder = new StringBuilder();
+            foreach (var line in this.queryTextBox.Lines)
+            {
+                builder.Append(line);
+                builder.Append(" ");
+            }
+            var output = builder.ToString().Trim();
+            return output;
+        }
+
         /// <summary>
         ///     Create the aggregation AGGS argument
         /// </summary>
@@ -275,7 +298,7 @@ namespace Gbdx.Aggregations
             {
                 request.AddParameter(
                     "query",
-                    this.queryTextBox.Text.Replace("\n", "").Replace("\r", ""),
+                    this.CreateQueryString(),
                     ParameterType.QueryString);
             }
 
@@ -331,7 +354,7 @@ namespace Gbdx.Aggregations
         {
             try
             {
-                var checkedBox = (CheckBox) sender;
+                var checkedBox = (CheckBox)sender;
                 if (!checkedBox.Checked)
                 {
                     return;
@@ -427,8 +450,7 @@ namespace Gbdx.Aggregations
         {
             MessageBox.Show(
                 "This tool calculates the change between two aggregations over the same area that represent different time slices. Geohash size must be consistent in order to obtain valid results from this algorithm."
-                +
-                " The algorithm performs a sparse cosine similarity based on all field values for each row, and calculates the diff between all fields individually. The output feature class will have the union of fields from both input features. Any pivot table will work.",
+                + " The algorithm performs a sparse cosine similarity based on all field values for each row, and calculates the diff between all fields individually. The output feature class will have the union of fields from both input features. Any pivot table will work.",
                 "About");
         }
 
@@ -452,9 +474,22 @@ namespace Gbdx.Aggregations
         {
             MessageBox.Show(
                 "This tool calculates the change between two or more aggregation layers over the same area that represent different time slices. Geohash size must be consistent in order to obtain valid results from this algorithm."
-                +
-                " The algorithm performs a sparse cosine similarity based on all field values for each row, and produces a pivot table of pairwise cell by cell comparisons. For percent diff on a field by field basis, use the Pairwise Change Detection tool.",
+                + " The algorithm performs a sparse cosine similarity based on all field values for each row, and produces a pivot table of pairwise cell by cell comparisons. For percent diff on a field by field basis, use the Pairwise Change Detection tool.",
                 "About");
+        }
+
+        private void EventHandlerQueryTextBoxKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Return || e.KeyCode == Keys.Enter)
+            {
+                ((TextBox) sender).AppendText("\r\n");
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.A)
+            {
+                ((TextBox) sender).SelectAll();
+                e.Handled = true;
+            }
         }
 
         /// <summary>
@@ -491,7 +526,7 @@ namespace Gbdx.Aggregations
             AggregationRelay.Instance.AoiHasBeenDrawn += this.EventHandlerInstanceAoiHasBeenDrawn;
 
             var commandBars = ArcMap.Application.Document.CommandBars;
-            var commandId = new UIDClass {Value = ThisAddIn.IDs.Gbdx_Aggregations_AggregationSelector};
+            var commandId = new UIDClass { Value = ThisAddIn.IDs.Gbdx_Aggregations_AggregationSelector };
             var commandItem = commandBars.Find(commandId, false, false);
 
             // save currently selected tool to be re-selected after the AOI has been drawn.
@@ -671,18 +706,18 @@ namespace Gbdx.Aggregations
             restClient.ExecuteAsync<AccessToken>(
                 request,
                 resp =>
-                {
-                    Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                    {
+                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-                    if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
-                    {
-                        this.token = resp.Data.access_token;
-                    }
-                    else
-                    {
-                        this.token = string.Empty;
-                    }
-                });
+                        if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
+                        {
+                            this.token = resp.Data.access_token;
+                        }
+                        else
+                        {
+                            this.token = string.Empty;
+                        }
+                    });
         }
 
         public static List<IFeatureLayer> GetFeatureLayersFromToc(IActiveView activeView)
@@ -766,7 +801,7 @@ namespace Gbdx.Aggregations
 
         public List<IFeature> GetSelectedFeatures(IFeatureLayer featureLayer)
         {
-            var featureSelection = (IFeatureSelection) featureLayer;
+            var featureSelection = (IFeatureSelection)featureLayer;
             var selectionSet = featureSelection.SelectionSet;
 
             ICursor cursor;
@@ -809,7 +844,7 @@ namespace Gbdx.Aggregations
                 var buffer = featureClass.CreateFeatureBuffer();
 
                 // Setup the features geometry.
-                buffer.Shape = (IGeometry) poly;
+                buffer.Shape = (IGeometry)poly;
 
                 buffer.Value[featureClass.FindField("Geohash")] = entry.RowKey;
                 foreach (var val in entry.Data.Keys)
@@ -880,7 +915,7 @@ namespace Gbdx.Aggregations
                 var buffer = featureClass.CreateFeatureBuffer();
 
                 // Setup the features geometry.
-                buffer.Shape = (IGeometry) poly;
+                buffer.Shape = (IGeometry)poly;
                 buffer.Value[featureClass.FindField("GeoHash")] = key;
                 foreach (var subKey in resultDictionary[key].Keys)
                 {
@@ -934,7 +969,7 @@ namespace Gbdx.Aggregations
                 }
 
                 var signature = this.FeaturesToPivotTable(outPut, "GeoHash", null);
-                var ignoreCols = new List<string> {"OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area"};
+                var ignoreCols = new List<string> { "OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area" };
 
                 var analyzer = new PivotTableAnalyzer(this.UpdatePBar, this.SetPBarProperties);
 
@@ -1058,7 +1093,7 @@ namespace Gbdx.Aggregations
 
                         this.statusLabel.Text = StatusLabelPrefix + "Preparing " + layerA;
                         Application.DoEvents();
-                        var ignoreCols = new List<string> {"OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area"};
+                        var ignoreCols = new List<string> { "OBJECTID", "SHAPE", "SHAPE_Length", "SHAPE_Area" };
                         var ptA = this.FeatureLayerToPivotTable(flayerA, "GeoHash", ignoreCols);
 
                         this.statusLabel.Text = StatusLabelPrefix + "Preparing " + layerB;
