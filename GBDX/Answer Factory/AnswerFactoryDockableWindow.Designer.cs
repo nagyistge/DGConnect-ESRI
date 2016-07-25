@@ -48,12 +48,12 @@
             this.saveButton = new System.Windows.Forms.Button();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.tableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
-            this.showResultsButton = new System.Windows.Forms.Button();
             this.resultRefrshButton = new System.Windows.Forms.Button();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
             this.projectNameDataGridView = new System.Windows.Forms.DataGridView();
             this.recipeStatusDataGridView = new System.Windows.Forms.DataGridView();
             this.projectSearchTextBox = new System.Windows.Forms.TextBox();
+            this.showResultsButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -173,9 +173,10 @@
             // 
             this.availableRecipesCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.availableRecipesCombobox.FormattingEnabled = true;
-            this.availableRecipesCombobox.Location = new System.Drawing.Point(146, 42);
+            this.availableRecipesCombobox.Location = new System.Drawing.Point(146, 41);
             this.availableRecipesCombobox.Name = "availableRecipesCombobox";
             this.availableRecipesCombobox.Size = new System.Drawing.Size(149, 24);
+            this.availableRecipesCombobox.Sorted = true;
             this.availableRecipesCombobox.TabIndex = 9;
             // 
             // label2
@@ -196,11 +197,11 @@
             this.selectionTypecomboBox.Items.AddRange(new object[] {
             "Draw Rectangle",
             "Use Selected Feature"});
-            this.selectionTypecomboBox.Location = new System.Drawing.Point(146, 78);
+            this.selectionTypecomboBox.Location = new System.Drawing.Point(146, 77);
             this.selectionTypecomboBox.Name = "selectionTypecomboBox";
             this.selectionTypecomboBox.Size = new System.Drawing.Size(149, 24);
             this.selectionTypecomboBox.TabIndex = 12;
-            this.selectionTypecomboBox.SelectedIndexChanged += new System.EventHandler(this.selectionTypecomboBox_SelectedIndexChanged);
+            this.selectionTypecomboBox.SelectedIndexChanged += new System.EventHandler(this.EventhandlerSelectionTypecomboBoxSelectedIndexChanged);
             // 
             // drawButton
             // 
@@ -247,10 +248,10 @@
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 49.99999F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50.00001F));
             this.tableLayoutPanel3.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle());
-            this.tableLayoutPanel3.Controls.Add(this.showResultsButton, 2, 4);
             this.tableLayoutPanel3.Controls.Add(this.resultRefrshButton, 0, 4);
             this.tableLayoutPanel3.Controls.Add(this.splitContainer1, 0, 1);
             this.tableLayoutPanel3.Controls.Add(this.projectSearchTextBox, 0, 0);
+            this.tableLayoutPanel3.Controls.Add(this.showResultsButton, 2, 4);
             this.tableLayoutPanel3.Location = new System.Drawing.Point(12, 21);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 5;
@@ -262,17 +263,6 @@
             this.tableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tableLayoutPanel3.Size = new System.Drawing.Size(371, 349);
             this.tableLayoutPanel3.TabIndex = 0;
-            // 
-            // showResultsButton
-            // 
-            this.showResultsButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.showResultsButton.Location = new System.Drawing.Point(263, 312);
-            this.showResultsButton.Name = "showResultsButton";
-            this.showResultsButton.Size = new System.Drawing.Size(104, 33);
-            this.showResultsButton.TabIndex = 1;
-            this.showResultsButton.Text = "Show Results";
-            this.showResultsButton.UseVisualStyleBackColor = true;
-            this.showResultsButton.Click += new System.EventHandler(this.showResultsButton_Click);
             // 
             // resultRefrshButton
             // 
@@ -405,6 +395,17 @@
             this.projectSearchTextBox.TabIndex = 4;
             this.projectSearchTextBox.Text = "Type some text here to filter projects...";
             this.projectSearchTextBox.TextChanged += new System.EventHandler(this.projectSearchTextBox_TextChanged);
+            // 
+            // showResultsButton
+            // 
+            this.showResultsButton.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.showResultsButton.Location = new System.Drawing.Point(263, 312);
+            this.showResultsButton.Name = "showResultsButton";
+            this.showResultsButton.Size = new System.Drawing.Size(104, 33);
+            this.showResultsButton.TabIndex = 1;
+            this.showResultsButton.Text = "Show Results";
+            this.showResultsButton.UseVisualStyleBackColor = true;
+            this.showResultsButton.Click += new System.EventHandler(this.EventHandlerShowResultsButtonClick);
             // 
             // AnswerFactoryDockableWindow
             // 

@@ -33,6 +33,7 @@
                 <ComboBoxItem Content="6" />
                 <ComboBoxItem Content="7" />
                 <ComboBoxItem Content="8" />
+                <ComboBox Width="120"/>
             </ComboBox>
             <Label Content="Detail Granularity" HorizontalAlignment="Left" Margin="30.622,67.669,0,0"
                    VerticalAlignment="Top" Height="25.6" Width="102.4" />
@@ -48,7 +49,7 @@
                     </TransformGroup>
                 </Button.RenderTransform>
             </Button>
-            <GroupBox Height="90.924" Margin="19.022,120.761,0.978,0" VerticalAlignment="Top">
+            <GroupBox Height="90.924" Margin="20,120.761,0,0" VerticalAlignment="Top">
                 <GroupBox.Header>
                     <CheckBox x:Name="specifyDateCheckbox" Click="SpecifyDateCheckboxChecked"
                               Content="Specify Date Range" />
@@ -82,14 +83,14 @@
                 <ComboBoxItem Content="What is the twitter sentiment in the region?"/>
                 <ComboBoxItem Content="What type of data is available in the region?"/>
             </ComboBox>
-            <Button Name="selectAreaButton" Content="Select Area" HorizontalAlignment="Left" Margin="27.285,335.053,0,0" VerticalAlignment="Top" Width="75" Height="21.6" Click="SelectAreaButtonClick"/>
+            <Button Name="selectAreaButton" HorizontalAlignment="Left" Margin="27.285,335.053,0,0" VerticalAlignment="Top" Width="75" Height="21.6" Click="SelectAreaButtonClick"/>
             <TextBox Name="tbFilter" Height="55.935" Margin="19.022,237.645,0.978,0" TextWrapping="Wrap" VerticalAlignment="Top" AcceptsReturn="True" 
 VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;value&gt; AND|OR ..."/>
 
             <ProgressBar x:Name="pbarChangeDet" Height="17.938" Margin="18.044,218.287,0.978,0" VerticalAlignment="Top" Grid.Row="2"/>
             <TabControl x:Name="tabAggAnalytics" Height="187.54" Margin="27.285,383.253,18.508,0"
                         VerticalAlignment="Top" Grid.RowSpan="3">
-                <TabItem Header="Multi Change Detection" Margin="-8,0,4,-3" Visibility="Visible">
+                <TabItem Header="MButtonulti Change Detection" Margin="-8,0,4,-3" Visibility="Visible">
                     <Grid Background="#FFE5E5E5" Margin="-8,0,4,-3">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="15*" />
@@ -102,8 +103,8 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
                         <Button x:Name="buttAnalyzeDiffM" Content="Generate"
                                 Margin="0,106.66,9.849,0" VerticalAlignment="Top"
                                 Click="ButtMultiAnalyzeDiffClick" Grid.Column="2" HorizontalAlignment="Right" Width="75" />
-                        <Button x:Name="butChangeInfoM" Content="i" HorizontalAlignment="Right" Margin="0,5.5,9.849,0"
-                                VerticalAlignment="Top" Width="20.6" RenderTransformOrigin="0.604,-0.039"
+                        <Button x:Name="butChangeInfoM" Content="i" HorizontalAlignment="Right" Margin="0,0,9.849,117.16"
+                                VerticalAlignment="Bottom" Width="20.6" RenderTransformOrigin="0.604,-0.039"
                                 Click="ButChangeInfoMultiClick" Grid.Column="2" />
                         <ListBox Visibility="Visible" SelectionMode="Multiple" x:Name="lbChangeLayers"
                                  Grid.ColumnSpan="3" Height="69.2" Margin="10,32.46,15.793,0"
@@ -115,41 +116,44 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="15*" />
                             <ColumnDefinition Width="104*" />
-                            <ColumnDefinition Width="108.003" />
+                            <ColumnDefinition Width="83.676" />
+                            <ColumnDefinition Width="24.327"/>
                         </Grid.ColumnDefinitions>
                         <Button x:Name="buttAnalyzeAgg" Content="Refresh drop down lists" HorizontalAlignment="Left"
                                 Margin="10,12.805,0,0" VerticalAlignment="Top" Width="131.972"
                                 Click="ButtAnalyzeAggClick" Grid.ColumnSpan="3" />
                         <ComboBox x:Name="cbAggLayerA" Margin="10,39.765,10.228,0"
-                                  VerticalAlignment="Top" SelectedIndex="0" Grid.ColumnSpan="3" />
+                                  VerticalAlignment="Top" SelectedIndex="0" Grid.ColumnSpan="4" />
                         <ComboBox x:Name="cbAggLayerB" Margin="10,66.725,10.228,0"
-                                  VerticalAlignment="Top" SelectedIndex="0" Grid.ColumnSpan="3" />
+                                  VerticalAlignment="Top" SelectedIndex="0" Grid.ColumnSpan="4" />
                         <Button x:Name="buttAnalyzeDiff" Content="Generate" HorizontalAlignment="Right"
                                 Margin="0,93.685,8.614,0" VerticalAlignment="Top" Width="75"
-                                Click="ButtAnalyzeDiffClick" Grid.Column="2" />
+                                Click="ButtAnalyzeDiffClick" Grid.Column="2" Grid.ColumnSpan="2" />
                         <Button x:Name="butChangeInfo" Content="i" HorizontalAlignment="Left" Margin="77.551,5.5,0,0"
                                 VerticalAlignment="Top" Width="20.6" RenderTransformOrigin="0.604,-0.039"
-                                Click="ButChangeInfoClick" Grid.Column="2" />
+                                Click="ButChangeInfoClick" Grid.Column="2" Grid.ColumnSpan="2" />
                         <CheckBox Name="cbCalcDiffs" Content="Include % Diffs" Grid.Column="1"
-                                  HorizontalAlignment="Left" Margin="8,98.885,0,13.515" />
+                                  HorizontalAlignment="Left" Margin="7.999,98.885,0,13.515" />
                     </Grid>
                 </TabItem>
                 <TabItem Header="MLTC" Margin="-8,0,4,-3">
                     <Grid Background="#FFE5E5E5" Margin="0,-2.4,0,5.2">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="11*" />
-                            <ColumnDefinition Width="25*" />
+                            <ColumnDefinition Width="14*" />
+                            <ColumnDefinition Width="11*"/>
                             <ColumnDefinition Width="18*" />
                             <ColumnDefinition Width="17*" />
-                            <ColumnDefinition Width="45*" />
-                            <ColumnDefinition Width="95*" />
+                            <ColumnDefinition Width="46*" />
+                            <ColumnDefinition Width="9*" />
+                            <ColumnDefinition Width="89*"/>
                             <ColumnDefinition Width="17*" />
                         </Grid.ColumnDefinitions>
 
-                        <ComboBox x:Name="cbFocusLayer" Margin="10,45.137,10,0" VerticalAlignment="Top" Grid.ColumnSpan="7"/>
-                        <Button x:Name="butPopFocLyrCb" Content="Refresh drop down lists" HorizontalAlignment="Left" Margin="10,18.177,0,0" VerticalAlignment="Top" Width="143.4" RenderTransformOrigin="0.272,-0.055" Click="ButPopFocLyrCbClick" Grid.ColumnSpan="6"/>
-                        <Button x:Name="butRunSignature" Content="Generate" Grid.Column="5" Margin="0,85.937,10.295,0" VerticalAlignment="Top" Click="ButRunSignatureClick" HorizontalAlignment="Right" Width="75"/>
-                        <Button Content="i" Grid.Column="5" HorizontalAlignment="Right" Margin="0,10,20.695,0" VerticalAlignment="Top" Width="19.807" Height="16.36" Click="ButtonClick1"/>
+                        <ComboBox x:Name="cbFocusLayer" Margin="10,45.137,10,0" VerticalAlignment="Top" Grid.ColumnSpan="9"/>
+                        <Button x:Name="butPopFocLyrCb" Content="Refresh drop down lists" HorizontalAlignment="Left" Margin="10,18.177,0,0" VerticalAlignment="Top" Width="143.4" RenderTransformOrigin="0.272,-0.055" Click="ButPopFocLyrCbClick" Grid.ColumnSpan="8"/>
+                        <Button x:Name="butRunSignature" Content="Generate" Grid.Column="7" Margin="0,85.937,10.295,0" VerticalAlignment="Top" Click="ButRunSignatureClick" HorizontalAlignment="Right" Width="75"/>
+                        <Button Content="i" Grid.Column="7" HorizontalAlignment="Right" Margin="0,10,20.695,0" VerticalAlignment="Top" Width="19.807" Height="16.36" Click="ButtonClick1"/>
                     </Grid>
                 </TabItem>
             </TabControl>
@@ -160,6 +164,7 @@ VerticalScrollBarVisibility="Auto" ToolTip="Format is: &lt;fieldname&gt;:&lt;val
                       " SelectionChanged="SelectionTypeComboBoxSelectionChanged" HorizontalAlignment="Right" Width="146.702">
                 <ComboBoxItem>Draw Rectangle</ComboBoxItem>
                 <ComboBoxItem>Use Selected Polygons</ComboBoxItem>
+                <Label Content="Label"/>
             </ComboBox>
             <Label Content="Selection Type" Margin="27.285,304.091,164.465,0" VerticalAlignment="Top"/>
             <Label Content="Label" HorizontalAlignment="Left" Height="3.602" Margin="116.139,260.6,0,0" VerticalAlignment="Top" Width="7.461" Grid.Row="2"/>

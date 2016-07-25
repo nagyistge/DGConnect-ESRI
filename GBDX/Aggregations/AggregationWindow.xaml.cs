@@ -234,7 +234,6 @@ namespace Gbdx.Aggregations
 
         private void ButPopFocLyrCbClick(object sender, RoutedEventArgs e)
         {
-            var cView = this.GetContentsViewFromArcMap(ArcMap.Application, 0);
             var aView = this.GetActiveViewFromArcMap(ArcMap.Application);
             var layers = this.GetFeatureLayersFromToc(aView);
 
@@ -250,7 +249,7 @@ namespace Gbdx.Aggregations
                     this.cbFocusLayer.Items.RemoveAt(i);
                 }
             }
-
+             
             foreach (var layer in layers)
             {
                 // MessageBox.Show(layer.Name + " -- " + layer.DataSourceType);
@@ -378,7 +377,6 @@ namespace Gbdx.Aggregations
 
         private void ButtAnalyzeAggClick(object sender, RoutedEventArgs e)
         {
-            var cView = this.GetContentsViewFromArcMap(ArcMap.Application, 0);
             var aView = this.GetActiveViewFromArcMap(ArcMap.Application);
             var layers = this.GetFeatureLayersFromToc(aView);
 
@@ -393,7 +391,6 @@ namespace Gbdx.Aggregations
 
             foreach (var layer in layers)
             {
-                // MessageBox.Show(layer.Name + " -- " + layer.DataSourceType);
                 if (layer.Name.ToLower().Contains("aggregation"))
                 {
                     this.cbAggLayerA.Items.Add(layer.Name);
@@ -408,7 +405,6 @@ namespace Gbdx.Aggregations
 
         private void ButtAnalyzeAggMClick(object sender, RoutedEventArgs e)
         {
-            var cView = this.GetContentsViewFromArcMap(ArcMap.Application, 0);
             var aView = this.GetActiveViewFromArcMap(ArcMap.Application);
             var layers = this.GetFeatureLayersFromToc(aView);
 
@@ -928,9 +924,10 @@ namespace Gbdx.Aggregations
 
             for (var i = 0; i < map.LayerCount; i++)
             {
-                if (activeView.FocusMap.get_Layer(i) is IFeatureLayer)
+                var item = activeView.FocusMap.Layer[i] as IFeatureLayer;
+                if (item != null)
                 {
-                    outlist.Add((IFeatureLayer)activeView.FocusMap.get_Layer(i));
+                    outlist.Add(item);
                 }
             }
 
