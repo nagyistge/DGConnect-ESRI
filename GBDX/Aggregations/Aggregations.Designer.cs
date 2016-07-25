@@ -320,7 +320,7 @@
             this.selectionTypeComboBox.Items.AddRange(new object[] {
             "Draw Rectangle",
             "Use Selected Polygon"});
-            this.selectionTypeComboBox.Location = new System.Drawing.Point(126, 435);
+            this.selectionTypeComboBox.Location = new System.Drawing.Point(126, 436);
             this.selectionTypeComboBox.Name = "selectionTypeComboBox";
             this.selectionTypeComboBox.Size = new System.Drawing.Size(243, 24);
             this.selectionTypeComboBox.TabIndex = 10;
@@ -459,7 +459,7 @@
             this.tableLayoutPanel1.SetColumnSpan(this.aggLayerAComboBox, 3);
             this.aggLayerAComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.aggLayerAComboBox.FormattingEnabled = true;
-            this.aggLayerAComboBox.Location = new System.Drawing.Point(3, 40);
+            this.aggLayerAComboBox.Location = new System.Drawing.Point(3, 41);
             this.aggLayerAComboBox.Name = "aggLayerAComboBox";
             this.aggLayerAComboBox.Size = new System.Drawing.Size(351, 24);
             this.aggLayerAComboBox.TabIndex = 1;
@@ -614,7 +614,7 @@
             this.mltcTableLayout.SetColumnSpan(this.focusLayerComboBox, 3);
             this.focusLayerComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.focusLayerComboBox.FormattingEnabled = true;
-            this.focusLayerComboBox.Location = new System.Drawing.Point(3, 42);
+            this.focusLayerComboBox.Location = new System.Drawing.Point(3, 43);
             this.focusLayerComboBox.Name = "focusLayerComboBox";
             this.focusLayerComboBox.Size = new System.Drawing.Size(348, 24);
             this.focusLayerComboBox.TabIndex = 6;

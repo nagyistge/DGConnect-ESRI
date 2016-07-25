@@ -82,11 +82,13 @@
 
             try
             {
-                this.startDatePicker.Value = DateTime.Now.AddMonths(-1);
+                
                 this.startDatePicker.MaxDate = this.endDatePicker.Value.Date;
-                this.endDatePicker.Value = DateTime.Now.Date;
+                
                 this.endDatePicker.MinDate = this.startDatePicker.Value.Date;
                 this.endDatePicker.MaxDate = DateTime.Now.Date;
+                this.startDatePicker.Value = DateTime.Now.AddMonths(-1);
+                this.endDatePicker.Value = DateTime.Now.Date;
             }
             catch (Exception e)
             {

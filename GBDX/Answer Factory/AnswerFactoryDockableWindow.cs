@@ -959,7 +959,7 @@ namespace Gbdx.Answer_Factory
             }
         }
 
-        private void selectionTypecomboBox_SelectedIndexChanged(object sender, EventArgs e)
+        private void EventhandlerSelectionTypecomboBoxSelectedIndexChanged(object sender, EventArgs e)
         {
             if (this.selectionTypecomboBox.SelectedIndex == 0)
             {
@@ -971,7 +971,7 @@ namespace Gbdx.Answer_Factory
             }
         }
 
-        private void showResultsButton_Click(object sender, EventArgs e)
+        private void EventHandlerShowResultsButtonClick(object sender, EventArgs e)
         {
             try
             {
