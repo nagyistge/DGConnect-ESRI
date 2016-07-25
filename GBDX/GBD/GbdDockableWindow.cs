@@ -1279,8 +1279,32 @@ namespace Gbdx.Gbd
             newFilter += this.SunElevationFilterSetup(newFilter);
             newFilter += this.PanResolutionFilterSetup(newFilter);
             newFilter += AcquiredDateFilterSetup(newFilter, this.fromDateTimePicker, this.toDateTimePicker);
+            newFilter += IdahoIdOnlyFilterSetup(newFilter);
             newFilter = CatalogIdFilter(newFilter, this.catalogIdSearchTextBox.Text);
+
             return newFilter;
+        }
+
+        private string IdahoIdOnlyFilterSetup(string filter)
+        {
+            string output;
+            if (!this.idahoIdOnlyCheckBox.Checked)
+            {
+                return string.Empty;
+            }
+
+            if (string.IsNullOrEmpty(filter))
+            {
+                //                output = "[Cloud Cover]<='" + this.cloudCoverageComboBox.Items[selectedIndex] + "'";
+                output = string.Format("[PAN ID] <> '' OR [MS ID] <> ''");
+
+            }
+            else
+            {
+                output = string.Format(" AND [PAN ID] <> '' OR [MS ID] <> ''");
+            }
+
+            return output;
         }
 
         private void GbdDockableWindowMouseLeave(object sender, EventArgs e)
@@ -1456,7 +1480,7 @@ namespace Gbdx.Gbd
                 this.gbdOrderList.AddRange(data);
                 this.WriteGbdOrdersToFile(this.gbdOrderList);
                 this.UpdateStatus();
-                this.tabControl1.SelectTab(this.statusPage);
+                this.mainTabControl.SelectTab(this.statusPage);
             }
             catch (Exception error)
             {
@@ -2418,6 +2442,22 @@ namespace Gbdx.Gbd
             {
                 this.dockedWindowUi = new GbdDockableWindow(this.Hook);
                 return this.dockedWindowUi.Handle;
+            }
+        }
+
+        private void EventHandlerIdahoIdOnlyCheckBoxCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                this.SetHeaderBoxToOff();
+
+                this.dataView.RowFilter = this.FilterSetup();
+
+                this.UpdateSelectedAndTotalLabels();
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
             }
         }
     }
