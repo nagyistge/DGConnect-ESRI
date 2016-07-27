@@ -1279,7 +1279,7 @@ namespace Gbdx.Gbd
             newFilter += this.SunElevationFilterSetup(newFilter);
             newFilter += this.PanResolutionFilterSetup(newFilter);
             newFilter += AcquiredDateFilterSetup(newFilter, this.fromDateTimePicker, this.toDateTimePicker);
-            newFilter += IdahoIdOnlyFilterSetup(newFilter);
+            newFilter += this.IdahoIdOnlyFilterSetup(newFilter);
             newFilter = CatalogIdFilter(newFilter, this.catalogIdSearchTextBox.Text);
 
             return newFilter;
@@ -1287,24 +1287,28 @@ namespace Gbdx.Gbd
 
         private string IdahoIdOnlyFilterSetup(string filter)
         {
-            string output;
-            if (!this.idahoIdOnlyCheckBox.Checked)
-            {
-                return string.Empty;
-            }
+            var output = new StringBuilder();
 
-            if (string.IsNullOrEmpty(filter))
+            if (!string.IsNullOrEmpty(filter))
             {
-                //                output = "[Cloud Cover]<='" + this.cloudCoverageComboBox.Items[selectedIndex] + "'";
-                output = string.Format("[PAN ID] <> '' OR [MS ID] <> ''");
-
+                output.Append(" AND ");
             }
-            else
+            switch (this.idahoIdOnlyComboBox.SelectedIndex)
             {
-                output = string.Format(" AND [PAN ID] <> '' OR [MS ID] <> ''");
+                case 0: // no selection
+                    return string.Empty;
+                case 1: // Both
+                    output.Append("[PAN ID] <> '' AND [MS ID] <> ''");
+                    return output.ToString();
+                case 2: // MS Only
+                    output.Append("[MS ID] <> ''");
+                    return output.ToString();
+                case 3: // PAN Only
+                    output.Append("[PAN ID] <> ''");
+                    return output.ToString();
+                default:
+                    return string.Empty;
             }
-
-            return output;
         }
 
         private void GbdDockableWindowMouseLeave(object sender, EventArgs e)
