@@ -357,11 +357,11 @@
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(20, 407);
+            this.label2.Location = new System.Drawing.Point(38, 407);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(94, 13);
+            this.label2.Size = new System.Drawing.Size(57, 13);
             this.label2.TabIndex = 11;
-            this.label2.Text = "Catalog ID Search";
+            this.label2.Text = "Catalog ID";
             // 
             // catalogIdSearchTextBox
             // 
@@ -556,11 +556,11 @@
             // 
             this.label8.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(32, 367);
+            this.label8.Location = new System.Drawing.Point(43, 367);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(70, 13);
+            this.label8.Size = new System.Drawing.Size(48, 13);
             this.label8.TabIndex = 12;
-            this.label8.Text = "Idaho Id Only";
+            this.label8.Text = "Idaho ID";
             // 
             // idahoIdOnlyComboBox
             // 
@@ -570,8 +570,8 @@
             this.idahoIdOnlyComboBox.Items.AddRange(new object[] {
             "",
             "Both",
-            "MS Only",
-            "PAN Only"});
+            "MS",
+            "PAN"});
             this.idahoIdOnlyComboBox.Location = new System.Drawing.Point(137, 363);
             this.idahoIdOnlyComboBox.Name = "idahoIdOnlyComboBox";
             this.idahoIdOnlyComboBox.Size = new System.Drawing.Size(135, 21);
