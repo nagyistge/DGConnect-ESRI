@@ -1279,8 +1279,36 @@ namespace Gbdx.Gbd
             newFilter += this.SunElevationFilterSetup(newFilter);
             newFilter += this.PanResolutionFilterSetup(newFilter);
             newFilter += AcquiredDateFilterSetup(newFilter, this.fromDateTimePicker, this.toDateTimePicker);
+            newFilter += this.IdahoIdOnlyFilterSetup(newFilter);
             newFilter = CatalogIdFilter(newFilter, this.catalogIdSearchTextBox.Text);
+
             return newFilter;
+        }
+
+        private string IdahoIdOnlyFilterSetup(string filter)
+        {
+            var output = new StringBuilder();
+
+            if (!string.IsNullOrEmpty(filter))
+            {
+                output.Append(" AND ");
+            }
+            switch (this.idahoIdOnlyComboBox.SelectedIndex)
+            {
+                case 0: // no selection
+                    return string.Empty;
+                case 1: // Both
+                    output.Append("[PAN ID] <> '' AND [MS ID] <> ''");
+                    return output.ToString();
+                case 2: // MS Only
+                    output.Append("[MS ID] <> ''");
+                    return output.ToString();
+                case 3: // PAN Only
+                    output.Append("[PAN ID] <> ''");
+                    return output.ToString();
+                default:
+                    return string.Empty;
+            }
         }
 
         private void GbdDockableWindowMouseLeave(object sender, EventArgs e)
@@ -1456,7 +1484,7 @@ namespace Gbdx.Gbd
                 this.gbdOrderList.AddRange(data);
                 this.WriteGbdOrdersToFile(this.gbdOrderList);
                 this.UpdateStatus();
-                this.tabControl1.SelectTab(this.statusPage);
+                this.mainTabControl.SelectTab(this.statusPage);
             }
             catch (Exception error)
             {
@@ -2418,6 +2446,22 @@ namespace Gbdx.Gbd
             {
                 this.dockedWindowUi = new GbdDockableWindow(this.Hook);
                 return this.dockedWindowUi.Handle;
+            }
+        }
+
+        private void EventHandlerIdahoIdOnlyCheckBoxCheckedChanged(object sender, EventArgs e)
+        {
+            try
+            {
+                this.SetHeaderBoxToOff();
+
+                this.dataView.RowFilter = this.FilterSetup();
+
+                this.UpdateSelectedAndTotalLabels();
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
             }
         }
     }
