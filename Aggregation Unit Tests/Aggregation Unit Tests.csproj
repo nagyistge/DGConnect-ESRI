@@ -81,6 +81,10 @@
       <Project>{f6bd5faf-14c8-4aa6-b90c-03043b0e54fe}</Project>
       <Name>Aggregations</Name>
     </ProjectReference>
+    <ProjectReference Include="..\GbdxTools\GbdxTools.csproj">
+      <Project>{95b5413e-160a-4afb-8b0a-b0df1b1c093b}</Project>
+      <Name>GbdxTools</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="TestResources.resx">

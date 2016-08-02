@@ -100,6 +100,15 @@ namespace Aggregation_Unit_Tests {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {&quot;type&quot;: &quot;Polygon&quot;,&quot;coordinates&quot;: [[[-84.32281494140625,34.9895035675793],[-84.29122924804688,35.21981940793435],[-84.24041748046875,35.25459097465022],[-84.22531127929688,35.266925688950074],[-84.20745849609375,35.26580442886754],[-84.19921875,35.24674063355999],[-84.16213989257812,35.24113278166642],[-84.12368774414062,35.24898366572645],[-84.09072875976562,35.24898366572645],[-84.08798217773438,35.264683153268116],[-84.04266357421875,35.27701633139884],[-84.03030395507812,35.291589484566124],[-84.0234375 [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string NorthCarolinaPolygonGeoJson {
+            get {
+                return ResourceManager.GetString("NorthCarolinaPolygonGeoJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to {&quot;responseDate&quot; : &quot;2015-10-13T21:04:28Z&quot;,&quot;geom&quot; : {&quot;coordinates&quot; : [[[-77.9457575318865, 0.326966219845797], [-77.9457575318865, 9.36891804200086], [-70.1411254327631, 9.36891804200086], [-70.1411254327631, 0.326966219845797], [-77.9457575318865, 0.326966219845797]]],&quot;type&quot; : &quot;Polygon&quot;},&quot;query&quot; : null,&quot;startDate&quot; : &quot;2015-10-06T00:00:00&quot;,&quot;endDate&quot; : &quot;2015-10-13T00:00:00&quot;,&quot;totalItems&quot; : 147817,&quot;aggregations&quot; : [{&quot;name&quot; : &quot;geohash:4&quot;,&quot;terms&quot; : [{&quot;term&quot; : &quot;d2g0&quot;,&quot;count&quot; : 56819,&quot;aggregations&quot; : [{&quot;name&quot; : &quot;avg: [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string sentimentAggregation {
