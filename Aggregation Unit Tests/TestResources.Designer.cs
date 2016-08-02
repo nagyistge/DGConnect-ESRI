@@ -116,5 +116,14 @@ namespace Aggregation_Unit_Tests {
                 return ResourceManager.GetString("TermList", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;spatialReference&quot;: {&quot;wkid&quot;: 4326},&quot;rings&quot;: [[[34.9895035675793,-84.32281494140625],[-84.29122924804688,35.21981940793435],[-84.24041748046875,35.25459097465022],[-84.22531127929688,35.266925688950074],[-84.20745849609375,35.26580442886754],[-84.19921875,35.24674063355999],[-84.16213989257812,35.24113278166642],[-84.12368774414062,35.24898366572645],[-84.09072875976562,35.24898366572645],[-84.08798217773438,35.264683153268116],[-84.04266357421875,35.27701633139884],[-84.03030395507812,35.291589484566124],[ [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string testData {
+            get {
+                return ResourceManager.GetString("testData", resourceCulture);
+            }
+        }
     }
 }

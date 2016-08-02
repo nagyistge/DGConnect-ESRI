@@ -12,6 +12,8 @@ namespace Aggregation_Unit_Tests
 
     using ESRI.ArcGIS;
     using ESRI.ArcGIS.esriSystem;
+    using ESRI.ArcGIS.Geometry;
+    using ESRI.ArcGIS.Geodatabase;
 
     /// <summary>
     /// Summary description for AggregationProcessingTests
@@ -89,6 +91,23 @@ namespace Aggregation_Unit_Tests
                 Content = TestResources.MogJson
             });
             }
+
+        [TestMethod]
+        public void TestJsonDeserializer()
+        {
+            var jsonGeometryPoint = TestResources.testData;
+            //string jsonGeometryPoint = "{\"x\" : -118.15, \"y\" : 33.80, \"spatialReference\" : {\"wkid\" : 4326}}";
+            var jsonReader = new JSONReaderClass();
+            jsonReader.ReadFromString(jsonGeometryPoint);
+            var jsonDeserializer = new JSONDeserializerGdbClass();
+            jsonDeserializer.InitDeserializer(jsonReader, null);
+            IGeometry geometry = ((IExternalDeserializerGdb)jsonDeserializer).ReadGeometry(esriGeometryType.esriGeometryPolygon);
+            IPolygon point = (IPolygon)geometry;
+            //Console.Write("X:{0} - Y:{1} - Factory Code: {2}", point.X, point.Y, point.SpatialReference.FactoryCode);
+            //Console.Read();
+
+            Assert.IsTrue(true);
+        }
 
         [TestMethod]
         public void TestSingleValueAggregation()
