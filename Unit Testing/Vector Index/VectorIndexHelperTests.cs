@@ -61,46 +61,6 @@ namespace Gbdx.Vector_Index.Tests
         }
 
         /// <summary>
-        /// The create url test.
-        /// </summary>
-        [TestMethod()]
-        public void CreateUrlTest()
-        {
-            var bbox = new BoundingBox
-                           {
-                               Xmin = 3943760.1958370944,
-                               Ymax = 4053176.2055829926,
-                               Xmax = 4144843.9313378991,
-                               Ymin = 3876566.4773635361
-                           };
-
-            var retval = VectorIndexHelper.CreateUrl(bbox, "https://insight-dev-esc01:8443/insight-vector");
-
-            Assert.IsTrue(
-                string.Equals(
-                    retval,
-                    "https://insight-dev-esc01:8443/insight-vector/app/broker/vector/api/esri/sources?left=3943760.19583709&upper=4053176.20558299&right=4144843.9313379&lower=3876566.47736354"));
-        }
-
-        /// <summary>
-        /// The create url test null base string.
-        /// </summary>
-        [TestMethod()]
-        public void CreateUrlTestNullBaseString()
-        {
-            var bbox = new BoundingBox
-                           {
-                               Xmin = 3943760.1958370944,
-                               Ymax = 4053176.2055829926,
-                               Xmax = 4144843.9313378991,
-                               Ymin = 3876566.4773635361
-                           };
-            var retval = VectorIndexHelper.CreateUrl(bbox, null);
-
-            Assert.IsTrue(string.IsNullOrEmpty(retval));
-        }
-
-        /// <summary>
         /// The get source type test using type json.
         /// </summary>
         [TestMethod()]
@@ -158,20 +118,6 @@ namespace Gbdx.Vector_Index.Tests
             var result = VectorIndexHelper.GetSourceType(json);
 
             Assert.IsTrue(result == null);
-        }
-
-        /// <summary>
-        /// The get page id test.
-        /// </summary>
-        [TestMethod()]
-        public void GetPageIdTest()
-        {
-            const string json =
-                "{\"pagingId\":\"c2NhbjsxNTszMzY6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDE6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDg6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszMzc6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDk6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNTA6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszMzg6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszMzk6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDA6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDI6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDM6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDQ6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDU6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDY6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDc6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTsxO3RvdGFsX2hpdHM6NDI7\"}";
-            const string expectedValue =
-                "c2NhbjsxNTszMzY6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDE6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDg6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszMzc6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDk6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNTA6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszMzg6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszMzk6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDA6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDI6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDM6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDQ6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDU6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDY6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTszNDc6ODhkR2VDZ1ZUQTZjNFdQU050NDJ4QTsxO3RvdGFsX2hpdHM6NDI7";
-            var result = VectorIndexHelper.GetPageId(json);
-            Assert.IsTrue(string.Equals(expectedValue, result));
         }
 
         /// <summary>

@@ -4,6 +4,7 @@
  */
 namespace GbdxTools
 {
+    using System;
     using System.Collections.Generic;
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Geodatabase;
@@ -13,39 +14,6 @@ namespace GbdxTools
 
     public class GeometryClasses
     {
-        public class MultiPolygonGeoJson
-        {
-            public string type { get; set; }
-            public List<List<List<List<double>>>> coordinates { get; set; }
-        }
-
-        public class PolygonGeoJson
-        {
-            public string type { get; set; }
-            public List<List<List<double>>> coordinates { get; set; }
-        }
-
-        public class GeoJsonBaseObject
-        {
-            public string type { get; set; }
-            public List<object> coordinates { get; set; }
-        }
-
-        public class SpatialReference
-        {
-            public SpatialReference(int id)
-            {
-                this.wkid = id;
-            }
-            public int wkid { get; set; }
-        }
-
-        public class EsriPolygonJsonObject
-        {
-            public SpatialReference spatialReference { get; set; }
-            public List<List<List<double>>> rings { get; set; }
-        }
-
         private static bool IsClockwise(List<List<double>> ringToTest )
         {
             var output = false;
@@ -84,7 +52,7 @@ namespace GbdxTools
             return poly;
         }
 
-        public static string GeojsonToEsriJson(PolygonGeoJson poly)
+        private static string GeojsonToEsriJson(PolygonGeoJson poly)
         {
             var convertedPoly = ConvertGeoJsonCoordsToEsriCoords(poly);
 
@@ -99,7 +67,7 @@ namespace GbdxTools
             return outputString;
         }
 
-        public static IPolygon GeoJsonToEsriPolygon(string geoJson)
+        private static IPolygon GeoJsonToEsriPolygon(string geoJson)
         {
             var poly = JsonConvert.DeserializeObject<PolygonGeoJson>(geoJson);
             var convertedPoly = GeojsonToEsriJson(poly);
@@ -112,5 +80,106 @@ namespace GbdxTools
             IPolygon newPolygon = (IPolygon)geometry;
             return newPolygon;
         }
+
+        private static IPolygon EsriJsonToEsriPolygon(string esriJson)
+        {
+            var jsonReader = new JSONReaderClass();
+            jsonReader.ReadFromString(esriJson);
+            var jsonDeserializer = new JSONDeserializerGdbClass();
+            jsonDeserializer.InitDeserializer(jsonReader, null);
+            IGeometry geometry = ((IExternalDeserializerGdb)jsonDeserializer).ReadGeometry(esriGeometryType.esriGeometryPolygon);
+            IPolygon newPolygon = (IPolygon)geometry;
+            return newPolygon;
+        }
+
+        private static List<string> MultiPolygonObjectToEsriJson(MultiPolygonGeoJson multi)
+        {
+            List<string> esriJsonList = new List<string>();
+            foreach (List<List<List<double>>> poly in multi.coordinates)
+            {
+                // Convert the individual polygons within multipolygon
+                var newPoly = new PolygonGeoJson { type = "Polygon", coordinates = poly };
+
+                // check coordinates to make sure they match ESRI requirement for outer vs inner rings
+                var convertedPoly = ConvertGeoJsonCoordsToEsriCoords(newPoly);
+                var esriPolygonJsonObject = new EsriPolygonJsonObject
+                                                {
+                                                    spatialReference = new SpatialReference(4326),
+                                                    rings = convertedPoly.coordinates
+                                                };
+                var esriJson = JsonConvert.SerializeObject(esriPolygonJsonObject);
+                if (!string.IsNullOrEmpty(esriJson))
+                {
+                    esriJsonList.Add(esriJson);
+                }
+            }
+            return esriJsonList;
+        }
+
+        public static List<string> GeoJsonObjectToEsriJsonList(string aoiGeoJson)
+        {
+            List<string> output = new List<string>();
+
+            var generalObject = JsonConvert.DeserializeObject<GeoJsonBaseObject>(aoiGeoJson);
+
+            switch (generalObject.type)
+            {
+                case "Polygon":
+                    var poly = JsonConvert.DeserializeObject<PolygonGeoJson>(aoiGeoJson);
+                    output.Add(GeojsonToEsriJson(poly));
+                    break;
+                case "MultiPolygon":
+                    var multi = JsonConvert.DeserializeObject<MultiPolygonGeoJson>(aoiGeoJson);
+                    output.AddRange(MultiPolygonObjectToEsriJson(multi));
+                    break;
+            }
+            return output;
+        }
+
+        public static List<IPolygon> AoiGeoJsonToEsriPolygons(string aoiGeoJson)
+        {
+            var polyList = GeoJsonObjectToEsriJsonList(aoiGeoJson);
+
+            List<IPolygon> output = new List<IPolygon>();
+            foreach (var poly in polyList)
+            {
+                output.Add(EsriJsonToEsriPolygon(poly));
+            }
+            return output;
+        }
+    }
+
+    public class SpatialReference
+    {
+        public SpatialReference(int id)
+        {
+            this.wkid = id;
+        }
+        public int wkid { get; set; }
+    }
+
+    public class EsriPolygonJsonObject
+    {
+        public SpatialReference spatialReference { get; set; }
+        public List<List<List<double>>> rings { get; set; }
+    }
+
+    public class MultiPolygonGeoJson
+    {
+        public string type { get; set; }
+        public List<List<List<List<double>>>> coordinates { get; set; }
+    }
+
+    public class PolygonGeoJson : GeoJsonBaseObject
+    {
+        public string type { get; set; }
+        public List<List<List<double>>> coordinates { get; set; }
+    }
+
+    public class GeoJsonBaseObject
+    {
+        public string type { get; set; }
+
+        public List<object> coordinates;
     }
 }

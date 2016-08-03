@@ -137,36 +137,116 @@ namespace Aggregation_Unit_Tests
         public void TestJsonDeserializer()
         {
             var jsonGeometryPoint = TestResources.testData;
-            //string jsonGeometryPoint = "{\"x\" : -118.15, \"y\" : 33.80, \"spatialReference\" : {\"wkid\" : 4326}}";
+
             var jsonReader = new JSONReaderClass();
             jsonReader.ReadFromString(jsonGeometryPoint);
             var jsonDeserializer = new JSONDeserializerGdbClass();
             jsonDeserializer.InitDeserializer(jsonReader, null);
             IGeometry geometry = ((IExternalDeserializerGdb)jsonDeserializer).ReadGeometry(esriGeometryType.esriGeometryPolygon);
             IPolygon point = (IPolygon)geometry;
-            //Console.Write("X:{0} - Y:{1} - Factory Code: {2}", point.X, point.Y, point.SpatialReference.FactoryCode);
-            //Console.Read();
 
             Assert.IsTrue(true);
         }
 
 
         [TestMethod]
-        public void TestGeoJsonPolygonToEsriJson()
+        public void TestGeoJsonToEsriGeometryPolygon()
         {
             var polyJson = TestResources.NorthCarolinaPolygonGeoJson;
-            var deserializedObject =
-                this.deserial.Deserialize<GeometryClasses.PolygonGeoJson>(
-                    new RestResponse<GeometryClasses.PolygonGeoJson> { Content = polyJson});
 
-            var output = GeometryClasses.GeojsonToEsriJson(deserializedObject);
 
-            var poly = GeometryClasses.GeoJsonToEsriPolygon(polyJson);
+            PrivateType pt = new PrivateType(typeof(GeometryClasses));
+
+            var poly = (IPolygon)pt.InvokeStatic("GeoJsonToEsriPolygon", polyJson);
 
             if (poly != null)
             {
                 Assert.IsTrue(true);
             }
+        }
+
+
+        [TestMethod]
+        public void TestPolygoGeoJsonObjectToEsriJson()
+        {
+            var polyJson = TestResources.NorthCarolinaPolygonGeoJson;
+            var deserializedObject =
+                this.deserial.Deserialize<PolygonGeoJson>(
+                    new RestResponse<PolygonGeoJson> { Content = polyJson });
+            PrivateType pt = new PrivateType(typeof(GeometryClasses));
+            var output = (string) pt.InvokeStatic("GeojsonToEsriJson", deserializedObject);
+            Assert.IsTrue(output.Equals(TestResources.NorthCarolinaPolygonEsriJson));
+        }
+
+        [TestMethod]
+        public void TestGeoJsonMultiPolygonDeserialization()
+        {
+            var multiPolyJson = TestResources.CoNcMultiPolygonGeoJson;
+            var deserializedObject =
+                this.deserial.Deserialize<MultiPolygonGeoJson>(
+                    new RestResponse<MultiPolygonGeoJson> { Content = multiPolyJson });
+
+            Assert.IsTrue(deserializedObject.coordinates.Count == 2);
+        }
+
+        [TestMethod]
+        public void TestPolygonGeoJsonObjectToEsriJsonList()
+        {
+            var multiPolyJson = TestResources.CoNcMultiPolygonGeoJson;
+            var deserializedObject =
+                this.deserial.Deserialize<MultiPolygonGeoJson>(
+                    new RestResponse<MultiPolygonGeoJson> { Content = multiPolyJson });
+            var test = new GeometryClasses();
+            PrivateType privateHelperObject = new PrivateType(typeof(GeometryClasses));
+            var output = (List<string>)privateHelperObject.InvokeStatic("MultiPolygonObjectToEsriJson", new object[]{ deserializedObject});
+//            var output = GeometryClasses.MultiPolygonObjectToEsriJson(deserializedObject);
+
+            Assert.IsTrue(output.Count == 2);
+        }
+
+        [TestMethod]
+        public void TestDeserializeGeoJsonBaseObject()
+        {
+            var multiPolyJson = TestResources.CoNcMultiPolygonGeoJson;
+            var polygonJson = TestResources.NorthCarolinaPolygonGeoJson;
+
+            var deserializedMultiPoly =
+                this.deserial.Deserialize<GeoJsonBaseObject>(
+                    new RestResponse<MultiPolygonGeoJson> { Content = multiPolyJson });
+            var deserializedPoly =
+                this.deserial.Deserialize<GeoJsonBaseObject>(
+                    new RestResponse<MultiPolygonGeoJson> { Content = polygonJson });
+
+            Assert.IsTrue(deserializedPoly.type.Equals("Polygon") && deserializedMultiPoly.type.Equals("MultiPolygon"));
+        }
+
+
+        [TestMethod]
+        public void TestGeoJsonBaseObjectMultiPolygonToEsriJson()
+        {
+            var multiPolyJson = TestResources.CoNcMultiPolygonGeoJson;
+
+            var output = GeometryClasses.GeoJsonObjectToEsriJsonList(multiPolyJson);
+
+            Assert.IsTrue(output.Count == 2);
+        }
+
+        [TestMethod]
+        public void TestGeoJsonSingleToEsriJson()
+        {
+            var poly = TestResources.NorthCarolinaPolygonGeoJson;
+            var output = GeometryClasses.GeoJsonObjectToEsriJsonList(poly);
+
+            Assert.IsTrue(output.Count == 1);
+        }
+
+        [TestMethod]
+        public void MultiPolygonGeoJsonToEsriPolygonList()
+        {
+            var multiPolyJson = TestResources.CoNcMultiPolygonGeoJson;
+            var output = GeometryClasses.AoiGeoJsonToEsriPolygons(multiPolyJson);
+
+            Assert.IsTrue(output.Count == 2);
         }
     }
 }
