@@ -17,6 +17,7 @@ namespace Gbdx.Answer_Factory
     using Encryption;
 
     using ESRI.ArcGIS.Carto;
+    using ESRI.ArcGIS.Display;
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Framework;
     using ESRI.ArcGIS.Geodatabase;
@@ -1027,12 +1028,81 @@ namespace Gbdx.Answer_Factory
             this.recipeStatusDataGridView.PerformLayout();
         }
 
+        private List<IElement> DrawAois(List<IPolygon> polygons, List<IElement> preExisting=null)
+        {
+            var rgbColor = new RgbColorClass { Red = 0, Green = 0, Blue = 255, Transparency = 200 };
+
+            var graphicsContainer = (IGraphicsContainer)ArcMap.Document.FocusMap;
+
+            graphicsContainer.DeleteAllElements();
+
+            if (preExisting != null)
+            {
+                foreach (var elm in preExisting)
+                {
+                    graphicsContainer.DeleteElement(elm);
+                }
+            }
+
+            var geometryBag = new GeometryBagClass();
+            geometryBag.SpatialReference = ArcMap.Document.FocusMap.SpatialReference;
+            IGeometryCollection geometryCollection = geometryBag as IGeometryCollection;
+            List<IElement> elements = new List<IElement>();
+            foreach (var polygon in polygons)
+            {
+                geometryCollection.AddGeometry(polygon);
+                IElement element = null;
+
+                // Polygon elements
+                ILineSymbol lineSymbol = new SimpleLineSymbolClass();
+                lineSymbol.Color = rgbColor;
+                lineSymbol.Width = 2.0;
+
+                ISimpleFillSymbol simpleFillSymbol = new SimpleFillSymbolClass();
+                simpleFillSymbol.Color = rgbColor;
+                simpleFillSymbol.Style = esriSimpleFillStyle.esriSFSNull;
+                simpleFillSymbol.Outline = lineSymbol;
+
+                IFillShapeElement fillShapeElement = new PolygonElementClass();
+                fillShapeElement.Symbol = simpleFillSymbol;
+                element = (IElement)fillShapeElement; // Explicit Cast
+
+                element.Geometry = polygon;
+                graphicsContainer.AddElement(element, 0);
+                elements.Add(element);
+            }
+
+            // Create the polygon that will be the union of the features returned from the search cursor.
+            // The spatial reference of this feature does not need to be set ahead of time. The 
+            // ConstructUnion method defines the constructed polygon's spatial reference to be the same as 
+            // the input geometry bag.
+            ITopologicalOperator unionedPolygon = new PolygonClass();
+            unionedPolygon.ConstructUnion(geometryBag as IEnumGeometry);
+            var masterPoly = (IPolygon)unionedPolygon;
+
+            ArcMap.Document.ActiveView.Extent = masterPoly.Envelope;
+            //ArcMap.Document.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, masterPoly.Envelope);
+            ArcMap.Document.ActiveView.Refresh();
+            return elements;
+        }
+
         private void UpdateUiWithRecipes(List<Project2> results)
         {
             this.selectedAois.Clear();
             foreach (var item in results)
             {
                 this.selectedAois.AddRange(item.aois);
+                List<IPolygon> polygonsToBeDrawn = new List<IPolygon>();
+                foreach (var aoi in item.aois)
+                {
+                    polygonsToBeDrawn.AddRange(GeometryClasses.AoiGeoJsonToEsriPolygons(aoi));
+                }
+
+                // draw the polygons and shift the view of the map so that they are visible
+                DrawAois(polygonsToBeDrawn);
+
+
+
                 foreach (var recipe in item.recipeConfigs)
                 {
                     var newRow = this.RecipeRepo.NewRow();
