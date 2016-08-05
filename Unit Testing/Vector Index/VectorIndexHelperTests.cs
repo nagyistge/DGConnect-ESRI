@@ -61,66 +61,6 @@ namespace Gbdx.Vector_Index.Tests
         }
 
         /// <summary>
-        /// The get source type test using type json.
-        /// </summary>
-        [TestMethod()]
-        public void GetSourceTypeTestUsingTypeJSON()
-        {
-            const string json =
-                "{\"shards\":40,\"data\":[{\"name\":\"Polygon\",\"count\":7081},{\"name\":\"PolyLine\",\"count\":1377},{\"name\":\"Point\",\"count\":9869}]}";
-            var result = VectorIndexHelper.GetSourceType(json);
-
-            bool goodToGo = true;
-
-            if (!string.Equals("Polygon", result.Data[0].Name) || result.Data[0].Count != 7081)
-            {
-                goodToGo = false;
-            }
-
-            if (!string.Equals("PolyLine", result.Data[1].Name) || result.Data[1].Count != 1377)
-            {
-                goodToGo = false;
-            }
-
-            if (!string.Equals("Point", result.Data[2].Name) || result.Data[2].Count != 9869)
-            {
-                goodToGo = false;
-            }
-
-            if (result.Shards != 40)
-            {
-                goodToGo = false;
-            }
-
-            Assert.IsTrue(goodToGo);
-        }
-
-        /// <summary>
-        /// The get source type test using type empty string.
-        /// </summary>
-        [TestMethod()]
-        public void GetSourceTypeTestUsingTypeEmptyString()
-        {
-            string json = string.Empty;
-            var result = VectorIndexHelper.GetSourceType(json);
-
-            Assert.IsTrue(result == null);
-        }
-
-        /// <summary>
-        /// The get source type test using type garbage string.
-        /// </summary>
-        [TestMethod()]
-        public void GetSourceTypeTestUsingTypeGarbageString()
-        {
-            const string json =
-                "[{\"name\":\"Type1\",\"count\":7},{\"name\":\"Type2\",\"count\":10},{\"name\":\"Type3\",\"count\":5}hns4erw35yt3hetahsrtjaewrfw24]";
-            var result = VectorIndexHelper.GetSourceType(json);
-
-            Assert.IsTrue(result == null);
-        }
-
-        /// <summary>
         /// The table join test.
         /// </summary>
         [TestMethod()]
@@ -133,10 +73,6 @@ namespace Gbdx.Vector_Index.Tests
             const string json3 =
                 "{\"displayFieldName\":\"\",\"features\":[{\"attributes\":{\"vector.itemType\":\"Roads\",\"vector.ingestDate\":\"2015-02-03T18:30:53Z\",\"vector.text\":\"SYR | Offfice of Humanitarian Affairs | 0.077347346 | Track/Trail\",\"vector.itemDate\":\"2015-02-03T18:31:43Z\",\"vector.format\":\"FileGDB\",\"vector.ingestSource\":\"HGIS\",\"vector.source\":\"Offfice of Humanitarian Affairs\",\"vector.originalCrs\":\"EPSG:4326\",\"vector.name\":\"null\"},\"geometry\":{\"paths\":[[[36.74490000000009,34.95863386800005],[36.735100000000045,34.945133868000084],[36.72350000000006,34.934033868000085],[36.721100000000035,34.92613386800008],[36.72610000000009,34.909733868000046],[36.73610000000008,34.89333386800007]]],\"spatialReference\":{\"wkid\":4326}}},{\"attributes\":{\"vector.itemType\":\"Roads\",\"vector.ingestDate\":\"2015-02-03T18:30:54Z\",\"vector.text\":\"SYR | Offfice of Humanitarian Affairs | 0.08151657 | Secondary\",\"vector.itemDate\":\"2015-02-03T18:31:43Z\",\"vector.format\":\"FileGDB\",\"vector.ingestSource\":\"HGIS\",\"vector.source\":\"Offfice of Humanitarian Affairs\",\"vector.originalCrs\":\"EPSG:4326\",\"vector.name\":\"null\"},\"geometry\":{\"paths\":[[[36.56830000000008,34.90473386800005],[36.53590000000008,34.95213386800009],[36.52890000000008,34.95673386800007],[36.51870000000008,34.957133868000085],[36.51490000000007,34.96113386800005]]],\"spatialReference\":{\"wkid\":4326}}},{\"attributes\":{\"vector.itemType\":\"Roads\",\"vector.ingestDate\":\"2015-02-03T18:31:06Z\",\"vector.text\":\"SYR | Offfice of Humanitarian Affairs | 0.06328892 | Tertiary\",\"vector.itemDate\":\"2015-02-03T18:31:58Z\",\"vector.format\":\"FileGDB\",\"vector.ingestSource\":\"HGIS\",\"vector.source\":\"Offfice of Humanitarian Affairs\",\"vector.originalCrs\":\"EPSG:4326\",\"vector.name\":\"null\"},\"geometry\":{\"paths\":[[[36.22970000000004,35.71273386800004],[36.237100000000055,35.71613386800004],[36.25430000000006,35.716533868000056],[36.26430000000005,35.71153386800006],[36.27830000000006,35.70753386800004],[36.29030000000006,35.70973386800006]]],\"spatialReference\":{\"wkid\":4326}}},{\"attributes\":{\"vector.itemType\":\"Roads\",\"vector.ingestDate\":\"2015-02-03T18:30:57Z\",\"vector.text\":\"SYR | Offfice of Humanitarian Affairs | 0.03134597 | Primary\",\"vector.itemDate\":\"2015-02-03T18:31:46Z\",\"vector.format\":\"FileGDB\",\"vector.ingestSource\":\"HGIS\",\"vector.source\":\"Offfice of Humanitarian Affairs\",\"vector.originalCrs\":\"EPSG:4326\",\"vector.name\":\"null\"},\"geometry\":{\"paths\":[[[36.34690000000006,35.06313386800008],[36.373300000000086,35.080033868000044]]],\"spatialReference\":{\"wkid\":4326}}},{\"attributes\":{\"vector.itemType\":\"Roads\",\"vector.ingestDate\":\"2015-02-03T18:31:05Z\",\"vector.text\":\"SYR | Offfice of Humanitarian Affairs | 0.32352784 | Tertiary\",\"vector.itemDate\":\"2015-02-03T18:31:56Z\",\"vector.format\":\"FileGDB\",\"vector.ingestSource\":\"HGIS\",\"vector.source\":\"Offfice of Humanitarian Affairs\",\"vector.originalCrs\":\"EPSG:4326\",\"vector.name\":\"null\"},\"geometry\":{\"paths\":[[[36.187100000000044,35.53053386800008],[36.171700000000044,35.53573386800008],[36.15370000000007,35.540733868000075],[36.13210000000004,35.54373386800006],[36.11570000000006,35.54963386800006],[36.094700000000046,35.548133868000036],[36.06570000000005,35.54373386800006],[36.044500000000085,35.53963386800007],[36.022500000000036,35.534733868000046],[35.998500000000035,35.528733868000074],[35.97950000000009,35.522733868000046],[35.95650000000006,35.516733868000074],[35.93050000000005,35.51173386800008],[35.90650000000005,35.50473386800007],[35.88210000000004,35.49813386800008],[35.874100000000055,35.49273386800007]]],\"spatialReference\":{\"wkid\":4326}}}],\"spatialReference\":{\"wkid\":4326},\"fields\":[{\"alias\":\"Item Date\",\"name\":\"vector.itemDate\",\"length\":50,\"type\":\"esriFieldTypeDate\"},{\"alias\":\"Ingest Date\",\"name\":\"vector.ingestDate\",\"length\":50,\"type\":\"esriFieldTypeDate\"},{\"alias\":\"Ingest Source\",\"name\":\"vector.ingestSource\",\"length\":50,\"type\":\"esriFieldTypeString\"},{\"alias\":\"Name\",\"name\":\"vector.name\",\"length\":50,\"type\":\"esriFieldTypeString\"},{\"alias\":\"Item Type\",\"name\":\"vector.itemType\",\"length\":50,\"type\":\"esriFieldTypeString\"},{\"alias\":\"Format\",\"name\":\"vector.format\",\"length\":50,\"type\":\"esriFieldTypeString\"},{\"alias\":\"Source\",\"name\":\"vector.source\",\"length\":50,\"type\":\"esriFieldTypeString\"},{\"alias\":\"Original CRS\",\"name\":\"vector.originalCrs\",\"length\":50,\"type\":\"esriFieldTypeString\"},{\"alias\":\"Text\",\"name\":\"vector.text\",\"length\":500,\"type\":\"esriFieldTypeString\"}],\"geometryType\":\"esriGeometryPolyline\"}";
 
-            //var workspace =
-            //    VectorIndexHelper.OpenWorkspace(
-            //        Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location),
-            //        "test.gdb");
             var qf = new QueryFilterClass();
             var table1 = VectorIndexHelper.GetTable(json1); //, "Streets", ref workspace);
             var table2 = VectorIndexHelper.GetTable(json2); //, "Streets1", ref workspace);
@@ -147,9 +83,6 @@ namespace Gbdx.Vector_Index.Tests
             var outputCount = ((IFeatureClass)tableList[0].Table).FeatureCount(qf);
 
             Assert.IsTrue(15 == outputCount);
-
-            //var dataset = (IDataset) tableList[0];
-            //dataset.Delete();
         }
 
         /// <summary>

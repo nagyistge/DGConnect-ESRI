@@ -52,6 +52,8 @@ namespace Gbdx.Answer_Factory
 
         private delegate void ResultItemListDelegate(List<ResultItem> results);
 
+        private delegate void AddIdahoImagesToMap(List<string> idahoIds);
+
         #region Fields & Properties
 
         private static readonly object locker = new object();
@@ -789,6 +791,22 @@ namespace Gbdx.Answer_Factory
             }
         }
 
+        private List<string> GetIds(List<ResultItem> results)
+        {
+            HashSet<string> allIds = new HashSet<string>();
+            foreach (var result in results)
+            {
+                foreach (var idahoImage in result.idahoImages)
+                {
+                    if (!allIds.Contains(idahoImage.id))
+                    {
+                        allIds.Add(idahoImage.id);
+                    }
+                }
+            }
+            return allIds.ToList();
+        }
+
         private void ProcessResult(
             string projectName,
             string recipeName,
@@ -813,6 +831,11 @@ namespace Gbdx.Answer_Factory
                     }
 
                     layername = string.Format("{0}|{1}", projectName, item.recipeName);
+
+                    var idahoIds = GetIds(resp.Data);
+
+                    this.Invoke((MethodInvoker)(() => { GbdxHelper.AddIdahoWms(idahoIds, layername,this.token); }));
+
 
                     if (!string.IsNullOrEmpty(aoi) && !string.IsNullOrEmpty(layername))
                     {
@@ -1077,11 +1100,10 @@ namespace Gbdx.Answer_Factory
             // ConstructUnion method defines the constructed polygon's spatial reference to be the same as 
             // the input geometry bag.
             ITopologicalOperator unionedPolygon = new PolygonClass();
-            unionedPolygon.ConstructUnion(geometryBag as IEnumGeometry);
+            unionedPolygon.ConstructUnion((IEnumGeometry)geometryBag);
             var masterPoly = (IPolygon)unionedPolygon;
 
             ArcMap.Document.ActiveView.Extent = masterPoly.Envelope;
-            //ArcMap.Document.ActiveView.PartialRefresh(esriViewDrawPhase.esriViewGraphics, null, masterPoly.Envelope);
             ArcMap.Document.ActiveView.Refresh();
             return elements;
         }

@@ -1,5 +1,7 @@
 ﻿namespace AnswerFactory
 {
+    using System.Collections.Generic;
+
     public class Properties
     {
         public string query_string { get; set; }
@@ -22,6 +24,6 @@
         public object endDate { get; set; }
         public Properties properties { get; set; }
         public string displayAs { get; set; }
-        public object idahoImageIds { get; set; }
+        public List<IdahoImage> idahoImages { get; set; }
     }
 }
