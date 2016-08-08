@@ -46,17 +46,25 @@ namespace Gbdx.Answer_Factory
     /// </summary>
     public partial class AnswerFactoryDockableWindow : UserControl
     {
+        private delegate void AddIdahoImagesToMap(List<string> idahoIds);
+
         private delegate void ProjectListDelegate(List<ProjId> projects);
 
-        private delegate void RecipeListDelegate(List<Project2> results);
+        private delegate void RecipeListDelegate(List<Project2> results, Guid processingGuid);
 
         private delegate void ResultItemListDelegate(List<ResultItem> results);
-
-        private delegate void AddIdahoImagesToMap(List<string> idahoIds);
 
         #region Fields & Properties
 
         private static readonly object locker = new object();
+
+        private readonly DataView projectDataView;
+
+        private readonly DataTable ProjIdRepo;
+
+        private readonly DataTable RecipeRepo;
+
+        private readonly List<string> selectedAois;
 
         private IRestClient client;
 
@@ -66,19 +74,13 @@ namespace Gbdx.Answer_Factory
 
         private List<Project2> existingProjects = new List<Project2>();
 
-        private readonly DataView projectDataView;
-
-        private readonly DataTable ProjIdRepo;
-
         private List<Recipe> recipeList = new List<Recipe>();
-
-        private readonly DataTable RecipeRepo;
-
-        private readonly List<string> selectedAois;
 
         private string token;
 
         private ICommandItem PreviouslySelectedItem { get; set; }
+
+        private Guid AoiGuid { get; set; }
 
         /// <summary>
         ///     Host object of the dockable window
@@ -214,6 +216,49 @@ namespace Gbdx.Answer_Factory
             }
         }
 
+        private List<IElement> CreateElementAois(List<IPolygon> polygons, out IEnvelope encompassingEnvelope)
+        {
+            var rgbColor = new RgbColorClass { Red = 0, Green = 0, Blue = 255, Transparency = 200 };
+
+            var geometryBag = new GeometryBagClass();
+            geometryBag.SpatialReference = ArcMap.Document.FocusMap.SpatialReference;
+            IGeometryCollection geometryCollection = geometryBag;
+            var elements = new List<IElement>();
+            foreach (var polygon in polygons)
+            {
+                geometryCollection.AddGeometry(polygon);
+                IElement element = null;
+
+                // Polygon elements
+                ILineSymbol lineSymbol = new SimpleLineSymbolClass();
+                lineSymbol.Color = rgbColor;
+                lineSymbol.Width = 2.0;
+
+                ISimpleFillSymbol simpleFillSymbol = new SimpleFillSymbolClass();
+                simpleFillSymbol.Color = rgbColor;
+                simpleFillSymbol.Style = esriSimpleFillStyle.esriSFSNull;
+                simpleFillSymbol.Outline = lineSymbol;
+
+                IFillShapeElement fillShapeElement = new PolygonElementClass();
+                fillShapeElement.Symbol = simpleFillSymbol;
+                element = (IElement)fillShapeElement; // Explicit Cast
+
+                element.Geometry = polygon;
+                elements.Add(element);
+            }
+
+            // Create the polygon that will be the union of the features returned from the search cursor.
+            // The spatial reference of this feature does not need to be set ahead of time. The 
+            // ConstructUnion method defines the constructed polygon's spatial reference to be the same as 
+            // the input geometry bag.
+            ITopologicalOperator unionedPolygon = new PolygonClass();
+            unionedPolygon.ConstructUnion(geometryBag);
+            var masterPoly = (IPolygon)unionedPolygon;
+
+            encompassingEnvelope = masterPoly.Envelope;
+            return elements;
+        }
+
         private string CreateProjectJson(List<IPolygon> polygons)
         {
             // get the geojson of the aois
@@ -302,6 +347,46 @@ namespace Gbdx.Answer_Factory
             }
         }
 
+        private void EventhandlerSelectionTypecomboBoxSelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.selectionTypecomboBox.SelectedIndex == 0)
+            {
+                this.drawButton.Enabled = true;
+            }
+            else
+            {
+                this.drawButton.Enabled = false;
+            }
+        }
+
+        private void EventHandlerShowResultsButtonClick(object sender, EventArgs e)
+        {
+            try
+            {
+                if (this.projectNameDataGridView.SelectedRows.Count <= 0
+                    || this.recipeStatusDataGridView.SelectedRows.Count <= 0)
+                {
+                    MessageBox.Show("Please select a project and recipe");
+                    return;
+                }
+                var projectId = this.projectNameDataGridView.SelectedRows[0].Cells["Id"].Value;
+                var recipeName = this.recipeStatusDataGridView.SelectedRows[0].Cells["Recipe Name"].Value;
+                var projectName = this.projectNameDataGridView.SelectedRows[0].Cells["Project Name"].Value;
+
+                if (projectId == null || recipeName == null || projectName == null)
+                {
+                    MessageBox.Show("Selection Error");
+                    return;
+                }
+
+                this.GetResult(projectId.ToString(), recipeName.ToString(), projectName.ToString());
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
+        }
+
         private void GetGeometries(
             string query,
             string token,
@@ -353,6 +438,22 @@ namespace Gbdx.Answer_Factory
                     this.GetTypes(source.name, query, token, aoi, client, layerName);
                 }
             }
+        }
+
+        private List<string> GetIds(List<ResultItem> results)
+        {
+            var allIds = new HashSet<string>();
+            foreach (var result in results)
+            {
+                foreach (var idahoImage in result.idahoImages)
+                {
+                    if (!allIds.Contains(idahoImage.id))
+                    {
+                        allIds.Add(idahoImage.id);
+                    }
+                }
+            }
+            return allIds.ToList();
         }
 
         private void GetPageIdResponseProcess(
@@ -502,7 +603,8 @@ namespace Gbdx.Answer_Factory
             var request = new RestRequest(string.Format("/answer-factory-project-service/api/project/{0}", projectId));
             request.AddHeader("Authorization", "Bearer " + authToken);
             request.AddHeader("Content-Type", "application/json");
-
+            var processingGuid = Guid.NewGuid();
+            this.AoiGuid = processingGuid;
             restClient.ExecuteAsync<List<Project2>>(
                 request,
                 resp =>
@@ -510,7 +612,27 @@ namespace Gbdx.Answer_Factory
                         Jarvis.Logger.Info(resp.ResponseUri.ToString());
                         if (resp.Data != null)
                         {
-                            this.Invoke(new RecipeListDelegate(this.UpdateUiWithRecipes), resp.Data);
+                            this.Invoke(new RecipeListDelegate(this.UpdateUiWithRecipes), resp.Data, processingGuid);
+                        }
+                    });
+        }
+
+        private void GetRecipeStatus(string authToken, string projectId)
+        {
+            var restClient = new RestClient(Settings.Default.baseUrl);
+            var request =
+                new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectId));
+            request.AddHeader("Authorization", "Bearer " + authToken);
+            request.AddHeader("Content-Type", "application/json");
+
+            restClient.ExecuteAsync<List<ResultItem>>(
+                request,
+                resp =>
+                    {
+                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                        if (resp.Data != null)
+                        {
+                            this.Invoke(new ResultItemListDelegate(this.UpdateRecipeUiStatus), resp.Data);
                         }
                     });
         }
@@ -533,30 +655,11 @@ namespace Gbdx.Answer_Factory
             this.client.ExecuteAsync<List<ResultItem>>(
                 request,
                 resp =>
-                {
-                    this.ProcessResult(projectName, recipeName, resp, this.selectedAois, this.token, this.client);
-                });
-        }
-
-        private void GetRecipeStatus(string authToken, string projectId)
-        {
-            var restClient = new RestClient(Settings.Default.baseUrl);
-            var request =
-                new RestRequest(string.Format("/answer-factory-recipe-service/api/result/project/{0}", projectId));
-            request.AddHeader("Authorization", "Bearer " + authToken);
-            request.AddHeader("Content-Type", "application/json");
-
-            restClient.ExecuteAsync<List<ResultItem>>(
-                request,
-                resp =>
                     {
-                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
-                        if (resp.Data != null)
-                        {
-                            this.Invoke(new ResultItemListDelegate(this.UpdateRecipeUiStatus), resp.Data);
-                        }
+                        this.ProcessResult(projectName, recipeName, resp, this.selectedAois, this.token, this.client);
                     });
         }
+
         /// <summary>
         ///     Get Token to use with GBDX services
         /// </summary>
@@ -652,7 +755,7 @@ namespace Gbdx.Answer_Factory
                 var types = resp.Data;
                 foreach (var type in types.data)
                 {
-                    this.GetPagingId(geometry, type.name, query, token, aoi, client, layerName+"|"+type.name);
+                    this.GetPagingId(geometry, type.name, query, token, aoi, client, layerName + "|" + type.name);
                 }
             }
         }
@@ -791,22 +894,6 @@ namespace Gbdx.Answer_Factory
             }
         }
 
-        private List<string> GetIds(List<ResultItem> results)
-        {
-            HashSet<string> allIds = new HashSet<string>();
-            foreach (var result in results)
-            {
-                foreach (var idahoImage in result.idahoImages)
-                {
-                    if (!allIds.Contains(idahoImage.id))
-                    {
-                        allIds.Add(idahoImage.id);
-                    }
-                }
-            }
-            return allIds.ToList();
-        }
-
         private void ProcessResult(
             string projectName,
             string recipeName,
@@ -821,7 +908,7 @@ namespace Gbdx.Answer_Factory
             if (resp.Data != null)
             {
                 // since there can be multiple query ids its good to check to make sure we don't end up pulling duplicate results.
-                HashSet<string> usedQueries = new HashSet<string>();
+                var usedQueries = new HashSet<string>();
                 foreach (var item in resp.Data)
                 {
                     // if the recipe names don't match move on to the next
@@ -832,10 +919,9 @@ namespace Gbdx.Answer_Factory
 
                     layername = string.Format("{0}|{1}", projectName, item.recipeName);
 
-                    var idahoIds = GetIds(resp.Data);
+                    var idahoIds = this.GetIds(resp.Data);
 
-                    this.Invoke((MethodInvoker)(() => { GbdxHelper.AddIdahoWms(idahoIds, layername,this.token); }));
-
+                    this.Invoke((MethodInvoker)(() => { GbdxHelper.AddIdahoWms(idahoIds, layername, this.token); }));
 
                     if (!string.IsNullOrEmpty(aoi) && !string.IsNullOrEmpty(layername))
                     {
@@ -983,46 +1069,6 @@ namespace Gbdx.Answer_Factory
             }
         }
 
-        private void EventhandlerSelectionTypecomboBoxSelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (this.selectionTypecomboBox.SelectedIndex == 0)
-            {
-                this.drawButton.Enabled = true;
-            }
-            else
-            {
-                this.drawButton.Enabled = false;
-            }
-        }
-
-        private void EventHandlerShowResultsButtonClick(object sender, EventArgs e)
-        {
-            try
-            {
-                if (this.projectNameDataGridView.SelectedRows.Count <= 0
-                    || this.recipeStatusDataGridView.SelectedRows.Count <= 0)
-                {
-                    MessageBox.Show("Please select a project and recipe");
-                    return;
-                }
-                var projectId = this.projectNameDataGridView.SelectedRows[0].Cells["Id"].Value;
-                var recipeName = this.recipeStatusDataGridView.SelectedRows[0].Cells["Recipe Name"].Value;
-                var projectName = this.projectNameDataGridView.SelectedRows[0].Cells["Project Name"].Value;
-
-                if (projectId == null || recipeName == null || projectName == null)
-                {
-                    MessageBox.Show("Selection Error");
-                    return;
-                }
-
-                this.GetResult(projectId.ToString(), recipeName.ToString(), projectName.ToString());
-            }
-            catch (Exception error)
-            {
-                Jarvis.Logger.Error(error);
-            }
-        }
-
         private void UpdateProjectsUi(List<ProjId> projects)
         {
             foreach (var item in projects)
@@ -1051,79 +1097,36 @@ namespace Gbdx.Answer_Factory
             this.recipeStatusDataGridView.PerformLayout();
         }
 
-        private List<IElement> DrawAois(List<IPolygon> polygons, List<IElement> preExisting=null)
-        {
-            var rgbColor = new RgbColorClass { Red = 0, Green = 0, Blue = 255, Transparency = 200 };
-
-            var graphicsContainer = (IGraphicsContainer)ArcMap.Document.FocusMap;
-
-            graphicsContainer.DeleteAllElements();
-
-            if (preExisting != null)
-            {
-                foreach (var elm in preExisting)
-                {
-                    graphicsContainer.DeleteElement(elm);
-                }
-            }
-
-            var geometryBag = new GeometryBagClass();
-            geometryBag.SpatialReference = ArcMap.Document.FocusMap.SpatialReference;
-            IGeometryCollection geometryCollection = geometryBag as IGeometryCollection;
-            List<IElement> elements = new List<IElement>();
-            foreach (var polygon in polygons)
-            {
-                geometryCollection.AddGeometry(polygon);
-                IElement element = null;
-
-                // Polygon elements
-                ILineSymbol lineSymbol = new SimpleLineSymbolClass();
-                lineSymbol.Color = rgbColor;
-                lineSymbol.Width = 2.0;
-
-                ISimpleFillSymbol simpleFillSymbol = new SimpleFillSymbolClass();
-                simpleFillSymbol.Color = rgbColor;
-                simpleFillSymbol.Style = esriSimpleFillStyle.esriSFSNull;
-                simpleFillSymbol.Outline = lineSymbol;
-
-                IFillShapeElement fillShapeElement = new PolygonElementClass();
-                fillShapeElement.Symbol = simpleFillSymbol;
-                element = (IElement)fillShapeElement; // Explicit Cast
-
-                element.Geometry = polygon;
-                graphicsContainer.AddElement(element, 0);
-                elements.Add(element);
-            }
-
-            // Create the polygon that will be the union of the features returned from the search cursor.
-            // The spatial reference of this feature does not need to be set ahead of time. The 
-            // ConstructUnion method defines the constructed polygon's spatial reference to be the same as 
-            // the input geometry bag.
-            ITopologicalOperator unionedPolygon = new PolygonClass();
-            unionedPolygon.ConstructUnion((IEnumGeometry)geometryBag);
-            var masterPoly = (IPolygon)unionedPolygon;
-
-            ArcMap.Document.ActiveView.Extent = masterPoly.Envelope;
-            ArcMap.Document.ActiveView.Refresh();
-            return elements;
-        }
-
-        private void UpdateUiWithRecipes(List<Project2> results)
+        private void UpdateUiWithRecipes(List<Project2> results, Guid processingGuid)
         {
             this.selectedAois.Clear();
             foreach (var item in results)
             {
                 this.selectedAois.AddRange(item.aois);
-                List<IPolygon> polygonsToBeDrawn = new List<IPolygon>();
+                var polygonsToBeDrawn = new List<IPolygon>();
                 foreach (var aoi in item.aois)
                 {
                     polygonsToBeDrawn.AddRange(GeometryClasses.AoiGeoJsonToEsriPolygons(aoi));
                 }
 
-                // draw the polygons and shift the view of the map so that they are visible
-                DrawAois(polygonsToBeDrawn);
+                IEnvelope encompassingEnvelope;
+                var elementList = this.CreateElementAois(polygonsToBeDrawn, out encompassingEnvelope);
 
+                if (this.AoiGuid != processingGuid)
+                {
+                    return;
+                }
 
+                var graphicsContainer = (IGraphicsContainer)ArcMap.Document.FocusMap;
+                graphicsContainer.DeleteAllElements();
+
+                foreach (var elm in elementList)
+                {
+                    graphicsContainer.AddElement(elm, 0);
+                }
+
+                ArcMap.Document.ActiveView.Extent = encompassingEnvelope;
+                ArcMap.Document.ActiveView.Refresh();
 
                 foreach (var recipe in item.recipeConfigs)
                 {
