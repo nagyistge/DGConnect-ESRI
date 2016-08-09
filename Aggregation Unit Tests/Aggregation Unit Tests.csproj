@@ -36,6 +36,12 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ESRI.ArcGIS.Geodatabase, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="ESRI.ArcGIS.Geometry, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
+      <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
     <Reference Include="ESRI.ArcGIS.System, Version=10.2.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -74,6 +80,10 @@
     <ProjectReference Include="..\Aggregations\Aggregations.csproj">
       <Project>{f6bd5faf-14c8-4aa6-b90c-03043b0e54fe}</Project>
       <Name>Aggregations</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\GbdxTools\GbdxTools.csproj">
+      <Project>{95b5413e-160a-4afb-8b0a-b0df1b1c093b}</Project>
+      <Name>GbdxTools</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

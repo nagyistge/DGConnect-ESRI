@@ -21,10 +21,16 @@
 
 namespace Gbdx
 {
+    using System;
+    using System.Collections.Generic;
     using System.Net;
     using System.Windows;
 
     using Encryption;
+
+    using ESRI.ArcGIS.Carto;
+    using ESRI.ArcGIS.esriSystem;
+    using ESRI.ArcGIS.GISClient;
 
     using Gbdx;
 
@@ -70,5 +76,158 @@ namespace Gbdx
 
             return userSettings.baseUrl;
         }
+        /// <summary>
+        ///     Recursively iterate through the layers and turn their visbility to true
+        /// </summary>
+        /// <param name="layer">layer to check for sub layers</param>
+        private static void SublayerVisibleOn(ILayer layer)
+        {
+            var compLayer = layer as ICompositeLayer;
+
+            if (compLayer == null)
+            {
+                return;
+            }
+
+            for (var i = 0; i < compLayer.Count; i++)
+            {
+                var subLayer = compLayer.Layer[i];
+
+                // turn visibility on
+                subLayer.Visible = true;
+
+                // check to see if the layer has sub-layers
+                var subComp = subLayer as ICompositeLayer;
+
+                // if there are sub layers then enable them.
+                if (subComp != null && subComp.Count > 0)
+                {
+                    SublayerVisibleOn(subComp as ILayer);
+                }
+            }
+        }
+        public static void AddIdahoWms(string idahoId, string groupLayerName, string token)
+        {
+            IWMSGroupLayer wmsGroupLayer = null;
+
+            IGroupLayer groupLayer = new GroupLayerClass();
+            groupLayer.Name = groupLayerName;
+
+            var wmsMapLayer = new WMSMapLayerClass();
+
+            // create and configure wms connection name, this is used to store the connection properties
+            IWMSConnectionName pConnName = new WMSConnectionNameClass();
+            IPropertySet propSet = new PropertySetClass();
+
+            // create the idaho wms url
+            var idahoUrl = string.Format(
+                "http://idaho.geobigdata.io/v1/wms/idaho-images/{0}/{1}/mapserv?",
+                idahoId, token);
+
+            // setup the arcmap connection properties
+            propSet.SetProperty("URL", idahoUrl);
+            pConnName.ConnectionProperties = propSet;
+
+            //uses the name information to connect to the service
+            IDataLayer dataLayer = wmsMapLayer;
+            try
+            {
+                dataLayer.Connect((IName)pConnName);
+            }
+            catch (Exception e)
+            {
+                Jarvis.Logger.Error("Problems connecting to WMS: " + e.Message);
+            }
+
+            // get wms service description
+            var serviceDesc = wmsMapLayer.IWMSGroupLayer_WMSServiceDescription;
+
+            ILayer wmsLayer = null;
+
+            // add layers for the wms currently there will only be one.
+            for (var i = 0; i <= serviceDesc.LayerDescriptionCount - 1; i++)
+            {
+                var layerDesc = serviceDesc.LayerDescription[i];
+
+                var grpLayer = wmsMapLayer.CreateWMSGroupLayers(layerDesc);
+                for (var j = 0; j <= grpLayer.Count - 1; j++)
+                {
+                    wmsLayer = wmsMapLayer;
+                    wmsMapLayer.Name = idahoId;
+                }
+            }
+
+            // turn on sub layers, add it to arcmap and move it to top of TOC
+//            SublayerVisibleOn(wmsLayer);
+            groupLayer.Add(wmsLayer);
+
+            // turn on sub layers, add it to arcmap and move it to top of TOC
+            ArcMap.Document.AddLayer(groupLayer);
+            ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
+        }
+
+        public static void AddIdahoWms(List<string> idahoIds, string groupLayerName, string token)
+        {
+            IWMSGroupLayer wmsGroupLayer = null;
+            IGroupLayer groupLayer = new GroupLayerClass();
+            groupLayer.Name = groupLayerName;
+            foreach (var id in idahoIds)
+            {
+                var wmsMapLayer = new WMSMapLayerClass();
+
+                // create and configure wms connection name, this is used to store the connection properties
+                IWMSConnectionName pConnName = new WMSConnectionNameClass();
+                IPropertySet propSet = new PropertySetClass();
+
+                // create the idaho wms url
+                var idahoUrl = string.Format(
+                    "http://idaho.geobigdata.io/v1/wms/idaho-images/{0}/{1}/mapserv?",
+                    id,
+                    token);
+
+                Jarvis.Logger.Info("Adding WMS Layer to: " + idahoUrl);
+
+                // setup the arcmap connection properties
+                propSet.SetProperty("URL", idahoUrl);
+                pConnName.ConnectionProperties = propSet;
+
+                //uses the name information to connect to the service
+                IDataLayer dataLayer = wmsMapLayer;
+                try
+                {
+                    dataLayer.Connect((IName)pConnName);
+                }
+                catch (Exception e)
+                {
+                    Jarvis.Logger.Error("Problems connecting to WMS: " + e.Message);
+                }
+
+                // get wms service description
+                var serviceDesc = wmsMapLayer.IWMSGroupLayer_WMSServiceDescription;
+
+                ILayer wmsLayer = null;
+
+                // add layers for the wms currently there will only be one.
+                for (var i = 0; i <= serviceDesc.LayerDescriptionCount - 1; i++)
+                {
+                    var layerDesc = serviceDesc.LayerDescription[i];
+
+                    var grpLayer = wmsMapLayer.CreateWMSGroupLayers(layerDesc);
+                    for (var j = 0; j <= grpLayer.Count - 1; j++)
+                    {
+                        wmsLayer = wmsMapLayer;
+                        wmsMapLayer.Name = id;
+                    }
+                }
+
+                // turn on sub layers, add it to arcmap and move it to top of TOC
+                SublayerVisibleOn(wmsLayer);
+                groupLayer.Add(wmsLayer);
+            }
+            // turn on sub layers, add it to arcmap and move it to top of TOC
+            ArcMap.Document.AddLayer(groupLayer);
+            ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
+        }
+
     }
 }

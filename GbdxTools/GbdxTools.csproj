@@ -66,6 +66,8 @@
     <Compile Include="CheckGroupBox.Designer.cs" />
     <Compile Include="DataGridViewDisableCheckBoxCell.cs" />
     <Compile Include="FieldDefinition.cs" />
+    <Compile Include="GeoConverter.cs" />
+    <Compile Include="GeometryClasses.cs" />
     <Compile Include="Jarvis.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

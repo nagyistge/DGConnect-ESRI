@@ -173,7 +173,7 @@
             // 
             this.availableRecipesCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.availableRecipesCombobox.FormattingEnabled = true;
-            this.availableRecipesCombobox.Location = new System.Drawing.Point(146, 41);
+            this.availableRecipesCombobox.Location = new System.Drawing.Point(146, 42);
             this.availableRecipesCombobox.Name = "availableRecipesCombobox";
             this.availableRecipesCombobox.Size = new System.Drawing.Size(149, 24);
             this.availableRecipesCombobox.Sorted = true;
@@ -197,7 +197,7 @@
             this.selectionTypecomboBox.Items.AddRange(new object[] {
             "Draw Rectangle",
             "Use Selected Feature"});
-            this.selectionTypecomboBox.Location = new System.Drawing.Point(146, 77);
+            this.selectionTypecomboBox.Location = new System.Drawing.Point(146, 78);
             this.selectionTypecomboBox.Name = "selectionTypecomboBox";
             this.selectionTypecomboBox.Size = new System.Drawing.Size(149, 24);
             this.selectionTypecomboBox.TabIndex = 12;

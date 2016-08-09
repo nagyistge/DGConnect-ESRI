@@ -47,16 +47,13 @@ namespace GBD.Tests
         /// The convert wkt to esri test.
         /// </summary>
         [TestMethod()]
-        public void ConvertWktToEsriTest()
+        public void GetPointsFromWKT()
         {
             //var output = GbdJarvis.ConvertWktToEsri(TestResource.wkt);
 
             var output = GbdJarvis.GetPointsFromWkt(TestResource.wkt);
 
             Assert.IsTrue(output.Count == 21);
-
-            //Assert.IsTrue(output.IsClosed);
-
         }
     }
 }

@@ -57,17 +57,6 @@ namespace Gbdx.Vector_Index
                                                                           };
 
         /// <summary>
-        /// The invalid field starting characters.
-        /// </summary>
-        private static readonly Regex InvalidFieldStartingCharacters =
-            new Regex("[^`~@#$%^&*()-+=|,\\\\<>?/{}\\.!'[\\]:;_0123456789]");
-
-        /// <summary>
-        /// The invalid field characters.
-        /// </summary>
-        private static readonly Regex InvalidFieldCharacters = new Regex("[^`~@#$%^&*()-+=|\\\\,<>?/{}\\.!'[\\]:;]");
-
-        /// <summary>
         /// The spatial reference factory.
         /// </summary>
         private static readonly ISpatialReferenceFactory SpatialReferenceFactory = new SpatialReferenceEnvironment();
@@ -84,42 +73,6 @@ namespace Gbdx.Vector_Index
         private static readonly Logger Logger = new Logger(Jarvis.LogFile, false);
 
         #region Public Methods
-        #region Create URL Methods
-
-        /// <summary>
-        /// Creates a URL string that will get the number of sources within a bounding box.
-        /// </summary>
-        /// <param name="bBox">
-        /// coordinates of the BoundingBox
-        /// </param>
-        /// <param name="baseUrl">
-        /// base url to get to the service
-        /// </param>
-        /// <returns>
-        /// The sources and number of types per source
-        /// </returns>
-        public static string CreateUrl(BoundingBox bBox, string baseUrl)
-        {
-            try
-            {
-                var output =
-                    string.Format(
-                        "{0}/insight-vector/api/esri/sources?left={1}&upper={2}&right={3}&lower={4}",
-                        baseUrl,
-                        bBox.Xmin,
-                        bBox.Ymax,
-                        bBox.Xmax,
-                        bBox.Ymin);
-                return output;
-            }
-            catch (Exception error)
-            {
-                Logger.Error(error);
-                return string.Empty;
-            }
-        }
-
-        #endregion
 
         /// <summary>
         /// Creates a feature layer from the feature class.
@@ -194,9 +147,7 @@ namespace Gbdx.Vector_Index
                 // extract the first item on the table to be come the master
                 var masterFeature = (IFeatureClass)tables[0].Table;
                 var insertCursor = masterFeature.Insert(true);
-                var timer = new Stopwatch();
-                timer.Stop();
-                timer.Reset();
+
                 var featureBuffer = masterFeature.CreateFeatureBuffer();
                 for (var i = 0; i <= tables.Count - 1; i++)
                 {
@@ -299,7 +250,7 @@ namespace Gbdx.Vector_Index
         /// <returns>
         /// The <see cref="IElement"/>.
         /// </returns>
-        public static IElement AddGraphicToMap(
+        private static IElement AddGraphicToMap(
             IMap map,
             IGeometry geometry,
             IRgbColor rgbColor,
@@ -450,7 +401,7 @@ namespace Gbdx.Vector_Index
         /// <param name="rowToBeCombined">
         /// Original row that will be copied
         /// </param>
-        public static void AddFields(ref IFeatureBuffer homeRow, IFeature rowToBeCombined)
+        private static void AddFields(ref IFeatureBuffer homeRow, IFeature rowToBeCombined)
         {
             // Copy the attributes of the orig feature the new feature
             var fieldsNew = rowToBeCombined.Fields;
@@ -498,42 +449,19 @@ namespace Gbdx.Vector_Index
                 var map = mxdoc.FocusMap;
                 map.AddLayer(layer);
             }
-            catch(Exception error)
+            catch (Exception error)
             {
                 Jarvis.Logger.Error(error);
             }
         }
-
-        /// <summary>
-        /// Deserializes the JSON received into a list of SourceType.  Returns null if the JSON string is empty or an error occurs.
-        /// </summary>
-        /// <param name="json">
-        /// JSON string for a list of SourceType
-        /// </param>
-        /// <returns>
-        /// List of SourceType
-        /// </returns>
-        public static SourceTypeResponseObject GetSourceType(string json)
-        {
-            try
-            {
-                var result = JsonSerializer.Deserialize<SourceTypeResponseObject>(json);
-                return result;
-            }
-            catch (Exception error)
-            {
-                Logger.Error(error);
-                return null;
-            }
-        }
-
+        
         /// <summary>
         /// The vector index color.
         /// </summary>
         /// <returns>
         /// The <see cref="IRgbColor"/>.
         /// </returns>
-        public static IRgbColor VectorIndexColor()
+        private static IRgbColor VectorIndexColor()
         {
             IRgbColor rgbColor = new RgbColorClass();
             rgbColor.Red = 0;
@@ -541,7 +469,6 @@ namespace Gbdx.Vector_Index
             rgbColor.Blue = 0;
             return rgbColor;
         }
-
 
         /// <summary>
         /// The project to WGS 1984.
@@ -559,10 +486,13 @@ namespace Gbdx.Vector_Index
         }
 
         #endregion
+
         #region Protected Methods
+
         #endregion
 
         #region Private Methods
+
         #endregion
     }
 }
