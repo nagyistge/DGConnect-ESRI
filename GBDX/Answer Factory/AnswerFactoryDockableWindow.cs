@@ -203,7 +203,12 @@ namespace Gbdx.Answer_Factory
 
                 WriteToTable(workspace, jsonOutput, tableName);
 
-                this.Invoke((MethodInvoker)(() => { AddLayerToMap(tableName, layerName); }));
+                this.Invoke((MethodInvoker)(() =>
+                {
+                    this.loadingCircle.Active = false;
+                    this.loadingCircle.Visible = false;
+                    AddLayerToMap(tableName, layerName);
+                }));
 
                 if (File.Exists(filepath))
                 {
@@ -378,7 +383,8 @@ namespace Gbdx.Answer_Factory
                     MessageBox.Show("Selection Error");
                     return;
                 }
-
+                this.loadingCircle.Visible = true;
+                this.loadingCircle.Active = true;
                 this.GetResult(projectId.ToString(), recipeName.ToString(), projectName.ToString());
             }
             catch (Exception error)
