@@ -597,7 +597,7 @@
                         {
                             entry.Data.Add(f, int.Parse(val));
                         }
-                        catch (Exception e)
+                        catch
                         {
                         }
                     }
@@ -671,7 +671,7 @@
                         {
                             entry.Data.Add(fname, int.Parse(val));
                         }
-                        catch (Exception e)
+                        catch
                         {
                         }
                     }
@@ -1044,6 +1044,7 @@
             }
             catch (Exception ex)
             {
+                Jarvis.Logger.Error(ex);
                 MessageBox.Show("An unhandled exception occurred");
             }
         }

@@ -108,8 +108,6 @@ namespace Gbdx
         }
         public static void AddIdahoWms(string idahoId, string groupLayerName, string token)
         {
-            IWMSGroupLayer wmsGroupLayer = null;
-
             IGroupLayer groupLayer = new GroupLayerClass();
             groupLayer.Name = groupLayerName;
 
@@ -168,7 +166,12 @@ namespace Gbdx
 
         public static void AddIdahoWms(List<string> idahoIds, string groupLayerName, string token)
         {
-            IWMSGroupLayer wmsGroupLayer = null;
+            // Don't do anything if the aren't any idaho id's to work with
+            if (idahoIds.Count <= 0)
+            {
+                return;
+            }
+
             IGroupLayer groupLayer = new GroupLayerClass();
             groupLayer.Name = groupLayerName;
             foreach (var id in idahoIds)

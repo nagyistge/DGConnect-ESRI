@@ -78,11 +78,6 @@ namespace Gbdx.Vector_Index.Forms
         private const int MaxAttempts = 5;
 
         /// <summary>
-        ///     When true a console will appear when exceptions occur.  Currently not functional.
-        /// </summary>
-        private static readonly bool ConsoleLogging = false;
-
-        /// <summary>
         ///     Random number generator meant to create a new state number for certain kinds of events.
         /// </summary>
         private readonly Random applicationStateGenerator = new Random(DateTime.UtcNow.Millisecond);
@@ -96,11 +91,6 @@ namespace Gbdx.Vector_Index.Forms
         private string Aoi = string.Empty;
 
         /// <summary>
-        ///     Contains the coordinates of the bounding box.
-        /// </summary>
-        private BoundingBox bBox;
-
-        /// <summary>
         ///     The IElement containing the visual of the bounding box displayed on Arc Map
         /// </summary>
         private IElement boundingBoxGraphicElement;
@@ -112,28 +102,13 @@ namespace Gbdx.Vector_Index.Forms
         private int currentApplicationState;
 
         /// <summary>
-        ///     Current number of threads in use that are communicating with GBDX services
-        /// </summary>
-        private int currentThreadCount;
-
-        /// <summary>
-        ///     Main network object that will be copied to threads as needed.
-        /// </summary>
-        private NetObject networkObject;
-
-        /// <summary>
         ///     Originally selected esri item.  Once the Vector index tool has drawn it's bounding box this tool will be
         ///     re-selected.
         /// </summary>
         private ICommandItem originallySelectedItem;
 
         private string query = string.Empty;
-
-        /// <summary>
-        ///     Determines if the UVI is in test mode.  This variable will only be true if manually set in a developer environment.
-        /// </summary>
-        private bool test;
-
+        
         private string token = string.Empty;
 
         /// <summary>

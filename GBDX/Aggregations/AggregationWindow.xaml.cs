@@ -371,6 +371,7 @@ namespace Gbdx.Aggregations
             }
             catch (Exception ex)
             {
+                Jarvis.Logger.Error(ex);
                 MessageBox.Show("An unhandled exception occurred");
             }
         }
@@ -787,7 +788,7 @@ namespace Gbdx.Aggregations
                         {
                             entry.Data.Add(f, int.Parse(val));
                         }
-                        catch (Exception e)
+                        catch
                         {
                         }
                     }
@@ -861,7 +862,7 @@ namespace Gbdx.Aggregations
                         {
                             entry.Data.Add(fname, int.Parse(val));
                         }
-                        catch (Exception e)
+                        catch
                         {
                         }
                     }
