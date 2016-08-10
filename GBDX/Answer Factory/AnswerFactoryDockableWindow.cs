@@ -383,8 +383,7 @@ namespace Gbdx.Answer_Factory
                     MessageBox.Show("Selection Error");
                     return;
                 }
-                this.loadingCircle.Visible = true;
-                this.loadingCircle.Active = true;
+                
                 this.GetResult(projectId.ToString(), recipeName.ToString(), projectName.ToString());
             }
             catch (Exception error)
@@ -652,12 +651,16 @@ namespace Gbdx.Answer_Factory
                 MessageBox.Show("No Project id");
                 return;
             }
+
             var request = new RestRequest(
                 string.Format("/answer-factory-recipe-service/api/result/project/{0}", id),
                 Method.GET);
 
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
+
+            this.loadingCircle.Visible = true;
+            this.loadingCircle.Active = true;
             this.client.ExecuteAsync<List<ResultItem>>(
                 request,
                 resp =>
@@ -941,6 +944,12 @@ namespace Gbdx.Answer_Factory
                     }
                 }
             }
+            this.Invoke((MethodInvoker) (() =>
+            {
+                this.loadingCircle.Visible = false;
+                this.loadingCircle.Active = false;
+            }));
+            
         }
 
         private void projectNameDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
