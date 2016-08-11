@@ -426,7 +426,18 @@
             var aoi = string.Empty;
             if (this.selectionTypeComboBox.SelectedIndex == 1)
             {
-                aoi = Jarvis.ConvertPolygonsToGeoJson(Jarvis.GetPolygons(ArcMap.Document.FocusMap));
+                try
+                {
+                    aoi = Jarvis.ConvertPolygonsToGeoJson(Jarvis.GetPolygons(ArcMap.Document.FocusMap));
+                }
+                catch (OutOfMemoryException exception)
+                {
+                    Jarvis.Logger.Error("To many features selected");
+                    Jarvis.Logger.Error(exception);
+                    MessageBox.Show(GbdxResources.ToManyFeaturesSelected);
+                    this.goButton.Enabled = true;
+                    return;
+                }
             }
             else if (this.selectionTypeComboBox.SelectedIndex == 0)
             {

@@ -362,6 +362,15 @@ namespace GbdxSettings {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to To many features have been selected.  Please select fewer features and try again..
+        /// </summary>
+        public static string ToManyFeaturesSelected {
+            get {
+                return ResourceManager.GetString("ToManyFeaturesSelected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Total Items: .
         /// </summary>
         public static string totalItems {

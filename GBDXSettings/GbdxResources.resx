@@ -238,4 +238,7 @@ Please select features and try again.</value>
   <data name="redrawBoundingBox" xml:space="preserve">
     <value>Please click Select Area and redraw bounding box by clicking and dragging to create a polygon.</value>
   </data>
+  <data name="ToManyFeaturesSelected" xml:space="preserve">
+    <value>To many features have been selected.  Please select fewer features and try again.</value>
+  </data>
 </root>
