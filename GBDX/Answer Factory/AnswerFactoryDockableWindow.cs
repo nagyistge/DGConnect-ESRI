@@ -436,6 +436,18 @@ namespace Gbdx.Answer_Factory
 
             if (resp.Data != null)
             {
+
+                if (resp.Data.data.Count == 0)
+                {
+                    this.Invoke((MethodInvoker)(() =>
+                    {
+                        this.loadingCircle.Visible = false;
+                        this.loadingCircle.Active = false;
+                        MessageBox.Show("No data results");
+                        return;
+                    }));
+
+                }
                 var sources = resp.Data;
 
                 foreach (var source in sources.data)
@@ -916,6 +928,18 @@ namespace Gbdx.Answer_Factory
             var aoi = ConvertAoisToGeometryCollection(AoiList);
             if (resp.Data != null)
             {
+                if (resp.Data.Count == 0)
+                {
+                    this.Invoke((MethodInvoker)(() =>
+                    {
+                        this.loadingCircle.Visible = false;
+                        this.loadingCircle.Active = false;
+                        MessageBox.Show("No data results");
+                        return;
+                    }));
+
+                }
+
                 // since there can be multiple query ids its good to check to make sure we don't end up pulling duplicate results.
                 var usedQueries = new HashSet<string>();
                 foreach (var item in resp.Data)
