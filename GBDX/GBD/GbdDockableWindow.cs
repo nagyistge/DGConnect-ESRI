@@ -439,9 +439,30 @@ namespace Gbdx.Gbd
                 SublayerVisibleOn(wmsLayer);
                 groupLayer.Add(wmsLayer);
             }
-            // turn on sub layers, add it to arcmap and move it to top of TOC
-            ArcMap.Document.AddLayer(groupLayer);
-            ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
+
+            // Check to see if the spatial refrence matches WGS84.  If not throw up a warning.
+            if (ArcMap.Document.FocusMap.SpatialReference.FactoryCode != 4326)
+            {
+                var dialogResult = MessageBox.Show(
+                    GbdxResources.projectionMismatchWarning,
+                    "WARNING",
+                    MessageBoxButtons.YesNo);
+
+                if (dialogResult != DialogResult.Yes)
+                {
+                    return;
+                }
+
+                // turn on sub layers, add it to arcmap and move it to top of TOC
+                ArcMap.Document.AddLayer(groupLayer);
+                ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
+            }
+            else
+            {
+                // turn on sub layers, add it to arcmap and move it to top of TOC
+                ArcMap.Document.AddLayer(groupLayer);
+                ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
+            }
         }
 
         private static string CatalogIdFilter(string filter, string catId)
