@@ -439,30 +439,10 @@ namespace Gbdx.Gbd
                 SublayerVisibleOn(wmsLayer);
                 groupLayer.Add(wmsLayer);
             }
-
-            // Check to see if the spatial refrence matches WGS84.  If not throw up a warning.
-            if (ArcMap.Document.FocusMap.SpatialReference.FactoryCode != 4326)
-            {
-                var dialogResult = MessageBox.Show(
-                    GbdxResources.projectionMismatchWarning,
-                    "WARNING",
-                    MessageBoxButtons.YesNo);
-
-                if (dialogResult != DialogResult.Yes)
-                {
-                    return;
-                }
-
                 // turn on sub layers, add it to arcmap and move it to top of TOC
                 ArcMap.Document.AddLayer(groupLayer);
                 ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
-            }
-            else
-            {
-                // turn on sub layers, add it to arcmap and move it to top of TOC
-                ArcMap.Document.AddLayer(groupLayer);
-                ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
-            }
+            
         }
 
         private static string CatalogIdFilter(string filter, string catId)
@@ -630,8 +610,32 @@ namespace Gbdx.Gbd
             {
                 return false;
             }
-
             var row = this.dataGridView1.Rows[e.RowIndex];
+
+            var catalogId = row.Cells["Catalog ID"].Value.ToString();
+
+            if (ArcMap.Document.FocusMap.SpatialReference.FactoryCode != 4326)
+            {
+                var dialogResult = MessageBox.Show(
+                    GbdxResources.projectionMismatchWarning,
+                    "WARNING",
+                    MessageBoxButtons.YesNo);
+
+                if (dialogResult == DialogResult.No)
+                {
+                    var result = this.localDatatable.Select("[Catalog ID] = '" + catalogId + "'");
+                    if (result.Length != 0)
+                    {
+                        var myRow = result[0];
+                        myRow["PAN"] = false;
+                        myRow["MS"] = false;
+                        myRow.AcceptChanges();
+                    }
+                    return false;
+                }
+            }
+
+            
             var idahoId = string.Empty;
 
             var interp = string.Empty;
@@ -648,7 +652,7 @@ namespace Gbdx.Gbd
                 interp = "MS";
             }
 
-            var catalogId = row.Cells["Catalog ID"].Value.ToString();
+            
 
             // check to see if there is currently a known value for idahoId.
             if (this.usedIdahoIds.ContainsKey(idahoId))
