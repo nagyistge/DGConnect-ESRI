@@ -54,6 +54,7 @@
             this.recipeStatusDataGridView = new System.Windows.Forms.DataGridView();
             this.projectSearchTextBox = new System.Windows.Forms.TextBox();
             this.showResultsButton = new System.Windows.Forms.Button();
+            this.loadingCircle = new MRG.Controls.UI.LoadingCircle();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.tableLayoutPanel2.SuspendLayout();
@@ -130,7 +131,7 @@
             // resetButton
             // 
             this.resetButton.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.resetButton.Location = new System.Drawing.Point(39, 112);
+            this.resetButton.Location = new System.Drawing.Point(25, 112);
             this.resetButton.Name = "resetButton";
             this.resetButton.Size = new System.Drawing.Size(65, 30);
             this.resetButton.TabIndex = 10;
@@ -143,9 +144,9 @@
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(35, 9);
+            this.label1.Location = new System.Drawing.Point(29, 11);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(105, 17);
+            this.label1.Size = new System.Drawing.Size(83, 13);
             this.label1.TabIndex = 4;
             this.label1.Text = "Project Name";
             // 
@@ -153,9 +154,9 @@
             // 
             this.projectNameTextbox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.tableLayoutPanel2.SetColumnSpan(this.projectNameTextbox, 2);
-            this.projectNameTextbox.Location = new System.Drawing.Point(146, 7);
+            this.projectNameTextbox.Location = new System.Drawing.Point(118, 8);
             this.projectNameTextbox.Name = "projectNameTextbox";
-            this.projectNameTextbox.Size = new System.Drawing.Size(228, 22);
+            this.projectNameTextbox.Size = new System.Drawing.Size(256, 20);
             this.projectNameTextbox.TabIndex = 7;
             // 
             // label3
@@ -163,9 +164,9 @@
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this.label3.AutoSize = true;
             this.label3.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(3, 45);
+            this.label3.Location = new System.Drawing.Point(3, 47);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(137, 17);
+            this.label3.Size = new System.Drawing.Size(109, 13);
             this.label3.TabIndex = 6;
             this.label3.Text = "Available Recipes";
             // 
@@ -173,9 +174,9 @@
             // 
             this.availableRecipesCombobox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.availableRecipesCombobox.FormattingEnabled = true;
-            this.availableRecipesCombobox.Location = new System.Drawing.Point(146, 42);
+            this.availableRecipesCombobox.Location = new System.Drawing.Point(118, 43);
             this.availableRecipesCombobox.Name = "availableRecipesCombobox";
-            this.availableRecipesCombobox.Size = new System.Drawing.Size(149, 24);
+            this.availableRecipesCombobox.Size = new System.Drawing.Size(177, 21);
             this.availableRecipesCombobox.Sorted = true;
             this.availableRecipesCombobox.TabIndex = 9;
             // 
@@ -184,9 +185,9 @@
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label2.AutoSize = true;
             this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 7.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(13, 81);
+            this.label2.Location = new System.Drawing.Point(11, 83);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(116, 17);
+            this.label2.Size = new System.Drawing.Size(92, 13);
             this.label2.TabIndex = 11;
             this.label2.Text = "Selection Type";
             // 
@@ -197,9 +198,9 @@
             this.selectionTypecomboBox.Items.AddRange(new object[] {
             "Draw Rectangle",
             "Use Selected Feature"});
-            this.selectionTypecomboBox.Location = new System.Drawing.Point(146, 78);
+            this.selectionTypecomboBox.Location = new System.Drawing.Point(118, 79);
             this.selectionTypecomboBox.Name = "selectionTypecomboBox";
-            this.selectionTypecomboBox.Size = new System.Drawing.Size(149, 24);
+            this.selectionTypecomboBox.Size = new System.Drawing.Size(177, 21);
             this.selectionTypecomboBox.TabIndex = 12;
             this.selectionTypecomboBox.SelectedIndexChanged += new System.EventHandler(this.EventhandlerSelectionTypecomboBoxSelectedIndexChanged);
             // 
@@ -252,6 +253,7 @@
             this.tableLayoutPanel3.Controls.Add(this.splitContainer1, 0, 1);
             this.tableLayoutPanel3.Controls.Add(this.projectSearchTextBox, 0, 0);
             this.tableLayoutPanel3.Controls.Add(this.showResultsButton, 2, 4);
+            this.tableLayoutPanel3.Controls.Add(this.loadingCircle, 1, 4);
             this.tableLayoutPanel3.Location = new System.Drawing.Point(12, 21);
             this.tableLayoutPanel3.Name = "tableLayoutPanel3";
             this.tableLayoutPanel3.RowCount = 5;
@@ -391,7 +393,7 @@
             this.projectSearchTextBox.ForeColor = System.Drawing.Color.LightGray;
             this.projectSearchTextBox.Location = new System.Drawing.Point(3, 3);
             this.projectSearchTextBox.Name = "projectSearchTextBox";
-            this.projectSearchTextBox.Size = new System.Drawing.Size(365, 22);
+            this.projectSearchTextBox.Size = new System.Drawing.Size(365, 20);
             this.projectSearchTextBox.TabIndex = 4;
             this.projectSearchTextBox.Text = "Type some text here to filter projects...";
             this.projectSearchTextBox.TextChanged += new System.EventHandler(this.projectSearchTextBox_TextChanged);
@@ -406,6 +408,24 @@
             this.showResultsButton.Text = "Show Results";
             this.showResultsButton.UseVisualStyleBackColor = true;
             this.showResultsButton.Click += new System.EventHandler(this.EventHandlerShowResultsButtonClick);
+            // 
+            // loadingCircle
+            // 
+            this.loadingCircle.Active = false;
+            this.loadingCircle.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this.loadingCircle.Color = System.Drawing.Color.DarkGray;
+            this.loadingCircle.InnerCircleRadius = 5;
+            this.loadingCircle.Location = new System.Drawing.Point(211, 317);
+            this.loadingCircle.Name = "loadingCircle";
+            this.loadingCircle.NumberSpoke = 12;
+            this.loadingCircle.OuterCircleRadius = 11;
+            this.loadingCircle.RotationSpeed = 100;
+            this.loadingCircle.Size = new System.Drawing.Size(46, 23);
+            this.loadingCircle.SpokeThickness = 2;
+            this.loadingCircle.StylePreset = MRG.Controls.UI.LoadingCircle.StylePresets.MacOSX;
+            this.loadingCircle.TabIndex = 5;
+            this.loadingCircle.Text = "loadingCircle1";
+            this.loadingCircle.Visible = false;
             // 
             // AnswerFactoryDockableWindow
             // 
@@ -452,6 +472,7 @@
         private System.Windows.Forms.TextBox projectSearchTextBox;
         private System.Windows.Forms.DataGridView projectNameDataGridView;
         private System.Windows.Forms.DataGridView recipeStatusDataGridView;
+        private MRG.Controls.UI.LoadingCircle loadingCircle;
 
     }
 }

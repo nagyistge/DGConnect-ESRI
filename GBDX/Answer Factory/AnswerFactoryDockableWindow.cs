@@ -203,7 +203,12 @@ namespace Gbdx.Answer_Factory
 
                 WriteToTable(workspace, jsonOutput, tableName);
 
-                this.Invoke((MethodInvoker)(() => { AddLayerToMap(tableName, layerName); }));
+                this.Invoke((MethodInvoker)(() =>
+                {
+                    this.loadingCircle.Active = false;
+                    this.loadingCircle.Visible = false;
+                    AddLayerToMap(tableName, layerName);
+                }));
 
                 if (File.Exists(filepath))
                 {
@@ -378,7 +383,7 @@ namespace Gbdx.Answer_Factory
                     MessageBox.Show("Selection Error");
                     return;
                 }
-
+                
                 this.GetResult(projectId.ToString(), recipeName.ToString(), projectName.ToString());
             }
             catch (Exception error)
@@ -431,6 +436,18 @@ namespace Gbdx.Answer_Factory
 
             if (resp.Data != null)
             {
+
+                if (resp.Data.data.Count == 0)
+                {
+                    this.Invoke((MethodInvoker)(() =>
+                    {
+                        this.loadingCircle.Visible = false;
+                        this.loadingCircle.Active = false;
+                        MessageBox.Show("No data results");
+                        return;
+                    }));
+
+                }
                 var sources = resp.Data;
 
                 foreach (var source in sources.data)
@@ -646,12 +663,16 @@ namespace Gbdx.Answer_Factory
                 MessageBox.Show("No Project id");
                 return;
             }
+
             var request = new RestRequest(
                 string.Format("/answer-factory-recipe-service/api/result/project/{0}", id),
                 Method.GET);
 
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
+
+            this.loadingCircle.Visible = true;
+            this.loadingCircle.Active = true;
             this.client.ExecuteAsync<List<ResultItem>>(
                 request,
                 resp =>
@@ -907,6 +928,18 @@ namespace Gbdx.Answer_Factory
             var aoi = ConvertAoisToGeometryCollection(AoiList);
             if (resp.Data != null)
             {
+                if (resp.Data.Count == 0)
+                {
+                    this.Invoke((MethodInvoker)(() =>
+                    {
+                        this.loadingCircle.Visible = false;
+                        this.loadingCircle.Active = false;
+                        MessageBox.Show("No data results");
+                        return;
+                    }));
+
+                }
+
                 // since there can be multiple query ids its good to check to make sure we don't end up pulling duplicate results.
                 var usedQueries = new HashSet<string>();
                 foreach (var item in resp.Data)
@@ -935,6 +968,12 @@ namespace Gbdx.Answer_Factory
                     }
                 }
             }
+            this.Invoke((MethodInvoker) (() =>
+            {
+                this.loadingCircle.Visible = false;
+                this.loadingCircle.Active = false;
+            }));
+            
         }
 
         private void projectNameDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)

@@ -69,6 +69,15 @@
     <Compile Include="GeoConverter.cs" />
     <Compile Include="GeometryClasses.cs" />
     <Compile Include="Jarvis.cs" />
+    <Compile Include="LoadingCircle.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="LoadingCircle.Designer.cs">
+      <DependentUpon>LoadingCircle.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LoadingCircleToolStripMenuItem.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

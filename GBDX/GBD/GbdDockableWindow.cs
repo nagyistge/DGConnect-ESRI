@@ -166,11 +166,6 @@ namespace Gbdx.Gbd
         private DateTime endTime;
 
         /// <summary>
-        ///     The total number of items in the data grid view.
-        /// </summary>
-        private int itemsTotal = 0;
-
-        /// <summary>
         ///     The IElement of the drawn AOI.
         /// </summary>
         private IElement localElement;
@@ -179,12 +174,7 @@ namespace Gbdx.Gbd
         ///     The polygon of the drawn AOI.
         /// </summary>
         private IPolygon localPolygon;
-
-        /// <summary>
-        ///     The log writer.
-        /// </summary>
-        private Logger logWriter;
-
+        
         /// <summary>
         ///     Thread control variable.  When set to false the threads will exit gracefully otherwise they will run until the work
         ///     queue has been depleted.
@@ -211,26 +201,6 @@ namespace Gbdx.Gbd
         ///     Thread that will do status update checks.
         /// </summary>
         private Thread statusUpdateThread;
-
-        /// <summary>
-        ///     Worker thread being used to get the meta data from GBD
-        /// </summary>
-        private Thread worker1Thread;
-
-        /// <summary>
-        ///     Worker thread being used to get the meta data from GBD
-        /// </summary>
-        private Thread worker2Thread;
-
-        /// <summary>
-        ///     Worker thread being used to get the meta data from GBD
-        /// </summary>
-        private Thread worker3Thread;
-
-        /// <summary>
-        ///     Worker thread being used to get the meta data from GBD
-        /// </summary>
-        private Thread worker4Thread;
 
         /// <summary>
         ///     Gets or sets the hook object of the dockable window
@@ -332,7 +302,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
 
             this.exportButton.Text = Settings.Default.baseUrl.Equals(Settings.Default.DefaultBaseUrl)
@@ -398,7 +368,6 @@ namespace Gbdx.Gbd
         private void AddIdahoWms(string catalogId, string colorInterp)
         {
             HashSet<string> idahoIds;
-            IWMSGroupLayer wmsGroupLayer = null;
             switch (colorInterp)
             {
                 case "PAN":
@@ -759,7 +728,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
         }
 
@@ -896,7 +865,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
         }
 
@@ -1020,7 +989,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
         }
 
@@ -1260,7 +1229,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
         }
 
@@ -1458,7 +1427,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
 
             return list;
@@ -1488,7 +1457,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
         }
 
@@ -1624,7 +1593,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
         }
 
@@ -1850,7 +1819,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
         }
 
@@ -1994,7 +1963,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
         }
 
@@ -2343,8 +2312,7 @@ namespace Gbdx.Gbd
             }
             catch (Exception error)
             {
-                this.logWriter.Error(error);
-                this.logWriter.Error(error);
+                Jarvis.Logger.Error(error);
             }
         }
 
@@ -2365,7 +2333,7 @@ namespace Gbdx.Gbd
                 }
                 catch (Exception error)
                 {
-                    this.logWriter.Error(error);
+                    Jarvis.Logger.Error(error);
                 }
             }
 
