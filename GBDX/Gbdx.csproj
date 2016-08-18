@@ -163,6 +163,7 @@
       <DependentUpon>AnswerFactoryDockableWindow.cs</DependentUpon>
     </Compile>
     <Compile Include="Answer Factory\AnswerFactorySelector.cs" />
+    <Compile Include="CatalogTokenRefresh.cs" />
     <Compile Include="Config.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Config.esriaddinx</DependentUpon>
@@ -385,6 +386,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\information.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddInContent Include="Images\CatalogTokenRefresh.png" />
   </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>
