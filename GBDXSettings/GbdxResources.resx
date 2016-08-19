@@ -241,4 +241,9 @@ Please select features and try again.</value>
   <data name="ToManyFeaturesSelected" xml:space="preserve">
     <value>To many features have been selected.  Please select fewer features and try again.</value>
   </data>
+  <data name="projectionMismatchWarning" xml:space="preserve">
+    <value>Adding a WMS layer on a map not in WGS84 projection can cause adverse viewing effects.
+
+Do you want to continue adding the WMS layer?</value>
+  </data>
 </root>
