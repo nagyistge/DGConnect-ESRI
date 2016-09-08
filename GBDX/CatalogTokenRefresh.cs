@@ -4,6 +4,8 @@ using System.Text;
 using System.IO;
 using System.Net;
 using System.Text.RegularExpressions;
+using System.Threading;
+using System.Windows.Forms;
 using Encryption;
 using ESRI.ArcGIS.ArcMapUI;
 using ESRI.ArcGIS.Carto;
@@ -64,6 +66,7 @@ namespace Gbdx
                 }
                 finally
                 {
+                    MessageBox.Show("Layer refresh complete");
                     working = false;
                 }
             }
@@ -113,47 +116,106 @@ namespace Gbdx
         {
             var catIDictionary = CheckLayers(map);
 
+
+            List<IGroupLayer> grpLayers = new List<IGroupLayer>();
             foreach (var key in catIDictionary.Keys)
             {
-                RemoveLayer(key);
-                RefreshLayer(key, catIDictionary[key], token);
+                //RemoveLayer(key);
+
+                grpLayers.Add(RefreshLayer(key, catIDictionary[key]));
+
             }
+
         }
 
-        private static void RefreshLayer(string catId, List<string> idahoIds, string token)
+        private static WMSMapLayerClass CreateWmsMapLayer(string id, int attempt = 0)
+        {
+            var wmsMapLayer = new WMSMapLayerClass();
+
+            // create and configure wms connection name, this is used to store the connection properties
+            IWMSConnectionName pConnName = new WMSConnectionNameClass();
+            IPropertySet propSet = new PropertySetClass();
+
+            // create the idaho wms url
+            var idahoUrl = string.Format(
+                "http://idaho.geobigdata.io/v1/wms/idaho-images/{0}/{1}/mapserv?",
+                id,
+                token);
+
+            Jarvis.Logger.Info("Adding WMS Layer to: " + idahoUrl);
+
+            // setup the arcmap connection properties
+            propSet.SetProperty("URL", idahoUrl);
+            propSet.SetProperty("VERSION","1.3.0");
+            pConnName.ConnectionProperties = propSet;
+
+            //uses the name information to connect to the service
+            IDataLayer dataLayer = wmsMapLayer;
+            try
+            {
+                dataLayer.Connect((IName)pConnName);
+            }
+            catch (Exception e)
+            {
+
+                Jarvis.Logger.Error("Problems connecting to WMS: " + e.Message);
+                
+                if(attempt <= 5)
+                {
+                    Thread.Sleep(500);
+                    attempt += 1;
+                    return CreateWmsMapLayer(id, attempt);
+                }
+                return null;
+            }
+
+            return wmsMapLayer;
+        }
+
+        private static IGroupLayer RefreshLayer(string catId, List<string> idahoIds)
         {
             IGroupLayer groupLayer = new GroupLayerClass();
             groupLayer.Name = catId;
             foreach (var id in idahoIds)
             {
-                var wmsMapLayer = new WMSMapLayerClass();
+                var wmsMapLayer = CreateWmsMapLayer(id);
 
-                // create and configure wms connection name, this is used to store the connection properties
-                IWMSConnectionName pConnName = new WMSConnectionNameClass();
-                IPropertySet propSet = new PropertySetClass();
-
-                // create the idaho wms url
-                var idahoUrl = string.Format(
-                    "http://idaho.geobigdata.io/v1/wms/idaho-images/{0}/{1}/mapserv?",
-                    id,
-                    token);
-
-                Jarvis.Logger.Info("Adding WMS Layer to: " + idahoUrl);
-
-                // setup the arcmap connection properties
-                propSet.SetProperty("URL", idahoUrl);
-                pConnName.ConnectionProperties = propSet;
-
-                //uses the name information to connect to the service
-                IDataLayer dataLayer = wmsMapLayer;
-                try
+                if(wmsMapLayer == null)
                 {
-                    dataLayer.Connect((IName)pConnName);
+                    Jarvis.Logger.Info("something bad happened");
+                    continue;
                 }
-                catch (Exception e)
-                {
-                    Jarvis.Logger.Error("Problems connecting to WMS: " + e.Message);
-                }
+                //// create and configure wms connection name, this is used to store the connection properties
+                //IWMSConnectionName pConnName = new WMSConnectionNameClass();
+                //IPropertySet propSet = new PropertySetClass();
+
+                //// create the idaho wms url
+                //var idahoUrl = string.Format(
+                //    "http://idaho.geobigdata.io/v1/wms/idaho-images/{0}/{1}/mapserv?",
+                //    id,
+                //    token);
+
+                //Jarvis.Logger.Info("Adding WMS Layer to: " + idahoUrl);
+
+                //// setup the arcmap connection properties
+                //propSet.SetProperty("URL", idahoUrl);
+                //pConnName.ConnectionProperties = propSet;
+
+                ////uses the name information to connect to the service
+                //IDataLayer dataLayer = wmsMapLayer;
+                //try
+                //{
+                //    dataLayer.Connect((IName)pConnName);
+                //}
+                //catch (Exception e)
+                //{
+                //    Jarvis.Logger.Error("Problems connecting to WMS: " + e.Message);
+                //    if (attempts <= 5)
+                //    {
+                //        RefreshLayer(catId,idahoIds,token, attempts++);
+                //    }
+                //    return;
+                //}
 
                 // get wms service description
                 var serviceDesc = wmsMapLayer.IWMSGroupLayer_WMSServiceDescription;
@@ -178,8 +240,9 @@ namespace Gbdx
                 groupLayer.Add(wmsLayer);
             }
             // turn on sub layers, add it to arcmap and move it to top of TOC
-            ArcMap.Document.AddLayer(groupLayer);
-            ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
+        //    ArcMap.Document.AddLayer(groupLayer);
+        //    ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
+            return groupLayer;
         }
 
         /// <summary>
