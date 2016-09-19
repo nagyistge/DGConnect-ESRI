@@ -59,7 +59,7 @@ namespace Gbdx
                         GetToken();
                     }
 
-                    UpdateTokens2(ArcMap.Document.FocusMap);
+                    UpdateTokens(ArcMap.Document.FocusMap);
                 }
                 catch (Exception error)
                 {
@@ -116,16 +116,7 @@ namespace Gbdx
                 token = string.Empty;
             }
         }
-
-        private static void UpdateTokens2(IMap map)
-        {
-            for (var i = 0; i < map.LayerCount; i++)
-            {
-                ReplaceIdahoIds(null, map.Layer[i], 0);
-            }
-
-        }
-
+        
         private static void UpdateTokens(IMap map)
         {
             var catIDictionary = CheckLayers(map);
@@ -290,65 +281,14 @@ namespace Gbdx
             for (int i = 0; i < map.LayerCount; i++)
             {
                 var layer = map.Layer[i];
+                var subLayers = CheckSubLayers(layer as ICompositeLayer);
 
-                if (CatIdPattern.IsMatch(layer.Name))
+                if (subLayers.Count > 0)
                 {
-                    var subLayers = CheckSubLayers(layer as ICompositeLayer);
-
-                    if (subLayers.Count > 0)
-                    {
-                        catIDictionary.Add(layer.Name, subLayers);
-                    }
+                    catIDictionary.Add(layer.Name, subLayers);
                 }
             }
             return catIDictionary;
-        }
-
-        private static Dictionary<string, List<WmsLayerInfo>> CheckLayers2(IMap map)
-        {
-            Dictionary<string, List<WmsLayerInfo>> output = new Dictionary<string, List<WmsLayerInfo>>();
-
-            for (int i = 0; i < map.LayerCount; i++)
-            {
-                var layer = map.Layer[i];
-
-                var compLayer = (ICompositeLayer) layer;
-
-                // if composite layer has more than 1 layer check the sub layers
-                if (compLayer.Count > 1)
-                {
-                    //CheckSubLayers2(compLayer);
-                }
-
-            }
-            return output;
-        }
-
-        private static List<WmsLayerInfo> CheckSubLayers2(ILayer layer, Dictionary<string, List<WmsLayerInfo>> layerDictionary)
-        {
-            var output = new List<WmsLayerInfo>();
-            var tempLayer = (ICompositeLayer) layer;
-
-            if (tempLayer.Count > 1)
-            {
-                for (int i = 0; i < tempLayer.Count; i++)
-                {
-                    var temp = tempLayer.Layer[i];
-                    if (IdahoIdPattern.IsMatch(temp.Name))
-                    {
-                        output.Add(new WmsLayerInfo(i, temp.Name));
-                    }
-                }
-
-            layerDictionary.Add(layer.Name, output);
-            }
-            else
-            {
-                
-            }
-            
-
-            return output;
         }
 
         /// <summary>
@@ -357,8 +297,6 @@ namespace Gbdx
         /// <param name="layerName"></param>
         private static void RemoveLayer(string layerName)
         {
-            int index = -1;
-
             ILayer targetLayer = null;
 
             // search through the layer names looking for the proper layer to delete.
@@ -386,7 +324,7 @@ namespace Gbdx
         private static List<string> CheckSubLayers(ICompositeLayer layer)
         {
             var output = new List<string>();
-            if (layer.Count > 1)
+            if (layer != null && layer.Count > 1)
             {
                 for (int i = 0; i < layer.Count; i++)
                 {
@@ -400,163 +338,7 @@ namespace Gbdx
             }
             return output;
         }
-
-
-        private static int FindLayer(ILayer layer)
-        {
-            for (int i = 0; i < ArcMap.Document.FocusMap.LayerCount; i++)
-            {
-                var templayer = ArcMap.Document.FocusMap.Layer[i];
-                if (templayer.Name != layer.Name)
-                {
-                    return i;
-                }
-            }
-            return -1;
-        }
-
-        private static void ReplaceIdahoIds(ILayer parentLayer, ILayer childLayer, int count)
-        {
-            // idaho id layer name found.  so let's swap it out
-            if (IdahoIdPattern.IsMatch(childLayer.Name))
-            {
-                IGroupLayer refreshedGroupLayer = null;
-
-                if (parentLayer == null)
-                {
-                    refreshedGroupLayer = Refreshlayers(childLayer);
-                    var index = FindLayer(childLayer);
-                    ArcMap.Document.FocusMap.DeleteLayer(childLayer);
-                    ArcMap.Document.FocusMap.MoveLayer(refreshedGroupLayer,index);
-                }
-                else
-                {
-                    refreshedGroupLayer = Refreshlayers(parentLayer);
-                    var index = FindLayer(parentLayer);
-                    ArcMap.Document.FocusMap.DeleteLayer(parentLayer);
-                    ArcMap.Document.FocusMap.MoveLayer(refreshedGroupLayer, index);
-                }
-
-                if (refreshedGroupLayer == null)
-                {
-                    return;
-                }
-                
-                ArcMap.Document.FocusMap.AddLayer(refreshedGroupLayer);
-
-                return;
-            }
-
-            var childCompLayer = childLayer as ICompositeLayer;
-
-            // check to see if the child has any children
-            if (childCompLayer != null && childCompLayer.Count > 1)
-            {
-                // check children layers of current child
-                ReplaceIdahoIds(childLayer, childCompLayer.Layer[0], 0);
-            }
-            else
-            {
-                // Keep checking the other layers of the parent layer
-                var compLayer = (ICompositeLayer) parentLayer;
-                if (count + 1 < compLayer.Count)
-                {
-                    ReplaceIdahoIds(parentLayer, compLayer.Layer[count + 1], count + 1);
-                }
-            }
-        }
-
-        private static ILayer RefreshIdahoId(string idahoID)
-        {
-
-            var wmsMapLayer = CreateWmsMapLayer(idahoID);
-
-            if (wmsMapLayer == null)
-            {
-                return null;
-            }
-
-            var serviceDesc = wmsMapLayer.IWMSGroupLayer_WMSServiceDescription;
-            ILayer wmsLayer = null;
-
-            // add layers for the wms currently there will only be one
-            for (var i = 0; i <= serviceDesc.LayerDescriptionCount - 1; i++)
-            {
-                var layerDesc = serviceDesc.LayerDescription[i];
-
-                var grpLayer = wmsMapLayer.CreateWMSGroupLayers(layerDesc);
-                for (var j = 0; j <= grpLayer.Count - 1; j++)
-                {
-                    wmsLayer = wmsMapLayer;
-                    wmsMapLayer.Name = idahoID;
-                }
-            }
-
-            SublayerVisibleOn(wmsLayer);
-            return wmsLayer;
-        }
         
-        private static List<ILayer> GetLayers(ILayer parent)
-        {
-            var compLayer = parent as ICompositeLayer2;
-            var output = new List<ILayer>();
-
-            if (compLayer == null)
-            {
-                return output;
-            }
-
-            for (int i = 0; i <= compLayer.Count; i++)
-            {
-                output.Add(compLayer.Layer[i]);
-            }
-
-            return output;
-        }
-
-        private static IGroupLayer Refreshlayers(ILayer parent)
-        {
-            var compLayer = parent as ICompositeLayer2;
-            List<ILayer> layerList;
-            if (compLayer!= null && compLayer.Count > 1)
-            {
-                layerList = GetLayers(parent);
-
-                // go through the layers and refresh them if they are idaho id named layers
-                for (int i = 0; i < layerList.Count; i++)
-                {
-                    var layer = layerList[i];
-                    if (IdahoIdPattern.IsMatch(layer.Name))
-                    {
-                        layerList[i] = RefreshIdahoId(layer.Name);
-                    }
-                }
-
-                IGroupLayer groupLayer = new GroupLayerClass();
-                groupLayer.Name = parent.Name;
-
-                for (var j = 0; j < layerList.Count; j++)
-                {
-                    groupLayer.Add(layerList[j]);
-                }
-
-                return groupLayer;
-            }
-
-            return null;
-        }
-    }
-
-    public class WmsLayerInfo
-    {
-        public int LayerIndex { get; set; }
-        public string IdahoId { get; set; }
-
-        public WmsLayerInfo(int index, string id)
-        {
-            this.LayerIndex = index;
-            this.IdahoId = id;
-        }
     }
 }
 
