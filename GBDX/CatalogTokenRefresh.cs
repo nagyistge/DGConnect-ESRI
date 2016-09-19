@@ -296,7 +296,7 @@ namespace Gbdx
         /// </summary>
         /// <param name="layerName"></param>
         private static void RemoveLayer(string layerName)
-        {
+        { 
             ILayer targetLayer = null;
 
             // search through the layer names looking for the proper layer to delete.
