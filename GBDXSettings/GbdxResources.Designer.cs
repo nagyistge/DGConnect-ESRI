@@ -279,17 +279,6 @@ namespace GbdxSettings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Adding a WMS layer on a map not in WGS84 projection can cause adverse viewing effects.
-        ///
-        ///Do you want to continue adding the WMS layer?.
-        /// </summary>
-        public static string projectionMismatchWarning {
-            get {
-                return ResourceManager.GetString("projectionMismatchWarning", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Queued.
         /// </summary>
         public static string Queued {

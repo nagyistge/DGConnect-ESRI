@@ -25,7 +25,6 @@ namespace Gbdx
     using System.Collections.Generic;
     using System.Net;
     using System.Windows;
-    using System.Windows.Forms;
 
     using Encryption;
 
@@ -35,7 +34,6 @@ namespace Gbdx
 
     using Gbdx;
 
-    using GbdxSettings;
     using GbdxSettings.Properties;
 
     using GbdxTools;
@@ -43,8 +41,6 @@ namespace Gbdx
     using NetworkConnections;
 
     using RestSharp;
-
-    using MessageBox = System.Windows.Forms.MessageBox;
 
     /// <summary>
     /// The gbdx cloud helper.
@@ -231,30 +227,9 @@ namespace Gbdx
                 SublayerVisibleOn(wmsLayer);
                 groupLayer.Add(wmsLayer);
             }
-
-            // Check to see if the spatial refrence matches WGS84.  If not throw up a warning.
-            if (ArcMap.Document.FocusMap.SpatialReference.FactoryCode != 4326)
-            {
-                var dialogResult = MessageBox.Show(
-                    GbdxResources.projectionMismatchWarning,
-                    "WARNING",
-                    MessageBoxButtons.YesNo);
-
-                if (dialogResult != DialogResult.Yes)
-                {
-                    return;
-                }
-
-                // turn on sub layers, add it to arcmap and move it to top of TOC
-                ArcMap.Document.AddLayer(groupLayer);
-                ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
-            }
-            else
-            {
-                // turn on sub layers, add it to arcmap and move it to top of TOC
-                ArcMap.Document.AddLayer(groupLayer);
-                ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
-            }
+            // turn on sub layers, add it to arcmap and move it to top of TOC
+            ArcMap.Document.AddLayer(groupLayer);
+            ArcMap.Document.FocusMap.MoveLayer(groupLayer, 0);
         }
 
     }
