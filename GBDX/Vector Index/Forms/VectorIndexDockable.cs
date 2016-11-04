@@ -744,7 +744,7 @@ namespace Gbdx.Vector_Index.Forms
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
                 this.GetGeometries(source, applicationState, attempts+1);
             }
@@ -774,7 +774,7 @@ namespace Gbdx.Vector_Index.Forms
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
                 this.GetTypes(geometryNode, applicationState, attempts+1);
                 return;
@@ -803,7 +803,7 @@ namespace Gbdx.Vector_Index.Forms
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
             // If we have a problem getting the page try again up to max attempts
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
                 this.GetPages(node, pageId, applicationState, totalCount, currentCount, layerName, fileStreamWriter, attempts+1);
                 return;
@@ -875,7 +875,7 @@ namespace Gbdx.Vector_Index.Forms
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
                 this.GetPagingId(node, attempts+1);
                 return;
