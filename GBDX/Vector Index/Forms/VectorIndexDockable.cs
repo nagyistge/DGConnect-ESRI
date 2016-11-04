@@ -910,7 +910,7 @@ namespace Gbdx.Vector_Index.Forms
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
                 this.GetSources(applicationState, attempts+1);
             }
