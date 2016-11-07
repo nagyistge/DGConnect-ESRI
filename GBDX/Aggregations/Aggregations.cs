@@ -1,31 +1,23 @@
 ﻿namespace Gbdx.Aggregations
 {
+    using Encryption;
+    using ESRI.ArcGIS.Carto;
+    using ESRI.ArcGIS.esriSystem;
+    using ESRI.ArcGIS.Framework;
+    using ESRI.ArcGIS.Geodatabase;
+    using ESRI.ArcGIS.Geometry;
+    using GbdxSettings;
+    using GbdxSettings.Properties;
+    using GbdxTools;
+    using global::Aggregations;
+    using NetworkConnections;
+    using RestSharp;
     using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Runtime.InteropServices;
     using System.Text;
     using System.Windows.Forms;
-
-    using Encryption;
-
-    using ESRI.ArcGIS.Carto;
-    using ESRI.ArcGIS.esriSystem;
-    using ESRI.ArcGIS.Framework;
-    using ESRI.ArcGIS.Geodatabase;
-    using ESRI.ArcGIS.Geometry;
-
-    using global::Aggregations;
-
-    using GbdxSettings;
-    using GbdxSettings.Properties;
-
-    using GbdxTools;
-
-    using NetworkConnections;
-
-    using RestSharp;
-
     using DockableWindow = ESRI.ArcGIS.Desktop.AddIns.DockableWindow;
 
     /// <summary>
@@ -70,7 +62,7 @@
         /// </summary>
         private ICommandItem PreviouslySelectedItem { get; set; }
 
-        #endregion
+        #endregion Fields & Properties
 
         public Aggregations(object hook)
         {
@@ -82,18 +74,22 @@
 
             try
             {
-                
-                this.startDatePicker.MaxDate = this.endDatePicker.Value.Date;
-                
-                this.endDatePicker.MinDate = this.startDatePicker.Value.Date;
-                this.endDatePicker.MaxDate = DateTime.Now.Date;
+                this.startDatePicker.MaxDate = DateTime.Now.AddYears(1);
+                this.endDatePicker.MaxDate = DateTime.Now.AddYears(1);
                 this.startDatePicker.Value = DateTime.Now.AddMonths(-1);
+                
                 this.endDatePicker.Value = DateTime.Now.Date;
+
+                this.startDatePicker.MaxDate = this.endDatePicker.Value.Date;
+                this.endDatePicker.MinDate = this.startDatePicker.Value.Date;
             }
             catch (Exception e)
             {
                 Jarvis.Logger.Error(e);
             }
+
+            this.startDatePicker.ValueChanged += EventHandlerDatePickerValueChanged;
+            this.endDatePicker.ValueChanged += EventHandlerDatePickerValueChanged;
 
             // Event handlers for when the group boxes are checked
             this.changeDetectionGroupBox.CheckedChanged += this.EventHandlerCheckBoxGroupCheckChanged;
@@ -716,18 +712,18 @@
             restClient.ExecuteAsync<AccessToken>(
                 request,
                 resp =>
-                    {
-                        Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                {
+                    Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-                        if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
-                        {
-                            this.token = resp.Data.access_token;
-                        }
-                        else
-                        {
-                            this.token = string.Empty;
-                        }
-                    });
+                    if (resp.StatusCode == HttpStatusCode.OK && resp.Data != null)
+                    {
+                        this.token = resp.Data.access_token;
+                    }
+                    else
+                    {
+                        this.token = string.Empty;
+                    }
+                });
         }
 
         public static List<IFeatureLayer> GetFeatureLayersFromToc(IActiveView activeView)
@@ -1338,7 +1334,7 @@
 
             private Aggregations m_windowUI;
 
-            #endregion
+            #endregion Fields & Properties
 
             protected override void Dispose(bool disposing)
             {
@@ -1351,6 +1347,23 @@
             {
                 this.m_windowUI = new Aggregations(this.Hook);
                 return this.m_windowUI.Handle;
+            }
+        }
+
+        private void EventHandlerDatePickerValueChanged(object sender, EventArgs e)
+        {
+            var dateTimePicker = (DateTimePicker) sender;
+
+            // make sure the object isn't null
+            if(dateTimePicker == null)
+            {
+                return;
+            }
+
+            if (dateTimePicker.Name == this.startDatePicker.Name || dateTimePicker.Name == this.endDatePicker.Name)
+            {
+                this.startDatePicker.MaxDate = this.endDatePicker.Value.Date;
+                this.endDatePicker.MinDate = this.startDatePicker.Value.Date;
             }
         }
     }
