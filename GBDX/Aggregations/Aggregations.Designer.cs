@@ -19,7 +19,45 @@
             }
             base.Dispose(disposing);
         }
-
+        private System.Windows.Forms.TableLayoutPanel aggregationsMainTableLayout;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ComboBox QuerySelectionComboBox;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.ComboBox detailLevelComboBox;
+        private System.Windows.Forms.TableLayoutPanel dateRangeTableLayout;
+        private System.Windows.Forms.DateTimePicker endDatePicker;
+        private System.Windows.Forms.Label label3;
+        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.DateTimePicker startDatePicker;
+        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TextBox queryTextBox;
+        private System.Windows.Forms.TabControl mainFormTabControl;
+        private System.Windows.Forms.TabPage aggregationsTabPage;
+        private System.Windows.Forms.TabPage analysisTabPage;
+        private UIToolbox.CheckGroupBox dateRangeCheckGroupBox;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.ComboBox selectionTypeComboBox;
+        private System.Windows.Forms.Button selectAreaButton;
+        private System.Windows.Forms.Button goButton;
+        private System.Windows.Forms.TableLayoutPanel analysisMainTableLayout;
+        private UIToolbox.CheckGroupBox changeDetectionGroupBox;
+        private System.Windows.Forms.Button infoButton;
+        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
+        private System.Windows.Forms.ComboBox aggLayerAComboBox;
+        private System.Windows.Forms.ComboBox aggLayerBComboBox;
+        private System.Windows.Forms.CheckBox includeDiffCheckbox;
+        private UIToolbox.CheckGroupBox multiChangeDetectionGroupBox;
+        private System.Windows.Forms.TableLayoutPanel multiChangeDetectionTableLayout;
+        private System.Windows.Forms.Button multiChangeDetectionInfoButton;
+        private System.Windows.Forms.ListBox changeLayersListBox;
+        private System.Windows.Forms.Button refreshButton;
+        private UIToolbox.CheckGroupBox mltcGroupBox;
+        private System.Windows.Forms.TableLayoutPanel mltcTableLayout;
+        private System.Windows.Forms.Button mltcInfoButton;
+        private System.Windows.Forms.ComboBox focusLayerComboBox;
+        private System.Windows.Forms.Button generateButton;
+        private System.Windows.Forms.Label statusLabel;
+        private System.Windows.Forms.ProgressBar analysisProgressBar;
         #region Windows Form Designer generated code
 
         /// <summary>
@@ -115,7 +153,7 @@
             this.aggregationsMainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 15F));
             this.aggregationsMainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 32F));
             this.aggregationsMainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 49F));
-            this.aggregationsMainTableLayout.Size = new System.Drawing.Size(372, 513);
+            this.aggregationsMainTableLayout.Size = new System.Drawing.Size(372, 516);
             this.aggregationsMainTableLayout.TabIndex = 0;
             // 
             // label1
@@ -123,9 +161,9 @@
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label1.AutoSize = true;
             this.aggregationsMainTableLayout.SetColumnSpan(this.label1, 3);
-            this.label1.Location = new System.Drawing.Point(100, 4);
+            this.label1.Location = new System.Drawing.Point(121, 6);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(171, 17);
+            this.label1.Size = new System.Drawing.Size(129, 13);
             this.label1.TabIndex = 0;
             this.label1.Text = "What are you looking for?";
             // 
@@ -171,10 +209,10 @@
             this.endDatePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.endDatePicker.CustomFormat = "";
             this.endDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.endDatePicker.Location = new System.Drawing.Point(131, 46);
+            this.endDatePicker.Location = new System.Drawing.Point(131, 47);
             this.endDatePicker.MaxDate = new System.DateTime(2016, 7, 21, 0, 0, 0, 0);
             this.endDatePicker.Name = "endDatePicker";
-            this.endDatePicker.Size = new System.Drawing.Size(217, 22);
+            this.endDatePicker.Size = new System.Drawing.Size(217, 20);
             this.endDatePicker.TabIndex = 3;
             this.endDatePicker.Value = new System.DateTime(2016, 7, 21, 0, 0, 0, 0);
             // 
@@ -183,18 +221,18 @@
             this.startDatePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this.startDatePicker.CustomFormat = "";
             this.startDatePicker.Format = System.Windows.Forms.DateTimePickerFormat.Short;
-            this.startDatePicker.Location = new System.Drawing.Point(131, 8);
+            this.startDatePicker.Location = new System.Drawing.Point(131, 9);
             this.startDatePicker.Name = "startDatePicker";
-            this.startDatePicker.Size = new System.Drawing.Size(217, 22);
+            this.startDatePicker.Size = new System.Drawing.Size(217, 20);
             this.startDatePicker.TabIndex = 2;
             // 
             // label4
             // 
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(21, 49);
+            this.label4.Location = new System.Drawing.Point(31, 51);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(86, 17);
+            this.label4.Size = new System.Drawing.Size(66, 13);
             this.label4.TabIndex = 1;
             this.label4.Text = "Ending Date";
             // 
@@ -202,9 +240,9 @@
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(18, 10);
+            this.label3.Location = new System.Drawing.Point(29, 12);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(91, 17);
+            this.label3.Size = new System.Drawing.Size(69, 13);
             this.label3.TabIndex = 0;
             this.label3.Text = "Starting Date";
             // 
@@ -218,18 +256,18 @@
             "What data is available in the region?",
             "What is the twitter sentiment in the region?",
             "What type of data is available in the region?"});
-            this.QuerySelectionComboBox.Location = new System.Drawing.Point(3, 30);
+            this.QuerySelectionComboBox.Location = new System.Drawing.Point(3, 32);
             this.QuerySelectionComboBox.Name = "QuerySelectionComboBox";
-            this.QuerySelectionComboBox.Size = new System.Drawing.Size(366, 24);
+            this.QuerySelectionComboBox.Size = new System.Drawing.Size(366, 21);
             this.QuerySelectionComboBox.TabIndex = 1;
             // 
             // label2
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(20, 77);
+            this.label2.Location = new System.Drawing.Point(30, 79);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(82, 17);
+            this.label2.Size = new System.Drawing.Size(63, 13);
             this.label2.TabIndex = 2;
             this.label2.Text = "Detail Level";
             // 
@@ -248,9 +286,9 @@
             "6",
             "7",
             "8"});
-            this.detailLevelComboBox.Location = new System.Drawing.Point(126, 73);
+            this.detailLevelComboBox.Location = new System.Drawing.Point(126, 75);
             this.detailLevelComboBox.Name = "detailLevelComboBox";
-            this.detailLevelComboBox.Size = new System.Drawing.Size(243, 24);
+            this.detailLevelComboBox.Size = new System.Drawing.Size(243, 21);
             this.detailLevelComboBox.TabIndex = 3;
             // 
             // label5
@@ -258,9 +296,9 @@
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.label5.AutoSize = true;
             this.aggregationsMainTableLayout.SetColumnSpan(this.label5, 2);
-            this.label5.Location = new System.Drawing.Point(3, 245);
+            this.label5.Location = new System.Drawing.Point(3, 247);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(82, 17);
+            this.label5.Size = new System.Drawing.Size(60, 13);
             this.label5.TabIndex = 5;
             this.label5.Text = "Query Filter";
             // 
@@ -275,14 +313,14 @@
             this.queryTextBox.Multiline = true;
             this.queryTextBox.Name = "queryTextBox";
             this.queryTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.queryTextBox.Size = new System.Drawing.Size(366, 142);
+            this.queryTextBox.Size = new System.Drawing.Size(366, 145);
             this.queryTextBox.TabIndex = 6;
             this.queryTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.EventHandlerQueryTextBoxKeyDown);
             // 
             // goButton
             // 
             this.goButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.goButton.Location = new System.Drawing.Point(273, 475);
+            this.goButton.Location = new System.Drawing.Point(273, 478);
             this.goButton.Name = "goButton";
             this.goButton.Size = new System.Drawing.Size(96, 35);
             this.goButton.TabIndex = 12;
@@ -293,7 +331,7 @@
             // selectAreaButton
             // 
             this.selectAreaButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.selectAreaButton.Location = new System.Drawing.Point(3, 475);
+            this.selectAreaButton.Location = new System.Drawing.Point(3, 478);
             this.selectAreaButton.Name = "selectAreaButton";
             this.selectAreaButton.Size = new System.Drawing.Size(96, 35);
             this.selectAreaButton.TabIndex = 11;
@@ -305,9 +343,9 @@
             // 
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(10, 439);
+            this.label6.Location = new System.Drawing.Point(22, 444);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(102, 17);
+            this.label6.Size = new System.Drawing.Size(78, 13);
             this.label6.TabIndex = 9;
             this.label6.Text = "Selection Type";
             // 
@@ -320,9 +358,9 @@
             this.selectionTypeComboBox.Items.AddRange(new object[] {
             "Draw Rectangle",
             "Use Selected Polygon"});
-            this.selectionTypeComboBox.Location = new System.Drawing.Point(126, 435);
+            this.selectionTypeComboBox.Location = new System.Drawing.Point(126, 440);
             this.selectionTypeComboBox.Name = "selectionTypeComboBox";
-            this.selectionTypeComboBox.Size = new System.Drawing.Size(243, 24);
+            this.selectionTypeComboBox.Size = new System.Drawing.Size(243, 21);
             this.selectionTypeComboBox.TabIndex = 10;
             // 
             // mainFormTabControl
@@ -342,10 +380,10 @@
             // 
             this.aggregationsTabPage.BackColor = System.Drawing.SystemColors.Control;
             this.aggregationsTabPage.Controls.Add(this.aggregationsMainTableLayout);
-            this.aggregationsTabPage.Location = new System.Drawing.Point(4, 25);
+            this.aggregationsTabPage.Location = new System.Drawing.Point(4, 22);
             this.aggregationsTabPage.Name = "aggregationsTabPage";
             this.aggregationsTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.aggregationsTabPage.Size = new System.Drawing.Size(384, 525);
+            this.aggregationsTabPage.Size = new System.Drawing.Size(384, 528);
             this.aggregationsTabPage.TabIndex = 0;
             this.aggregationsTabPage.Text = "Aggregations";
             // 
@@ -353,10 +391,10 @@
             // 
             this.analysisTabPage.BackColor = System.Drawing.SystemColors.Control;
             this.analysisTabPage.Controls.Add(this.analysisMainTableLayout);
-            this.analysisTabPage.Location = new System.Drawing.Point(4, 25);
+            this.analysisTabPage.Location = new System.Drawing.Point(4, 22);
             this.analysisTabPage.Name = "analysisTabPage";
             this.analysisTabPage.Padding = new System.Windows.Forms.Padding(3);
-            this.analysisTabPage.Size = new System.Drawing.Size(384, 525);
+            this.analysisTabPage.Size = new System.Drawing.Size(384, 528);
             this.analysisTabPage.TabIndex = 1;
             this.analysisTabPage.Text = "Analysis";
             // 
@@ -386,13 +424,13 @@
             this.analysisMainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
             this.analysisMainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 27F));
             this.analysisMainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 24F));
-            this.analysisMainTableLayout.Size = new System.Drawing.Size(372, 513);
+            this.analysisMainTableLayout.Size = new System.Drawing.Size(372, 516);
             this.analysisMainTableLayout.TabIndex = 0;
             // 
             // refreshButton
             // 
             this.refreshButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.refreshButton.Location = new System.Drawing.Point(3, 482);
+            this.refreshButton.Location = new System.Drawing.Point(3, 485);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(82, 28);
             this.refreshButton.TabIndex = 4;
@@ -459,9 +497,9 @@
             this.tableLayoutPanel1.SetColumnSpan(this.aggLayerAComboBox, 3);
             this.aggLayerAComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.aggLayerAComboBox.FormattingEnabled = true;
-            this.aggLayerAComboBox.Location = new System.Drawing.Point(3, 40);
+            this.aggLayerAComboBox.Location = new System.Drawing.Point(3, 42);
             this.aggLayerAComboBox.Name = "aggLayerAComboBox";
-            this.aggLayerAComboBox.Size = new System.Drawing.Size(351, 24);
+            this.aggLayerAComboBox.Size = new System.Drawing.Size(351, 21);
             this.aggLayerAComboBox.TabIndex = 1;
             // 
             // aggLayerBComboBox
@@ -472,7 +510,7 @@
             this.aggLayerBComboBox.FormattingEnabled = true;
             this.aggLayerBComboBox.Location = new System.Drawing.Point(3, 75);
             this.aggLayerBComboBox.Name = "aggLayerBComboBox";
-            this.aggLayerBComboBox.Size = new System.Drawing.Size(351, 24);
+            this.aggLayerBComboBox.Size = new System.Drawing.Size(351, 21);
             this.aggLayerBComboBox.TabIndex = 2;
             // 
             // includeDiffCheckbox
@@ -480,9 +518,9 @@
             this.includeDiffCheckbox.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.includeDiffCheckbox.AutoSize = true;
             this.tableLayoutPanel1.SetColumnSpan(this.includeDiffCheckbox, 2);
-            this.includeDiffCheckbox.Location = new System.Drawing.Point(3, 104);
+            this.includeDiffCheckbox.Location = new System.Drawing.Point(3, 106);
             this.includeDiffCheckbox.Name = "includeDiffCheckbox";
-            this.includeDiffCheckbox.Size = new System.Drawing.Size(123, 21);
+            this.includeDiffCheckbox.Size = new System.Drawing.Size(96, 17);
             this.includeDiffCheckbox.TabIndex = 3;
             this.includeDiffCheckbox.Text = "Include % Diffs";
             this.includeDiffCheckbox.UseVisualStyleBackColor = true;
@@ -542,17 +580,16 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.multiChangeDetectionTableLayout.SetColumnSpan(this.changeLayersListBox, 3);
             this.changeLayersListBox.FormattingEnabled = true;
-            this.changeLayersListBox.ItemHeight = 16;
             this.changeLayersListBox.Location = new System.Drawing.Point(3, 39);
             this.changeLayersListBox.Name = "changeLayersListBox";
             this.changeLayersListBox.SelectionMode = System.Windows.Forms.SelectionMode.MultiSimple;
-            this.changeLayersListBox.Size = new System.Drawing.Size(345, 84);
+            this.changeLayersListBox.Size = new System.Drawing.Size(345, 82);
             this.changeLayersListBox.TabIndex = 6;
             // 
             // generateButton
             // 
             this.generateButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.generateButton.Location = new System.Drawing.Point(287, 482);
+            this.generateButton.Location = new System.Drawing.Point(287, 485);
             this.generateButton.Name = "generateButton";
             this.generateButton.Size = new System.Drawing.Size(82, 28);
             this.generateButton.TabIndex = 3;
@@ -614,18 +651,18 @@
             this.mltcTableLayout.SetColumnSpan(this.focusLayerComboBox, 3);
             this.focusLayerComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.focusLayerComboBox.FormattingEnabled = true;
-            this.focusLayerComboBox.Location = new System.Drawing.Point(3, 42);
+            this.focusLayerComboBox.Location = new System.Drawing.Point(3, 44);
             this.focusLayerComboBox.Name = "focusLayerComboBox";
-            this.focusLayerComboBox.Size = new System.Drawing.Size(348, 24);
+            this.focusLayerComboBox.Size = new System.Drawing.Size(348, 21);
             this.focusLayerComboBox.TabIndex = 6;
             // 
             // statusLabel
             // 
             this.statusLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.statusLabel.AutoSize = true;
-            this.statusLabel.Location = new System.Drawing.Point(3, 421);
+            this.statusLabel.Location = new System.Drawing.Point(3, 423);
             this.statusLabel.Name = "statusLabel";
-            this.statusLabel.Size = new System.Drawing.Size(56, 17);
+            this.statusLabel.Size = new System.Drawing.Size(43, 13);
             this.statusLabel.TabIndex = 5;
             this.statusLabel.Text = "Status: ";
             // 
@@ -670,45 +707,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TableLayoutPanel aggregationsMainTableLayout;
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.ComboBox QuerySelectionComboBox;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.ComboBox detailLevelComboBox;
-        private System.Windows.Forms.TableLayoutPanel dateRangeTableLayout;
-        private System.Windows.Forms.DateTimePicker endDatePicker;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.DateTimePicker startDatePicker;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.TextBox queryTextBox;
-        private System.Windows.Forms.TabControl mainFormTabControl;
-        private System.Windows.Forms.TabPage aggregationsTabPage;
-        private System.Windows.Forms.TabPage analysisTabPage;
-        private UIToolbox.CheckGroupBox dateRangeCheckGroupBox;
-        private System.Windows.Forms.Label label6;
-        private System.Windows.Forms.ComboBox selectionTypeComboBox;
-        private System.Windows.Forms.Button selectAreaButton;
-        private System.Windows.Forms.Button goButton;
-        private System.Windows.Forms.TableLayoutPanel analysisMainTableLayout;
-        private UIToolbox.CheckGroupBox changeDetectionGroupBox;
-        private System.Windows.Forms.Button infoButton;
-        private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
-        private System.Windows.Forms.ComboBox aggLayerAComboBox;
-        private System.Windows.Forms.ComboBox aggLayerBComboBox;
-        private System.Windows.Forms.CheckBox includeDiffCheckbox;
-        private UIToolbox.CheckGroupBox multiChangeDetectionGroupBox;
-        private System.Windows.Forms.TableLayoutPanel multiChangeDetectionTableLayout;
-        private System.Windows.Forms.Button multiChangeDetectionInfoButton;
-        private System.Windows.Forms.ListBox changeLayersListBox;
-        private System.Windows.Forms.Button refreshButton;
-        private UIToolbox.CheckGroupBox mltcGroupBox;
-        private System.Windows.Forms.TableLayoutPanel mltcTableLayout;
-        private System.Windows.Forms.Button mltcInfoButton;
-        private System.Windows.Forms.ComboBox focusLayerComboBox;
-        private System.Windows.Forms.Button generateButton;
-        private System.Windows.Forms.Label statusLabel;
-        private System.Windows.Forms.ProgressBar analysisProgressBar;
+        
 
     }
 }
