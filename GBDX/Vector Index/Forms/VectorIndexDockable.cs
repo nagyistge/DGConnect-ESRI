@@ -954,7 +954,9 @@ namespace Gbdx.Vector_Index.Forms
             }
             else
             {
-                geometries.Add(poly);
+                // project the geometry to WGS84 only projection compatible on the backend
+                var projectedPoly = Jarvis.ProjectToWGS84(poly);
+                geometries.Add(projectedPoly);
             }
 
             // check to see if features were selected
