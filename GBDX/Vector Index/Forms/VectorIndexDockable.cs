@@ -669,7 +669,6 @@ namespace Gbdx.Vector_Index.Forms
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json", this.Aoi, ParameterType.RequestBody);
-            attempts++;
 
             client.ExecuteAsync<SourceTypeResponseObject>(
                 request,
