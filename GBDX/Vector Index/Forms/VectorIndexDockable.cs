@@ -75,7 +75,7 @@ namespace Gbdx.Vector_Index.Forms
         /// <summary>
         ///     Max number of attempts before an error message is displayed.
         /// </summary>
-        private const int MaxAttempts = 5;
+        private const int MaxAttempts = 3;
 
         /// <summary>
         ///     Random number generator meant to create a new state number for certain kinds of events.
@@ -669,7 +669,6 @@ namespace Gbdx.Vector_Index.Forms
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
             request.AddParameter("application/json", this.Aoi, ParameterType.RequestBody);
-            attempts++;
 
             client.ExecuteAsync<SourceTypeResponseObject>(
                 request,
@@ -744,9 +743,9 @@ namespace Gbdx.Vector_Index.Forms
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
-                this.GetGeometries(source, applicationState, attempts);
+                this.GetGeometries(source, applicationState, attempts+1);
             }
 
             if (applicationState == this.currentApplicationState)
@@ -774,9 +773,9 @@ namespace Gbdx.Vector_Index.Forms
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
-                this.GetTypes(geometryNode, applicationState, attempts);
+                this.GetTypes(geometryNode, applicationState, attempts+1);
                 return;
             }
 
@@ -803,9 +802,9 @@ namespace Gbdx.Vector_Index.Forms
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
             // If we have a problem getting the page try again up to max attempts
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
-                this.GetPages(node, pageId, applicationState, totalCount, currentCount, layerName, fileStreamWriter, attempts);
+                this.GetPages(node, pageId, applicationState, totalCount, currentCount, layerName, fileStreamWriter, attempts+1);
                 return;
             }
 
@@ -875,9 +874,9 @@ namespace Gbdx.Vector_Index.Forms
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
-                this.GetPagingId(node, attempts);
+                this.GetPagingId(node, attempts+1);
                 return;
             }
 
@@ -910,9 +909,9 @@ namespace Gbdx.Vector_Index.Forms
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
-            if (resp.Data == null || resp.StatusCode != HttpStatusCode.OK && attempts <= MaxAttempts)
+            if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
-                this.GetSources(applicationState, attempts);
+                this.GetSources(applicationState, attempts+1);
             }
 
             if (applicationState == this.currentApplicationState)
@@ -954,7 +953,9 @@ namespace Gbdx.Vector_Index.Forms
             }
             else
             {
-                geometries.Add(poly);
+                // project the geometry to WGS84 only projection compatible on the backend
+                var projectedPoly = Jarvis.ProjectToWGS84(poly);
+                geometries.Add(projectedPoly);
             }
 
             // check to see if features were selected
