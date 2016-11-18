@@ -2194,8 +2194,7 @@ namespace Gbdx.Gbd
 
                 this.DrawViewablePolygons();
 
-                this.dataGridView1.FirstDisplayedScrollingRowIndex = index;
-                this.dataGridView1.FirstDisplayedScrollingColumnIndex = horizIndex;
+                
 
                 var dataGridViewColumn = this.dataGridView1.Columns["Selected"];
                 if (dataGridViewColumn != null)
@@ -2208,7 +2207,22 @@ namespace Gbdx.Gbd
                         this.DrawCheckedPolygons();
                     }
                 }
+                try
+                {
+                    if(index > -1)
+                    {
+                        this.dataGridView1.FirstDisplayedScrollingRowIndex = index;
+                    }
 
+                    if(horizIndex > -1)
+                    {
+                        this.dataGridView1.FirstDisplayedScrollingColumnIndex = horizIndex;
+                    }
+                }
+                catch (Exception error)
+                {
+                    Jarvis.Logger.Error(error);
+                }
                 this.UpdateSelectedAndTotalLabels();
             }
             catch (Exception e)
