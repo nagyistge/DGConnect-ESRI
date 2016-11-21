@@ -1694,6 +1694,7 @@ namespace Gbdx.Gbd
                     break;
 
                 case "WORLDVIEW_8_BAND":
+                case "BGRN":
                     IdahoIdRepo.AddSingleMsId(catalogId, imageId);
 
                     currentValue = row["MS ID"].ToString();
