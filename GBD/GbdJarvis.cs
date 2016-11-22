@@ -85,6 +85,8 @@ namespace GBD
         {
             List<GbdPoint> points = new List<GbdPoint>();
             var wktString = wkt.Replace("POLYGON ((", string.Empty);
+            wktString = wktString.Replace("POLYGON((", string.Empty);
+
             wktString = wktString.Replace("))", string.Empty);
             var coordPairs = wktString.Split(',');
             foreach (var pair in coordPairs)

@@ -47,6 +47,8 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.catalogIdSearchTextBox = new System.Windows.Forms.TextBox();
+            this.label8 = new System.Windows.Forms.Label();
+            this.idahoIdOnlyComboBox = new System.Windows.Forms.ComboBox();
             this.mainTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.thumbnailPictureBox = new System.Windows.Forms.PictureBox();
@@ -60,8 +62,6 @@
             this.orderStatusTableLayout = new System.Windows.Forms.TableLayoutPanel();
             this.orderDataGridView = new System.Windows.Forms.DataGridView();
             this.refreshButton = new System.Windows.Forms.Button();
-            this.label8 = new System.Windows.Forms.Label();
-            this.idahoIdOnlyComboBox = new System.Windows.Forms.ComboBox();
             this.sensorOptionsLayoutPanel.SuspendLayout();
             this.toFromDateTimePickerLayoutPanel.SuspendLayout();
             this.mainTableLayout.SuspendLayout();
@@ -372,6 +372,32 @@
             this.catalogIdSearchTextBox.TabIndex = 7;
             this.catalogIdSearchTextBox.TextChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
+            // label8
+            // 
+            this.label8.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.label8.AutoSize = true;
+            this.label8.Location = new System.Drawing.Point(43, 367);
+            this.label8.Name = "label8";
+            this.label8.Size = new System.Drawing.Size(48, 13);
+            this.label8.TabIndex = 12;
+            this.label8.Text = "Idaho ID";
+            // 
+            // idahoIdOnlyComboBox
+            // 
+            this.idahoIdOnlyComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this.idahoIdOnlyComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.idahoIdOnlyComboBox.FormattingEnabled = true;
+            this.idahoIdOnlyComboBox.Items.AddRange(new object[] {
+            "",
+            "Both",
+            "MS",
+            "PAN"});
+            this.idahoIdOnlyComboBox.Location = new System.Drawing.Point(137, 363);
+            this.idahoIdOnlyComboBox.Name = "idahoIdOnlyComboBox";
+            this.idahoIdOnlyComboBox.Size = new System.Drawing.Size(135, 21);
+            this.idahoIdOnlyComboBox.TabIndex = 13;
+            this.idahoIdOnlyComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
+            // 
             // mainTableLayout
             // 
             this.mainTableLayout.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -551,32 +577,6 @@
             this.refreshButton.Text = "Refresh";
             this.refreshButton.UseVisualStyleBackColor = true;
             this.refreshButton.Click += new System.EventHandler(this.RefreshButtonClick);
-            // 
-            // label8
-            // 
-            this.label8.Anchor = System.Windows.Forms.AnchorStyles.None;
-            this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(43, 367);
-            this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(48, 13);
-            this.label8.TabIndex = 12;
-            this.label8.Text = "Idaho ID";
-            // 
-            // idahoIdOnlyComboBox
-            // 
-            this.idahoIdOnlyComboBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.idahoIdOnlyComboBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.idahoIdOnlyComboBox.FormattingEnabled = true;
-            this.idahoIdOnlyComboBox.Items.AddRange(new object[] {
-            "",
-            "Both",
-            "MS",
-            "PAN"});
-            this.idahoIdOnlyComboBox.Location = new System.Drawing.Point(137, 363);
-            this.idahoIdOnlyComboBox.Name = "idahoIdOnlyComboBox";
-            this.idahoIdOnlyComboBox.Size = new System.Drawing.Size(135, 21);
-            this.idahoIdOnlyComboBox.TabIndex = 13;
-            this.idahoIdOnlyComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
             // GbdDockableWindow
             // 
