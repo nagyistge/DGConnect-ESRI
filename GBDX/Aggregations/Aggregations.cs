@@ -26,6 +26,10 @@
     /// </summary>
     public partial class Aggregations : UserControl
     {
+        public delegate void SendAnInt(int val);
+
+        public delegate void UpdateAggWindowPbar(int max, int min, int val);
+
         #region Fields & Properties
 
         private const string StatusLabelPrefix = "Status: ";

@@ -8,10 +8,10 @@ using System.Text.RegularExpressions;
 namespace Gbdx.Aggregations {
  public class PivotTableAnalyzer {
 
-  private SendAnInt pbarValueUpdate;
-  private UpdateAggWindowPbar pbarUpdate;
+  private Aggregations.SendAnInt pbarValueUpdate;
+  private Aggregations.UpdateAggWindowPbar pbarUpdate;
 
-   public PivotTableAnalyzer(SendAnInt pbarValueUpdate,UpdateAggWindowPbar pbarUpdate) {
+   public PivotTableAnalyzer(Aggregations.SendAnInt pbarValueUpdate,Aggregations.UpdateAggWindowPbar pbarUpdate) {
      this.pbarValueUpdate = pbarValueUpdate;
      this.pbarUpdate = pbarUpdate;
    }
