@@ -58,9 +58,7 @@ namespace Gbdx.Aggregations
     using MessageBox = System.Windows.Forms.MessageBox;
     using UserControl = System.Windows.Controls.UserControl;
 
-    public delegate void SendAnInt(int val);
-
-    public delegate void UpdateAggWindowPbar(int max, int min, int val);
+    
 
     /// <summary>
     ///     Designer class of the dockable window add-in. It contains WPF user interfaces that

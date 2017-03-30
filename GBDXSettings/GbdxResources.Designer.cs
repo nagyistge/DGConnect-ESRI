@@ -398,7 +398,7 @@ namespace GbdxSettings {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Go to https://gbdx.geobigdata.io/account/login/ - Login &gt; User Settings &gt; API Key.
+        ///   Looks up a localized string similar to Go to https://gbdx.geobigdata.io/login/ - Login &gt; Profile&gt; API Key.
         /// </summary>
         public static string whereToGetApiKey {
             get {
