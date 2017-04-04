@@ -602,7 +602,7 @@ namespace Gbdx.Vector_Index.Forms
                 resp => this.ProcessGeometries(resp, source, applicationState, attempts));
         }
 
-        private void GetPages(TreeNode node, string pageId, int applicationState, int totalCount, int currentCount, string layerName, StreamWriter fileStreamWriter, int attempts = 0)
+        private void GetPages(TreeNode node, string pageId, int applicationState, string currentCount, string layerName, StreamWriter fileStreamWriter, int attempts = 0)
         {
             var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
             var request = new RestRequest("/insight-vector/api/esri/paging", Method.POST);
@@ -617,7 +617,7 @@ namespace Gbdx.Vector_Index.Forms
             attempts++;
             client.ExecuteAsync<PagedData2>(
                 request,
-                resp => this.ProcessPage(node, resp, applicationState, totalCount, currentCount, pageId, layerName, fileStreamWriter, attempts));
+                resp => this.ProcessPage(node, resp, applicationState, currentCount, pageId, layerName, fileStreamWriter, attempts));
         }
 
         //private void UpdateStatus(TreeNode node, )
@@ -655,8 +655,7 @@ namespace Gbdx.Vector_Index.Forms
             request.AddParameter("application/json", this.Aoi, ParameterType.RequestBody);
 
             attempts++;
-
-            client.ExecuteAsync<PageId>(request, resp => this.ProcessPagingId(resp, attempts, node, applicationState));
+            client.ExecuteAsync<PagedData2>(request, resp => this.ProcessPagingId(resp, attempts, node, applicationState));
         }
 
         private void GetSources(int applicationState, int attempts = 0)
@@ -791,20 +790,19 @@ namespace Gbdx.Vector_Index.Forms
         /// <param name="node"></param>
         /// <param name="resp">IRestResponse</param>
         /// <param name="applicationState"></param>
-        /// <param name="totalCount"></param>
-        /// <param name="currentCount"></param>
+        /// <param name="strCount"></param>
         /// <param name="pageId">page id for the next page of results</param>
         /// <param name="layerName">name of the layer that will be made</param>
         /// <param name="fileStreamWriter">streamwriter to the tempfile</param>
         /// <param name="attempts">number of attempts to make before erroring out</param>
-        private void ProcessPage(TreeNode node, IRestResponse<PagedData2> resp, int applicationState, int totalCount, int currentCount, string pageId, string layerName, StreamWriter fileStreamWriter, int attempts)
+        private void ProcessPage(TreeNode node, IRestResponse<PagedData2> resp, int applicationState, string strCount, string pageId, string layerName, StreamWriter fileStreamWriter, int attempts)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
             // If we have a problem getting the page try again up to max attempts
             if ((resp.Data == null || resp.StatusCode != HttpStatusCode.OK) && attempts <= MaxAttempts)
             {
-                this.GetPages(node, pageId, applicationState, totalCount, currentCount, layerName, fileStreamWriter, attempts+1);
+                this.GetPages(node, pageId, applicationState, strCount, layerName, fileStreamWriter, attempts+1);
                 return;
             }
 
@@ -820,16 +818,22 @@ namespace Gbdx.Vector_Index.Forms
                     int count;
                     var result = int.TryParse(resp.Data.item_count, out count);
 
+                    int currentCount = int.Parse(strCount);
+
                     if (result)
                     {
                         currentCount += count;
                     }
+                    int total;
 
-                    var message = string.Format("Downloading {0}%", currentCount / totalCount * 100);
-                    this.Invoke(new UpdateStatusText(this.UpdateTreeNodeStatus), node, message);
-
+                    if (int.TryParse(resp.Data.total_count, out total))
+                    {
+                        double percentage = Math.Floor(((double) currentCount / total) * 100);
+                        var message = $"Downloading {percentage}%";
+                        this.Invoke(new UpdateStatusText(this.UpdateTreeNodeStatus), node, message);
+                    }
                     // Continue getting the rest of the associated pages.
-                    this.GetPages(node, resp.Data.next_paging_id, applicationState, totalCount, currentCount, layerName, fileStreamWriter);
+                    this.GetPages(node, resp.Data.next_paging_id, applicationState, currentCount.ToString(), layerName, fileStreamWriter);
                 }
                 else
                 {
@@ -870,7 +874,7 @@ namespace Gbdx.Vector_Index.Forms
             }
         }
 
-        private void ProcessPagingId(IRestResponse<PageId> resp, int attempts, TreeNode node, int applicationState)
+        private void ProcessPagingId(IRestResponse<PagedData2> resp, int attempts, TreeNode node, int applicationState)
         {
             Jarvis.Logger.Info(resp.ResponseUri.ToString());
 
@@ -887,7 +891,8 @@ namespace Gbdx.Vector_Index.Forms
 
             if (applicationState == this.currentApplicationState)
             {
-                this.GetPages(node, resp.Data.pagingId, applicationState, resp.Data.itemCount,0, typeNode.Type.Name, fileStreamWriter);
+                this.ProcessPage(node, resp, applicationState,"0", resp.Data.next_paging_id,
+                    typeNode.Type.Name, fileStreamWriter, 0);
             }
         }
 
