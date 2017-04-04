@@ -19,6 +19,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+
+
 namespace Gbdx.Vector_Index.Forms
 {
     using System;
@@ -33,6 +35,7 @@ namespace Gbdx.Vector_Index.Forms
 
     using Encryption;
 
+	using ESRI.ArcGIS;
     using ESRI.ArcGIS.Carto;
     using ESRI.ArcGIS.esriSystem;
     using ESRI.ArcGIS.Framework;
@@ -649,6 +652,10 @@ namespace Gbdx.Vector_Index.Forms
 
             var client = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
 
+
+            RuntimeInfo arcRuntimeInfo = RuntimeManager.ActiveRuntime;
+
+            client.UserAgent += arcRuntimeInfo.Product + " " +arcRuntimeInfo.Version;
             var request = new RestRequest(addressUrl, Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
