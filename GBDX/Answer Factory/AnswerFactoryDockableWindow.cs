@@ -474,7 +474,7 @@ namespace Gbdx.Answer_Factory
         }
 
         private void GetPageIdResponseProcess(
-            IRestResponse<PageId> resp,
+            IRestResponse<PagedData2> resp,
             string geometry,
             string type,
             string query,
@@ -498,13 +498,12 @@ namespace Gbdx.Answer_Factory
             }
             if (resp.Data != null)
             {
-                var pageId = resp.Data.pagingId;
+                var pageId = resp.Data.next_paging_id;
                 var tempFile = Path.GetTempFileName();
 
                 var fileStream = File.Open(tempFile, FileMode.Append);
                 var fileStreamWriter = new StreamWriter(fileStream);
-
-                this.GetPages(pageId, token, client, fileStreamWriter, layerName);
+                this.ProcessPageResponse(resp, token, pageId, client, layerName, 0, fileStreamWriter);
             }
         }
 
@@ -550,7 +549,7 @@ namespace Gbdx.Answer_Factory
 
             attempts ++;
 
-            client.ExecuteAsync<PageId>(
+            client.ExecuteAsync<PagedData2>(
                 request,
                 resp =>
                 this.GetPageIdResponseProcess(resp, geometry, type, query, token, aoi, client, layerName, attempts));
