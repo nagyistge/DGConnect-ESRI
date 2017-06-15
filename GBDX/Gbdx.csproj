@@ -52,7 +52,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <RegisterForComInterop>false</RegisterForComInterop>
+    <RegisterForComInterop>true</RegisterForComInterop>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
@@ -63,6 +63,9 @@
     <Reference Include="Encryption, Version=1.2.5672.25579, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Libraries\Encryption.dll</HintPath>
+    </Reference>
+    <Reference Include="ESRI.ArcGIS.ADF.Local, Version=10.4.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="ESRI.ArcGIS.Carto, Version=10.0.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
@@ -109,6 +112,10 @@
     </Reference>
     <Reference Include="ESRI.ArcGIS.System">
       <Private>False</Private>
+    </Reference>
+    <Reference Include="ESRI.ArcGIS.SystemUI, Version=10.4.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <Reference Include="ESRI.ArcGIS.Version, Version=10.4.0.0, Culture=neutral, PublicKeyToken=8fc3cc631e44ad86, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -174,6 +181,13 @@
     <Compile Include="Gbd\GbdDockableWindow.Designer.cs">
       <DependentUpon>GbdDockableWindow.cs</DependentUpon>
     </Compile>
+    <Compile Include="Gbd\GbdDockableWindow2.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Gbd\GbdDockableWindow2.Designer.cs">
+      <DependentUpon>GbdDockableWindow2.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Gbd\GbdDockableWindow2Command.cs" />
     <Compile Include="Gbd\GbdRelay.cs" />
     <Compile Include="Gbd\Selector.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -270,6 +284,10 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Gbd\GbdDockableWindow.resx">
       <DependentUpon>GbdDockableWindow.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Gbd\GbdDockableWindow2.resx">
+      <DependentUpon>GbdDockableWindow2.cs</DependentUpon>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -382,6 +400,9 @@
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\CatalogTokenRefresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Gbd\GbdDockableWindow2Command.bmp" />
   </ItemGroup>
   <PropertyGroup>
     <ZipFileExtension>esriAddIn</ZipFileExtension>

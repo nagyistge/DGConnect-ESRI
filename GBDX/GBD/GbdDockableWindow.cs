@@ -245,36 +245,36 @@ namespace Gbdx.Gbd
 
             this.localDatatable = this.CreateDataTable();
 
-            this.dataGridView1.CellFormatting += this.EventHandlerCellFormatting;
+            //this.dataGridView1.CellFormatting += this.EventHandlerCellFormatting;
 
             this.workQueue = Queue.Synchronized(new Queue());
             this.dataView = new DataView(this.localDatatable);
 
-            this.dataGridView1.DataSource = this.dataView;
+            //this.dataGridView1.DataSource = this.dataView;
 
             var dataGridViewColumnHeaderStyle = new DataGridViewCellStyle();
             dataGridViewColumnHeaderStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
 
-            this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewColumnHeaderStyle;
+            //this.dataGridView1.ColumnHeadersDefaultCellStyle = dataGridViewColumnHeaderStyle;
 
-            var dataGridViewColumn = this.dataGridView1.Columns["Pan"];
-            if (dataGridViewColumn != null)
-            {
-                dataGridViewColumn.CellTemplate = new DataGridViewDisableCheckBoxCell();
-            }
+            //var dataGridViewColumn = this.Columns["Pan"];
+            //if (dataGridViewColumn != null)
+            //{
+            //    dataGridViewColumn.CellTemplate = new DataGridViewDisableCheckBoxCell();
+            //}
 
-            var dataGridViewColumnMs = this.dataGridView1.Columns["MS"];
-            if (dataGridViewColumnMs != null)
-            {
-                dataGridViewColumnMs.CellTemplate = new DataGridViewDisableCheckBoxCell();
-            }
+            //var dataGridViewColumnMs = this.dataGridView1.Columns["MS"];
+            //if (dataGridViewColumnMs != null)
+            //{
+            //    dataGridViewColumnMs.CellTemplate = new DataGridViewDisableCheckBoxCell();
+            //}
             // Set the current DateTime to last year
-            this.fromDateTimePicker.Value = DateTime.Now.AddMonths(-1);
+            this.startDateTimePicker.Value = DateTime.Now.AddMonths(-1);
             this.startTime = DateTime.Now.AddMonths(-1);
-            this.toDateTimePicker.Value = DateTime.Now;
+            this.endDateTimePicker.Value = DateTime.Now;
             this.endTime = DateTime.Now;
 
-            this.dataGridView1.CellClick += this.DataGridView1SelectionChanged;
+            this.data_grid_view.CellClick += this.DataGridView1SelectionChanged;
             this.allResults = new Dictionary<string, Properties>();
 
             this.thumbnailPictureBox.LoadCompleted += this.ThumbnailPictureBoxLoadCompleted;
@@ -286,24 +286,24 @@ namespace Gbdx.Gbd
             // Initialize the hashset and dictionary required for displaying mass polygons.
             this.userSelectedPolygons = new HashSet<string>();
 
-            this.dataGridView1.CellContentClick += this.EventHandlerCellContentClick;
+            this.data_grid_view.CellContentClick += this.EventHandlerCellContentClick;
             this.usedIdahoIds = new Dictionary<string, string>();
-            try
-            {
-                this.cbHeader = new DataGridViewCheckBoxHeaderCell();
+            //try
+            //{
+            //    this.cbHeader = new DataGridViewCheckBoxHeaderCell();
 
-                if (this.dataGridView1.Columns["Selected"] != null)
-                {
-                    this.dataGridView1.Columns["Selected"].HeaderCell = this.cbHeader;
+            //    if (this.dataGridView1.Columns["Selected"] != null)
+            //    {
+            //        this.dataGridView1.Columns["Selected"].HeaderCell = this.cbHeader;
 
-                    // Change the column width to something more reasonable. 
-                    this.dataGridView1.Columns["Selected"].Width = 29;
-                }
-            }
-            catch (Exception error)
-            {
-                Jarvis.Logger.Error(error);
-            }
+            //        // Change the column width to something more reasonable. 
+            //        this.dataGridView1.Columns["Selected"].Width = 29;
+            //    }
+            //}
+            //catch (Exception error)
+            //{
+            //    Jarvis.Logger.Error(error);
+            //}
 
             this.exportButton.Text = Settings.Default.baseUrl.Equals(Settings.Default.DefaultBaseUrl)
                                          ? "Export"
@@ -323,7 +323,7 @@ namespace Gbdx.Gbd
             }
 
             this.MouseLeave += this.GbdDockableWindowMouseLeave;
-            this.dataGridView1.MouseLeave += this.GbdDockableWindowMouseLeave;
+            this.data_grid_view.MouseLeave += this.GbdDockableWindowMouseLeave;
         }
 
         /// <summary>
@@ -509,13 +509,13 @@ namespace Gbdx.Gbd
             var temp = (DateTimePicker)sender;
 
             // Check to see which date time picker is being used
-            if (temp.Name == this.fromDateTimePicker.Name)
+            if (temp.Name == this.startDateTimePicker.Name)
             {
-                this.SetDate(ref this.fromDateTimePicker, ref this.startTime);
+                this.SetDate(ref this.startDateTimePicker, ref this.startTime);
             }
             else
             {
-                this.SetDate(ref this.toDateTimePicker, ref this.endTime);
+                this.SetDate(ref this.endDateTimePicker, ref this.endTime);
             }
         }
 
@@ -564,33 +564,33 @@ namespace Gbdx.Gbd
 
         private bool CheckSelectedCellClick(object sender, DataGridViewCellEventArgs e)
         {
-            var cell = this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
+            //var cell = this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex];
 
-            if (string.Equals(cell.OwningColumn.Name, "Selected"))
-            {
-                var formattedValue = this.dataGridView1.Rows[e.RowIndex].Cells["Catalog ID"].FormattedValue;
+            //if (string.Equals(cell.OwningColumn.Name, "Selected"))
+            //{
+            //    var formattedValue = this.dataGridView1.Rows[e.RowIndex].Cells["Catalog ID"].FormattedValue;
 
-                if (formattedValue != null)
-                {
-                    // Once null check has been completed convert it to string
-                    var catId = formattedValue.ToString();
+            //    if (formattedValue != null)
+            //    {
+            //        // Once null check has been completed convert it to string
+            //        var catId = formattedValue.ToString();
 
-                    // Find the row that has the corresponding catalog id
-                    var result = this.localDatatable.Select("[Catalog ID] = '" + catId + "'");
-                    if (result.Length == 0)
-                    {
-                        return false;
-                    }
+            //        // Find the row that has the corresponding catalog id
+            //        var result = this.localDatatable.Select("[Catalog ID] = '" + catId + "'");
+            //        if (result.Length == 0)
+            //        {
+            //            return false;
+            //        }
 
-                    // Set the value in the actual data table so it will remain persistant that the item has selected.
-                    var myRow = result[0];
-                    myRow["Selected"] = !(bool)myRow["Selected"];
-                    myRow.AcceptChanges();
-                }
-                this.UpdateSelectedAndTotalLabels();
-                return true;
-            }
-            this.UpdateSelectedAndTotalLabels();
+            //        // Set the value in the actual data table so it will remain persistant that the item has selected.
+            //        var myRow = result[0];
+            //        myRow["Selected"] = !(bool)myRow["Selected"];
+            //        myRow.AcceptChanges();
+            //    }
+            //    this.UpdateSelectedAndTotalLabels();
+            //    return true;
+            //}
+            //this.UpdateSelectedAndTotalLabels();
             return false;
         }
 
@@ -602,65 +602,65 @@ namespace Gbdx.Gbd
         /// <returns></returns>
         private bool CheckWmsCellClick(object sender, DataGridViewCellEventArgs e)
         {
-            var dgColumn = this.dataGridView1.Columns[e.ColumnIndex];
+            //var dgColumn = this.dataGridView1.Columns[e.ColumnIndex];
 
-            // check to make sure that the item clicked was either PAN or MS checkbox column.
-            if (dgColumn.Name != "PAN" && dgColumn.Name != "MS")
-            {
-                return false;
-            }
+            //// check to make sure that the item clicked was either PAN or MS checkbox column.
+            //if (dgColumn.Name != "PAN" && dgColumn.Name != "MS")
+            //{
+            //    return false;
+            //}
 
-            var row = this.dataGridView1.Rows[e.RowIndex];
-            var idahoId = string.Empty;
+            //var row = this.dataGridView1.Rows[e.RowIndex];
+            //var idahoId = string.Empty;
 
-            var interp = string.Empty;
+            //var interp = string.Empty;
 
-            // Get the proper ID number associated
-            if (dgColumn.Name == "PAN")
-            {
-                idahoId = row.Cells["PAN ID"].Value.ToString();
-                interp = "PAN";
-            }
-            else if (dgColumn.Name == "MS")
-            {
-                idahoId = row.Cells["MS ID"].Value.ToString();
-                interp = "MS";
-            }
+            //// Get the proper ID number associated
+            //if (dgColumn.Name == "PAN")
+            //{
+            //    idahoId = row.Cells["PAN ID"].Value.ToString();
+            //    interp = "PAN";
+            //}
+            //else if (dgColumn.Name == "MS")
+            //{
+            //    idahoId = row.Cells["MS ID"].Value.ToString();
+            //    interp = "MS";
+            //}
 
-            var catalogId = row.Cells["Catalog ID"].Value.ToString();
+            //var catalogId = row.Cells["Catalog ID"].Value.ToString();
 
-            // check to see if there is currently a known value for idahoId.
-            if (this.usedIdahoIds.ContainsKey(idahoId))
-            {
-                var map = ArcMap.Document.FocusMap;
+            //// check to see if there is currently a known value for idahoId.
+            //if (this.usedIdahoIds.ContainsKey(idahoId))
+            //{
+            //    var map = ArcMap.Document.FocusMap;
 
-                for (var i = 0; i < map.LayerCount; i++)
-                {
-                    var layer = map.Layer[i];
-                    if (layer == null)
-                    {
-                        continue;
-                    }
+            //    for (var i = 0; i < map.LayerCount; i++)
+            //    {
+            //        var layer = map.Layer[i];
+            //        if (layer == null)
+            //        {
+            //            continue;
+            //        }
 
-                    // make sure the layer name matches
-                    if (layer.Name != interp + " " + catalogId)
-                    {
-                        continue;
-                    }
+            //        // make sure the layer name matches
+            //        if (layer.Name != interp + " " + catalogId)
+            //        {
+            //            continue;
+            //        }
 
-                    // remove layer from arcmap and id from dictionary
-                    ArcMap.Document.FocusMap.DeleteLayer(layer);
-                    this.usedIdahoIds.Remove(idahoId);
-                }
-            }
-            else
-            {
-                // add idaho id
-                this.usedIdahoIds.Add(idahoId, catalogId);
+            //        // remove layer from arcmap and id from dictionary
+            //        ArcMap.Document.FocusMap.DeleteLayer(layer);
+            //        this.usedIdahoIds.Remove(idahoId);
+            //    }
+            //}
+            //else
+            //{
+            //    // add idaho id
+            //    this.usedIdahoIds.Add(idahoId, catalogId);
 
-                // The idaho id has been retrieved now ON TO ADDING IT
-                this.AddIdahoWms(catalogId, interp);
-            }
+            //    // The idaho id has been retrieved now ON TO ADDING IT
+            //    this.AddIdahoWms(catalogId, interp);
+            //}
             return true;
         }
 
@@ -966,7 +966,7 @@ namespace Gbdx.Gbd
                     return;
                 }
 
-                var rows = this.dataGridView1.Rows;
+                var rows = this.data_grid_view.Rows;
 
                 foreach (DataGridViewRow row in rows)
                 {
@@ -1034,7 +1034,7 @@ namespace Gbdx.Gbd
 
             var graphicsContainer = ArcMap.Document.ActiveView.FocusMap as IGraphicsContainer;
 
-            var rowCollection = this.dataGridView1.Rows;
+            var rowCollection = this.data_grid_view.Rows;
 
             // only draw polygons when the graphic container isn't null
             if (graphicsContainer != null)
@@ -1076,34 +1076,34 @@ namespace Gbdx.Gbd
         /// </param>
         private void EventHandlerCellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            try
-            {
-                // header cell click
-                if (e.RowIndex == -1)
-                {
-                    if (this.dataGridView1.Columns[e.ColumnIndex].Name == "Selected")
-                    {
-                        this.HeaderBoxClicked();
-                    }
+            //try
+            //{
+            //    // header cell click
+            //    if (e.RowIndex == -1)
+            //    {
+            //        if (this.dataGridView1.Columns[e.ColumnIndex].Name == "Selected")
+            //        {
+            //            this.HeaderBoxClicked();
+            //        }
 
-                    this.UpdateSelectedAndTotalLabels();
-                    return;
-                }
+            //        this.UpdateSelectedAndTotalLabels();
+            //        return;
+            //    }
 
-                // check to see if the WMS cells were clicked if so do the appropriate action and go no further 
-                if (this.CheckWmsCellClick(sender, e))
-                {
-                    return;
-                }
+            //    // check to see if the WMS cells were clicked if so do the appropriate action and go no further 
+            //    if (this.CheckWmsCellClick(sender, e))
+            //    {
+            //        return;
+            //    }
 
-                if (this.CheckSelectedCellClick(sender, e))
-                {
-                }
-            }
-            catch (Exception error)
-            {
-                Jarvis.Logger.Error(error);
-            }
+            //    if (this.CheckSelectedCellClick(sender, e))
+            //    {
+            //    }
+            //}
+            //catch (Exception error)
+            //{
+            //    Jarvis.Logger.Error(error);
+            //}
         }
 
         /// <summary>
@@ -1115,11 +1115,11 @@ namespace Gbdx.Gbd
         /// <param name="e"></param>
         private void EventHandlerCellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            foreach (DataGridViewRow row in this.dataGridView1.Rows)
-            {
-                this.SetImageryCheckbox("PAN ID", "PAN", row, this.usedIdahoIds);
-                this.SetImageryCheckbox("MS ID", "MS", row, this.usedIdahoIds);
-            }
+            //foreach (DataGridViewRow row in this.data_grid_view.Rows)
+            //{
+            //    this.SetImageryCheckbox("PAN ID", "PAN", row, this.usedIdahoIds);
+            //    this.SetImageryCheckbox("MS ID", "MS", row, this.usedIdahoIds);
+            //}
         }
 
         /// <summary>
@@ -1164,7 +1164,7 @@ namespace Gbdx.Gbd
 
                 // Make a copy of the current data grid view.
                 var currentView = new DataGridView();
-                currentView = this.dataGridView1;
+                currentView = this.data_grid_view;
 
                 var columnHeader = string.Empty;
                 for (var i = 0; i <= currentView.Columns.Count - 1; i++)
@@ -1247,7 +1247,7 @@ namespace Gbdx.Gbd
             newFilter += this.NadirAngleFilterSetup(newFilter);
             newFilter += this.SunElevationFilterSetup(newFilter);
             newFilter += this.PanResolutionFilterSetup(newFilter);
-            newFilter += AcquiredDateFilterSetup(newFilter, this.fromDateTimePicker, this.toDateTimePicker);
+            newFilter += AcquiredDateFilterSetup(newFilter, this.startDateTimePicker, this.endDateTimePicker);
             newFilter += this.IdahoIdOnlyFilterSetup(newFilter);
             newFilter = CatalogIdFilter(newFilter, this.catalogIdSearchTextBox.Text);
 
@@ -1362,6 +1362,179 @@ namespace Gbdx.Gbd
             }
         }
 
+        private GbdSearchObject ConstructSearchObject(string wktSearchArea=null)
+        {
+            if (wktSearchArea == null)
+            {
+                return null;
+            }
+            var searchObject = new GbdSearchObject
+            {
+                searchAreaWkt = wktSearchArea,
+                startDate = this.startDateTimePicker.Value.ToString("yyyy-MM-dd"),
+                endDate = this.endDateTimePicker.Value.ToString("yyyy-MM-dd")
+            };
+            searchObject.types.Add("Acquisition");
+            //searchObject.types.Add("IDAHOImage");
+            var sensor = this.GetSensorFilterString();
+            if(sensor != string.Empty)
+            {
+                searchObject.filters.Add(sensor);
+            }
+
+            var panResolution = this.GetPanResolutionString();
+            if(panResolution != string.Empty)
+            {
+                searchObject.filters.Add(panResolution);
+            }
+
+            var nadirAngle = this.GetOffNadirAngleString();
+            if (nadirAngle != string.Empty)
+            {
+                searchObject.filters.Add(nadirAngle);
+            }
+
+            var sunElevation = this.GetSunElevationString();
+            if (sunElevation != string.Empty)
+            {
+                searchObject.filters.Add(sunElevation);
+            }
+
+            var cloudCoverage = this.GetCloudCoverageString();
+            if (cloudCoverage != string.Empty)
+            {
+                searchObject.filters.Add(cloudCoverage);
+            }
+
+            var temp = JsonConvert.SerializeObject(searchObject);
+            return searchObject;
+        }
+
+        private string GetCloudCoverageString()
+        {
+            string output = "cloudcoverage <= ";
+            if (this.cloudCoverageComboBox.SelectedIndex < 0)
+            {
+                return string.Empty;
+            }
+
+            output += this.cloudCoverageComboBox.Items[this.cloudCoverageComboBox.SelectedIndex].ToString();
+            return output;
+        }
+
+        private string GetSunElevationString()
+        {
+            string output = "sunElevation <= ";
+            if (this.sunElevationComboBox.SelectedIndex < 0)
+            {
+                return string.Empty;
+            }
+
+            output += this.sunElevationComboBox.Items[this.sunElevationComboBox.SelectedIndex].ToString();
+
+            return output;
+        }
+
+        private string GetPanResolutionString()
+        {
+            string output = string.Empty;
+            if (this.panResolutionComboBox.SelectedIndex < 0)
+            {
+                return string.Empty;
+            }
+
+            output = $"panResolution <= {this.panResolutionComboBox.Items[this.panResolutionComboBox.SelectedIndex]}";
+
+            return output;
+        }
+
+        private string GetOffNadirAngleString()
+        {
+            string output = "offNadirAngle <= ";
+            if (this.nadirAngleComboBox.SelectedIndex < 0)
+            {
+                return string.Empty;
+            }
+            output += this.nadirAngleComboBox.Items[this.nadirAngleComboBox.SelectedIndex].ToString();
+
+            return output;
+        }
+
+        private string GetSensorFilterString()
+        {
+            string output = string.Empty;
+            if(this.sensorComboBox.SelectedIndex < 0)
+            {
+                return string.Empty;
+            }
+            switch (this.sensorComboBox.Items[this.sensorComboBox.SelectedIndex].ToString())
+            {
+                case "WorldView-1":
+                    output += "(sensorPlatformName == WORLDVIEW01)";
+                    break;
+
+                case "WorldView-2":
+                    output += "(sensorPlatformName == WORLDVIEW02)";
+                    break;
+
+                case "WorldView-3":
+                    output += "(sensorPlatformName == WORLDVIEW03_VNIR) OR (sensorPlatformName == WORLDVIEW03_SWIR)";
+                    break;
+
+                case "GeoEye-1":
+                    output += "(sensorPlatformName == GEOEYE01)";
+                    break;
+                case "QuickBird":
+                    output += "(sensorPlatformName == QUICKBIRD02)";
+                    break;
+            }
+
+            return output;
+        }
+        
+        private void GetGbdData2(string wkt)
+        {
+            // Set control variable to true prior to kicking off work.
+            this.okToWork = true;
+
+            var restClient = new RestClient("https://geobigdata.io");
+
+            var request = new RestRequest("catalog/v2/search", Method.POST);
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+            GbdSearchObject searchObj = new GbdSearchObject {searchAreaWkt = wkt};
+
+            var test2 = ConstructSearchObject(wkt);
+            var test = this.startDateTimePicker.Value;
+            searchObj.startDate = this.startDateTimePicker.Value.ToString("yyyy-MM-dd");
+            searchObj.endDate = this.endDateTimePicker.Value.ToString("yyyy-MM-dd");
+            //searchObj.types.Add("Acquisition");
+            //searchObj.types.Add("IDAHOImage");                     
+            string serializedString = JsonConvert.SerializeObject(searchObj);
+            request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
+            restClient.ExecuteAsync<List<GbdResponse>>(request, resp=> this.ProcessGbdSearchResult2(resp, wkt, this.token));
+
+            //foreach (var polygon in polygons)
+            //{
+            //    var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
+            //    request.AddHeader("Authorization", "Bearer " + this.token);
+            //    request.AddHeader("Content-Type", "application/json");
+
+            //    var searchObject = new GbdSearchObject { searchAreaWkt = polygon.ToString() };
+            //    searchObject.types.Add("Acquisition");
+            //    searchObject.types.Add("IDAHOImage");
+
+            //    var serializedString = JsonConvert.SerializeObject(searchObject);
+
+            //    request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
+
+            //    var polygon1 = polygon;
+            //    restClient.ExecuteAsync<List<GbdResponse>>(
+            //        request,
+            //resp => this.ProcessGbdSearchResult(resp, polygon1.ToString(), this.token));
+            //}
+        }
+
         /// <summary>
         ///     Get the user selected imagery cat ids for ordering
         /// </summary>
@@ -1466,11 +1639,11 @@ namespace Gbdx.Gbd
         /// </summary>
         private void HeaderBoxClicked()
         {
-            var dataGridViewColumn = this.dataGridView1.Columns["Selected"];
+            var dataGridViewColumn = this.data_grid_view.Columns["Selected"];
             if (dataGridViewColumn != null)
             {
                 var chkBox = (DataGridViewCheckBoxHeaderCell)dataGridViewColumn.HeaderCell;
-                this.SetAllCheckBoxes(chkBox.isChecked, this.dataGridView1);
+                this.SetAllCheckBoxes(chkBox.isChecked, this.data_grid_view);
 
                 if (chkBox.isChecked)
                 {
@@ -1504,16 +1677,19 @@ namespace Gbdx.Gbd
             this.localElement = elm;
             this.localDatatable.Clear();
 
-            var output = GbdJarvis.CreateAois(this.localPolygon.Envelope);
+            string test = Jarvis.ConvertPolygonToWKT(poly);
+            
+            //var output = GbdJarvis.CreateAois(this.localPolygon.Envelope);
 
-            if (output == null)
-            {
-                MessageBox.Show(GbdxResources.redrawBoundingBox);
-                return;
-            }
+            //if (output == null)
+            //{
+            //    MessageBox.Show(GbdxResources.redrawBoundingBox);
+            //    return;
+            //}
 
             // Login has been completed so lets proceed with the next set of network calls.
-            this.GetGbdData(output);
+            this.GetGbdData2(test);
+            //this.GetGbdData(output);
         }
 
         /// <summary>
@@ -1571,7 +1747,7 @@ namespace Gbdx.Gbd
             try
             {
                 // get the ID's of the images to be ordered
-                var catIdList = GetImageryToBeOrdered(this.dataGridView1);
+                var catIdList = GetImageryToBeOrdered(this.data_grid_view);
 
                 var output = JsonConvert.SerializeObject(catIdList);
 
@@ -1637,6 +1813,42 @@ namespace Gbdx.Gbd
             }
 
             return output;
+        }
+
+        private void ProcessGbdSearchResult2(IRestResponse<List<GbdResponse>> resp, string wkt, string authToken)
+        {
+            try
+            {
+                Jarvis.Logger.Info(resp.ResponseUri.ToString());
+            }
+            catch (Exception e)
+            {
+                Jarvis.Logger.Error(e);
+            }
+
+            if (resp.Data != null)
+            {
+                // Create data table in the thread to be mereged later
+                var dt = this.CreateDataTable();
+                var responses = new Dictionary<string, Properties>();
+
+                // go through all the results and add valid rows to the temporary table.
+                foreach (var gbdResponse in resp.Data)
+                {
+                    if (gbdResponse.results == null)
+                    {
+                        continue;
+                    }
+
+                    foreach (var item in gbdResponse.results)
+                    {
+                        ProcessRow(item, dt, responses);
+                    }
+                }
+
+                // Now all the work has been completed so lets do a callback to the main thread to merge it with the existing results.
+                this.Invoke(new DataTableDone(this.UpdateDataTable), dt, responses);
+            }
         }
 
         private void ProcessGbdSearchResult(IRestResponse<List<GbdResponse>> resp, string polygon, string authToken)
@@ -2004,17 +2216,17 @@ namespace Gbdx.Gbd
         /// </summary>
         private void SetHeaderBoxToOff()
         {
-            if (this.dataGridView1.Rows.Count <= 0)
+            if (this.data_grid_view.Rows.Count <= 0)
             {
                 return;
             }
 
-            var dataGridViewColumn = this.dataGridView1.Columns["Selected"];
+            var dataGridViewColumn = this.data_grid_view.Columns["Selected"];
             if (dataGridViewColumn != null)
             {
                 var chkBox = (DataGridViewCheckBoxHeaderCell)dataGridViewColumn.HeaderCell;
                 chkBox.isChecked = false;
-                this.SetAllCheckBoxes(chkBox.isChecked, this.dataGridView1);
+                this.SetAllCheckBoxes(chkBox.isChecked, this.data_grid_view);
 
                 var graphicsContainer = (IGraphicsContainer)ArcMap.Document.ActiveView.FocusMap;
                 graphicsContainer.DeleteAllElements();
@@ -2178,8 +2390,8 @@ namespace Gbdx.Gbd
                     return;
                 }
                 // need to check the newly added data for duplicates and remove them
-                var index = this.dataGridView1.FirstDisplayedScrollingRowIndex;
-                var horizIndex = this.dataGridView1.FirstDisplayedScrollingColumnIndex;
+                var index = this.data_grid_view.FirstDisplayedScrollingRowIndex;
+                var horizIndex = this.data_grid_view.FirstDisplayedScrollingColumnIndex;
 
                 this.localDatatable.Merge(dataTobeAdded, true);
 
@@ -2190,21 +2402,21 @@ namespace Gbdx.Gbd
 
                 if (this.displayAllPolgons)
                 {
-                    this.SetAllCheckBoxes(this.displayAllPolgons, this.dataGridView1);
+                    this.SetAllCheckBoxes(this.displayAllPolgons, this.data_grid_view);
                 }
 
                 this.DrawViewablePolygons();
 
                 
 
-                var dataGridViewColumn = this.dataGridView1.Columns["Selected"];
+                var dataGridViewColumn = this.data_grid_view.Columns["Selected"];
                 if (dataGridViewColumn != null)
                 {
                     var chkBox = (DataGridViewCheckBoxHeaderCell)dataGridViewColumn.HeaderCell;
 
                     if (chkBox.isChecked)
                     {
-                        this.SetAllCheckBoxes(chkBox.isChecked, this.dataGridView1);
+                        this.SetAllCheckBoxes(chkBox.isChecked, this.data_grid_view);
                         this.DrawCheckedPolygons();
                     }
                 }
@@ -2212,12 +2424,12 @@ namespace Gbdx.Gbd
                 {
                     if(index > -1)
                     {
-                        this.dataGridView1.FirstDisplayedScrollingRowIndex = index;
+                        this.data_grid_view.FirstDisplayedScrollingRowIndex = index;
                     }
 
                     if(horizIndex > -1)
                     {
-                        this.dataGridView1.FirstDisplayedScrollingColumnIndex = horizIndex;
+                        this.data_grid_view.FirstDisplayedScrollingColumnIndex = horizIndex;
                     }
                 }
                 catch (Exception error)
@@ -2337,7 +2549,7 @@ namespace Gbdx.Gbd
         private void UpdateSelectedAndTotalLabels()
         {
             var selectedRowCount = 0;
-            foreach (DataGridViewRow row in this.dataGridView1.Rows)
+            foreach (DataGridViewRow row in this.data_grid_view.Rows)
             {
                 try
                 {
@@ -2353,7 +2565,7 @@ namespace Gbdx.Gbd
             }
 
             this.selectedItemsLabel.Text = GbdxResources.selectedItems + selectedRowCount;
-            this.totalItemsLabel.Text = GbdxResources.totalItems + this.dataGridView1.RowCount;
+            this.totalItemsLabel.Text = GbdxResources.totalItems + this.data_grid_view.RowCount;
         }
 
         private void UpdateStatus()

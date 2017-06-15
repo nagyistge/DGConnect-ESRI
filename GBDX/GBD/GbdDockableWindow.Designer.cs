@@ -37,9 +37,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.toFromDateTimePickerLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.toDateTimePicker = new System.Windows.Forms.DateTimePicker();
+            this.endDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.label6 = new System.Windows.Forms.Label();
-            this.fromDateTimePicker = new System.Windows.Forms.DateTimePicker();
+            this.startDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.label5 = new System.Windows.Forms.Label();
             this.cloudCoverageComboBox = new System.Windows.Forms.ComboBox();
             this.nadirAngleComboBox = new System.Windows.Forms.ComboBox();
@@ -50,12 +50,12 @@
             this.label8 = new System.Windows.Forms.Label();
             this.idahoIdOnlyComboBox = new System.Windows.Forms.ComboBox();
             this.mainTableLayout = new System.Windows.Forms.TableLayoutPanel();
-            this.dataGridView1 = new System.Windows.Forms.DataGridView();
             this.thumbnailPictureBox = new System.Windows.Forms.PictureBox();
             this.exportButton = new System.Windows.Forms.Button();
             this.selectButton = new System.Windows.Forms.Button();
             this.selectedItemsLabel = new System.Windows.Forms.Label();
             this.totalItemsLabel = new System.Windows.Forms.Label();
+            this.data_grid_view = new System.Windows.Forms.DataGridView();
             this.mainTabControl = new System.Windows.Forms.TabControl();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.statusPage = new System.Windows.Forms.TabPage();
@@ -65,8 +65,8 @@
             this.sensorOptionsLayoutPanel.SuspendLayout();
             this.toFromDateTimePickerLayoutPanel.SuspendLayout();
             this.mainTableLayout.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumbnailPictureBox)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.data_grid_view)).BeginInit();
             this.mainTabControl.SuspendLayout();
             this.tabPage1.SuspendLayout();
             this.statusPage.SuspendLayout();
@@ -132,9 +132,9 @@
             "1.1",
             "1.2",
             "1.3 (Lowest Resolution)"});
-            this.panResolutionComboBox.Location = new System.Drawing.Point(137, 194);
+            this.panResolutionComboBox.Location = new System.Drawing.Point(137, 188);
             this.panResolutionComboBox.Name = "panResolutionComboBox";
-            this.panResolutionComboBox.Size = new System.Drawing.Size(135, 21);
+            this.panResolutionComboBox.Size = new System.Drawing.Size(135, 33);
             this.panResolutionComboBox.TabIndex = 10;
             this.panResolutionComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -142,9 +142,9 @@
             // 
             this.label7.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(14, 244);
+            this.label7.Location = new System.Drawing.Point(6, 229);
             this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(106, 13);
+            this.label7.Size = new System.Drawing.Size(121, 43);
             this.label7.TabIndex = 0;
             this.label7.Text = "Max Cloud Coverage";
             // 
@@ -152,9 +152,9 @@
             // 
             this.satLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.satLabel.AutoSize = true;
-            this.satLabel.Location = new System.Drawing.Point(47, 11);
+            this.satLabel.Location = new System.Drawing.Point(27, 5);
             this.satLabel.Name = "satLabel";
-            this.satLabel.Size = new System.Drawing.Size(40, 13);
+            this.satLabel.Size = new System.Drawing.Size(80, 25);
             this.satLabel.TabIndex = 0;
             this.satLabel.Text = "Sensor";
             // 
@@ -170,9 +170,9 @@
             "WorldView-3",
             "GeoEye-1",
             "QuickBird"});
-            this.sensorComboBox.Location = new System.Drawing.Point(137, 7);
+            this.sensorComboBox.Location = new System.Drawing.Point(137, 6);
             this.sensorComboBox.Name = "sensorComboBox";
-            this.sensorComboBox.Size = new System.Drawing.Size(135, 21);
+            this.sensorComboBox.Size = new System.Drawing.Size(135, 33);
             this.sensorComboBox.TabIndex = 1;
             this.sensorComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -180,9 +180,9 @@
             // 
             this.acquiredDateLabel.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.acquiredDateLabel.AutoSize = true;
-            this.acquiredDateLabel.Location = new System.Drawing.Point(25, 102);
+            this.acquiredDateLabel.Location = new System.Drawing.Point(8, 83);
             this.acquiredDateLabel.Name = "acquiredDateLabel";
-            this.acquiredDateLabel.Size = new System.Drawing.Size(84, 13);
+            this.acquiredDateLabel.Size = new System.Drawing.Size(117, 50);
             this.acquiredDateLabel.TabIndex = 2;
             this.acquiredDateLabel.Text = "Acquisition Date";
             // 
@@ -190,9 +190,9 @@
             // 
             this.label1.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(27, 198);
+            this.label1.Location = new System.Drawing.Point(10, 184);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(79, 13);
+            this.label1.Size = new System.Drawing.Size(114, 42);
             this.label1.TabIndex = 3;
             this.label1.Text = "Pan Resolution";
             // 
@@ -200,9 +200,9 @@
             // 
             this.label3.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(27, 291);
+            this.label3.Location = new System.Drawing.Point(15, 275);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(79, 13);
+            this.label3.Size = new System.Drawing.Size(103, 45);
             this.label3.TabIndex = 5;
             this.label3.Text = "Off Nadir Angle";
             // 
@@ -212,9 +212,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.toFromDateTimePickerLayoutPanel.ColumnCount = 1;
             this.toFromDateTimePickerLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.toFromDateTimePickerLayoutPanel.Controls.Add(this.toDateTimePicker, 0, 3);
+            this.toFromDateTimePickerLayoutPanel.Controls.Add(this.endDateTimePicker, 0, 3);
             this.toFromDateTimePickerLayoutPanel.Controls.Add(this.label6, 0, 2);
-            this.toFromDateTimePickerLayoutPanel.Controls.Add(this.fromDateTimePicker, 0, 1);
+            this.toFromDateTimePickerLayoutPanel.Controls.Add(this.startDateTimePicker, 0, 1);
             this.toFromDateTimePickerLayoutPanel.Controls.Add(this.label5, 0, 0);
             this.toFromDateTimePickerLayoutPanel.Location = new System.Drawing.Point(137, 39);
             this.toFromDateTimePickerLayoutPanel.Name = "toFromDateTimePickerLayoutPanel";
@@ -226,50 +226,50 @@
             this.toFromDateTimePickerLayoutPanel.Size = new System.Drawing.Size(135, 126);
             this.toFromDateTimePickerLayoutPanel.TabIndex = 7;
             // 
-            // toDateTimePicker
+            // endDateTimePicker
             // 
-            this.toDateTimePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.endDateTimePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.toDateTimePicker.CustomFormat = "MM\'/\'dd\'/\'yyyy";
-            this.toDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.toDateTimePicker.Location = new System.Drawing.Point(3, 103);
-            this.toDateTimePicker.Name = "toDateTimePicker";
-            this.toDateTimePicker.Size = new System.Drawing.Size(129, 20);
-            this.toDateTimePicker.TabIndex = 1;
-            this.toDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
+            this.endDateTimePicker.CustomFormat = "MM\'/\'dd\'/\'yyyy";
+            this.endDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endDateTimePicker.Location = new System.Drawing.Point(3, 103);
+            this.endDateTimePicker.Name = "endDateTimePicker";
+            this.endDateTimePicker.Size = new System.Drawing.Size(129, 31);
+            this.endDateTimePicker.TabIndex = 1;
+            this.endDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
             // label6
             // 
             this.label6.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(57, 78);
+            this.label6.Location = new System.Drawing.Point(49, 72);
             this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(20, 13);
+            this.label6.Size = new System.Drawing.Size(37, 25);
             this.label6.TabIndex = 0;
             this.label6.Text = "To";
             // 
-            // fromDateTimePicker
+            // startDateTimePicker
             // 
-            this.fromDateTimePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.startDateTimePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.fromDateTimePicker.CustomFormat = "MM\'/\'dd\'/\'yyyy";
-            this.fromDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.fromDateTimePicker.ImeMode = System.Windows.Forms.ImeMode.Disable;
-            this.fromDateTimePicker.Location = new System.Drawing.Point(3, 33);
-            this.fromDateTimePicker.Name = "fromDateTimePicker";
-            this.fromDateTimePicker.Size = new System.Drawing.Size(129, 20);
-            this.fromDateTimePicker.TabIndex = 1;
-            this.fromDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
+            this.startDateTimePicker.CustomFormat = "MM\'/\'dd\'/\'yyyy";
+            this.startDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startDateTimePicker.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.startDateTimePicker.Location = new System.Drawing.Point(3, 33);
+            this.startDateTimePicker.Name = "startDateTimePicker";
+            this.startDateTimePicker.Size = new System.Drawing.Size(129, 31);
+            this.startDateTimePicker.TabIndex = 1;
+            this.startDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
             // label5
             // 
             this.label5.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(52, 8);
+            this.label5.Location = new System.Drawing.Point(37, 2);
             this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(30, 13);
+            this.label5.Size = new System.Drawing.Size(61, 25);
             this.label5.TabIndex = 0;
             this.label5.Text = "From";
             // 
@@ -291,9 +291,9 @@
             "80",
             "90",
             "100"});
-            this.cloudCoverageComboBox.Location = new System.Drawing.Point(137, 240);
+            this.cloudCoverageComboBox.Location = new System.Drawing.Point(137, 234);
             this.cloudCoverageComboBox.Name = "cloudCoverageComboBox";
-            this.cloudCoverageComboBox.Size = new System.Drawing.Size(135, 21);
+            this.cloudCoverageComboBox.Size = new System.Drawing.Size(135, 33);
             this.cloudCoverageComboBox.TabIndex = 1;
             this.cloudCoverageComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -314,9 +314,9 @@
             "70",
             "80",
             "90"});
-            this.nadirAngleComboBox.Location = new System.Drawing.Point(137, 287);
+            this.nadirAngleComboBox.Location = new System.Drawing.Point(137, 281);
             this.nadirAngleComboBox.Name = "nadirAngleComboBox";
-            this.nadirAngleComboBox.Size = new System.Drawing.Size(135, 21);
+            this.nadirAngleComboBox.Size = new System.Drawing.Size(135, 33);
             this.nadirAngleComboBox.TabIndex = 8;
             this.nadirAngleComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -337,9 +337,9 @@
             "70",
             "80",
             "90"});
-            this.sunElevationComboBox.Location = new System.Drawing.Point(137, 328);
+            this.sunElevationComboBox.Location = new System.Drawing.Point(137, 326);
             this.sunElevationComboBox.Name = "sunElevationComboBox";
-            this.sunElevationComboBox.Size = new System.Drawing.Size(135, 21);
+            this.sunElevationComboBox.Size = new System.Drawing.Size(135, 33);
             this.sunElevationComboBox.TabIndex = 9;
             this.sunElevationComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -347,9 +347,9 @@
             // 
             this.label4.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(30, 332);
+            this.label4.Location = new System.Drawing.Point(16, 323);
             this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(73, 13);
+            this.label4.Size = new System.Drawing.Size(101, 31);
             this.label4.TabIndex = 6;
             this.label4.Text = "Sun Elevation";
             // 
@@ -357,18 +357,18 @@
             // 
             this.label2.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(38, 407);
+            this.label2.Location = new System.Drawing.Point(11, 401);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(57, 13);
+            this.label2.Size = new System.Drawing.Size(112, 25);
             this.label2.TabIndex = 11;
             this.label2.Text = "Catalog ID";
             // 
             // catalogIdSearchTextBox
             // 
             this.catalogIdSearchTextBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this.catalogIdSearchTextBox.Location = new System.Drawing.Point(137, 403);
+            this.catalogIdSearchTextBox.Location = new System.Drawing.Point(137, 398);
             this.catalogIdSearchTextBox.Name = "catalogIdSearchTextBox";
-            this.catalogIdSearchTextBox.Size = new System.Drawing.Size(135, 20);
+            this.catalogIdSearchTextBox.Size = new System.Drawing.Size(135, 31);
             this.catalogIdSearchTextBox.TabIndex = 7;
             this.catalogIdSearchTextBox.TextChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -376,9 +376,9 @@
             // 
             this.label8.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(43, 367);
+            this.label8.Location = new System.Drawing.Point(21, 361);
             this.label8.Name = "label8";
-            this.label8.Size = new System.Drawing.Size(48, 13);
+            this.label8.Size = new System.Drawing.Size(91, 25);
             this.label8.TabIndex = 12;
             this.label8.Text = "Idaho ID";
             // 
@@ -392,9 +392,9 @@
             "Both",
             "MS",
             "PAN"});
-            this.idahoIdOnlyComboBox.Location = new System.Drawing.Point(137, 363);
+            this.idahoIdOnlyComboBox.Location = new System.Drawing.Point(137, 360);
             this.idahoIdOnlyComboBox.Name = "idahoIdOnlyComboBox";
-            this.idahoIdOnlyComboBox.Size = new System.Drawing.Size(135, 21);
+            this.idahoIdOnlyComboBox.Size = new System.Drawing.Size(135, 33);
             this.idahoIdOnlyComboBox.TabIndex = 13;
             this.idahoIdOnlyComboBox.SelectedIndexChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
@@ -406,13 +406,13 @@
             this.mainTableLayout.ColumnCount = 2;
             this.mainTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 284F));
             this.mainTableLayout.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.mainTableLayout.Controls.Add(this.dataGridView1, 0, 1);
             this.mainTableLayout.Controls.Add(this.sensorOptionsLayoutPanel, 0, 0);
             this.mainTableLayout.Controls.Add(this.thumbnailPictureBox, 1, 0);
             this.mainTableLayout.Controls.Add(this.exportButton, 1, 3);
             this.mainTableLayout.Controls.Add(this.selectButton, 0, 3);
             this.mainTableLayout.Controls.Add(this.selectedItemsLabel, 0, 2);
             this.mainTableLayout.Controls.Add(this.totalItemsLabel, 1, 2);
+            this.mainTableLayout.Controls.Add(this.data_grid_view, 0, 1);
             this.mainTableLayout.Location = new System.Drawing.Point(6, 6);
             this.mainTableLayout.Name = "mainTableLayout";
             this.mainTableLayout.RowCount = 5;
@@ -421,28 +421,8 @@
             this.mainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 36F));
             this.mainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 41F));
             this.mainTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.mainTableLayout.Size = new System.Drawing.Size(571, 787);
+            this.mainTableLayout.Size = new System.Drawing.Size(563, 766);
             this.mainTableLayout.TabIndex = 1;
-            // 
-            // dataGridView1
-            // 
-            this.dataGridView1.AllowUserToAddRows = false;
-            this.dataGridView1.AllowUserToDeleteRows = false;
-            this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dataGridView1.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.DisplayedCells;
-            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.mainTableLayout.SetColumnSpan(this.dataGridView1, 2);
-            this.dataGridView1.Location = new System.Drawing.Point(3, 445);
-            this.dataGridView1.MultiSelect = false;
-            this.dataGridView1.Name = "dataGridView1";
-            this.dataGridView1.RowTemplate.Height = 24;
-            this.dataGridView1.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dataGridView1.ShowEditingIcon = false;
-            this.dataGridView1.Size = new System.Drawing.Size(565, 242);
-            this.dataGridView1.TabIndex = 1;
-            this.dataGridView1.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.DataGridView1CellMouseEnter);
             // 
             // thumbnailPictureBox
             // 
@@ -451,14 +431,14 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.thumbnailPictureBox.Location = new System.Drawing.Point(287, 3);
             this.thumbnailPictureBox.Name = "thumbnailPictureBox";
-            this.thumbnailPictureBox.Size = new System.Drawing.Size(281, 436);
+            this.thumbnailPictureBox.Size = new System.Drawing.Size(273, 436);
             this.thumbnailPictureBox.TabIndex = 2;
             this.thumbnailPictureBox.TabStop = false;
             // 
             // exportButton
             // 
             this.exportButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.exportButton.Location = new System.Drawing.Point(469, 734);
+            this.exportButton.Location = new System.Drawing.Point(461, 713);
             this.exportButton.Name = "exportButton";
             this.exportButton.Size = new System.Drawing.Size(99, 25);
             this.exportButton.TabIndex = 3;
@@ -469,7 +449,7 @@
             // selectButton
             // 
             this.selectButton.Anchor = System.Windows.Forms.AnchorStyles.Left;
-            this.selectButton.Location = new System.Drawing.Point(3, 734);
+            this.selectButton.Location = new System.Drawing.Point(3, 713);
             this.selectButton.Name = "selectButton";
             this.selectButton.Size = new System.Drawing.Size(94, 24);
             this.selectButton.TabIndex = 4;
@@ -481,9 +461,9 @@
             // 
             this.selectedItemsLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.selectedItemsLabel.AutoSize = true;
-            this.selectedItemsLabel.Location = new System.Drawing.Point(3, 701);
+            this.selectedItemsLabel.Location = new System.Drawing.Point(3, 674);
             this.selectedItemsLabel.Name = "selectedItemsLabel";
-            this.selectedItemsLabel.Size = new System.Drawing.Size(83, 13);
+            this.selectedItemsLabel.Size = new System.Drawing.Size(165, 25);
             this.selectedItemsLabel.TabIndex = 5;
             this.selectedItemsLabel.Text = "Selected Items: ";
             // 
@@ -491,11 +471,26 @@
             // 
             this.totalItemsLabel.Anchor = System.Windows.Forms.AnchorStyles.Left;
             this.totalItemsLabel.AutoSize = true;
-            this.totalItemsLabel.Location = new System.Drawing.Point(287, 701);
+            this.totalItemsLabel.Location = new System.Drawing.Point(287, 674);
             this.totalItemsLabel.Name = "totalItemsLabel";
-            this.totalItemsLabel.Size = new System.Drawing.Size(65, 13);
+            this.totalItemsLabel.Size = new System.Drawing.Size(129, 25);
             this.totalItemsLabel.TabIndex = 6;
             this.totalItemsLabel.Text = "Total Items: ";
+            // 
+            // data_grid_view
+            // 
+            this.data_grid_view.AllowUserToDeleteRows = false;
+            this.data_grid_view.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.data_grid_view.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.mainTableLayout.SetColumnSpan(this.data_grid_view, 2);
+            this.data_grid_view.Location = new System.Drawing.Point(3, 445);
+            this.data_grid_view.Name = "data_grid_view";
+            this.data_grid_view.ReadOnly = true;
+            this.data_grid_view.RowTemplate.Height = 33;
+            this.data_grid_view.Size = new System.Drawing.Size(557, 221);
+            this.data_grid_view.TabIndex = 7;
             // 
             // mainTabControl
             // 
@@ -513,10 +508,10 @@
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.mainTableLayout);
-            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Location = new System.Drawing.Point(8, 39);
             this.tabPage1.Name = "tabPage1";
             this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
-            this.tabPage1.Size = new System.Drawing.Size(583, 799);
+            this.tabPage1.Size = new System.Drawing.Size(575, 778);
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Search";
             this.tabPage1.UseVisualStyleBackColor = true;
@@ -524,10 +519,10 @@
             // statusPage
             // 
             this.statusPage.Controls.Add(this.orderStatusTableLayout);
-            this.statusPage.Location = new System.Drawing.Point(4, 22);
+            this.statusPage.Location = new System.Drawing.Point(8, 39);
             this.statusPage.Name = "statusPage";
             this.statusPage.Padding = new System.Windows.Forms.Padding(3);
-            this.statusPage.Size = new System.Drawing.Size(583, 799);
+            this.statusPage.Size = new System.Drawing.Size(575, 778);
             this.statusPage.TabIndex = 1;
             this.statusPage.Text = "Order Status";
             this.statusPage.UseVisualStyleBackColor = true;
@@ -547,7 +542,7 @@
             this.orderStatusTableLayout.RowCount = 2;
             this.orderStatusTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 95.16908F));
             this.orderStatusTableLayout.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 4.830918F));
-            this.orderStatusTableLayout.Size = new System.Drawing.Size(551, 787);
+            this.orderStatusTableLayout.Size = new System.Drawing.Size(543, 766);
             this.orderStatusTableLayout.TabIndex = 0;
             // 
             // orderDataGridView
@@ -564,13 +559,13 @@
             this.orderDataGridView.RowTemplate.Height = 24;
             this.orderDataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.orderDataGridView.ShowEditingIcon = false;
-            this.orderDataGridView.Size = new System.Drawing.Size(545, 742);
+            this.orderDataGridView.Size = new System.Drawing.Size(537, 722);
             this.orderDataGridView.TabIndex = 0;
             // 
             // refreshButton
             // 
             this.refreshButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.refreshButton.Location = new System.Drawing.Point(473, 756);
+            this.refreshButton.Location = new System.Drawing.Point(465, 735);
             this.refreshButton.Name = "refreshButton";
             this.refreshButton.Size = new System.Drawing.Size(75, 23);
             this.refreshButton.TabIndex = 1;
@@ -589,8 +584,8 @@
             this.toFromDateTimePickerLayoutPanel.PerformLayout();
             this.mainTableLayout.ResumeLayout(false);
             this.mainTableLayout.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.thumbnailPictureBox)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.data_grid_view)).EndInit();
             this.mainTabControl.ResumeLayout(false);
             this.tabPage1.ResumeLayout(false);
             this.statusPage.ResumeLayout(false);
@@ -611,15 +606,14 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TableLayoutPanel toFromDateTimePickerLayoutPanel;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.DateTimePicker fromDateTimePicker;
-        private System.Windows.Forms.DateTimePicker toDateTimePicker;
+        private System.Windows.Forms.DateTimePicker startDateTimePicker;
+        private System.Windows.Forms.DateTimePicker endDateTimePicker;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox cloudCoverageComboBox;
         private System.Windows.Forms.ComboBox nadirAngleComboBox;
         private System.Windows.Forms.ComboBox sunElevationComboBox;
         private System.Windows.Forms.TableLayoutPanel mainTableLayout;
-        private System.Windows.Forms.DataGridView dataGridView1;
         private System.Windows.Forms.ComboBox panResolutionComboBox;
         private System.Windows.Forms.PictureBox thumbnailPictureBox;
         private System.Windows.Forms.Button exportButton;
@@ -636,6 +630,6 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label8;
         private System.Windows.Forms.ComboBox idahoIdOnlyComboBox;
-
+        private System.Windows.Forms.DataGridView data_grid_view;
     }
 }

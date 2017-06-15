@@ -41,6 +41,7 @@ namespace GBD
             this.filters = new List<string>();
             this.tagResults = false;
             this.types = new List<string>();
+            this.limit = 1000;
         }
 
         /// <summary>
@@ -72,5 +73,11 @@ namespace GBD
         /// Gets or sets the types.
         /// </summary>
         public List<string> types { get; set; }
+
+        /// <summary>
+        /// Number of responses limitation.  The higher the limit the slower the response will be.
+        /// Defaulted value is 1000
+        /// </summary>
+        public int limit { get; set; }
     }
 }

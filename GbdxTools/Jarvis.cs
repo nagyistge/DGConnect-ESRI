@@ -841,5 +841,62 @@
             return jsonObject;
         }
 
+        #region WKT Converter
+
+        public static string ConvertPolygonToWKT(IPolygon poly)
+        {
+            StringBuilder output = new StringBuilder();
+            var poly4 = (IPolygon4)poly;
+            var exteriorRingGeometryBag = poly4.ExteriorRingBag;
+            var exteriorRingGeometryCollection = exteriorRingGeometryBag as IGeometryCollection;
+
+            if (exteriorRingGeometryCollection != null)
+            {
+                output.Append("POLYGON((");
+                for (var i = 0; i < exteriorRingGeometryCollection.GeometryCount; i++)
+                {
+                    if (i != 0)
+                    {
+                        output.Append(",");
+                    }
+                    var exteriorRingGeometry = exteriorRingGeometryCollection.Geometry[i];
+
+                    output.Append(ConvertPointCollectionToWkt(exteriorRingGeometry));
+
+                    //output.Append(ConvertInteriorRingsToGeoJson(poly4.InteriorRingBag[exteriorRingGeometry as IRing]));
+                    output.Append("))");
+
+                }
+            }
+
+            return output.ToString();
+        }
+
+        private static string ConvertPointCollectionToWkt(IGeometry ringGeometry)
+        {
+            var pointCollect = ringGeometry as IPointCollection;
+            var builder = new StringBuilder();
+            if (pointCollect != null)
+            {
+                for (var i = 0; i < pointCollect.PointCount; i++)
+                {
+                    if (i != 0)
+                    {
+                        builder.Append(", ");
+                    }
+                    var point = pointCollect.Point[i];
+                    builder.Append(PointToWkt(point));
+                }
+            }
+            return builder.ToString();
+        }
+
+        public static string PointToWkt(IPoint point)
+        {
+            return $"{point.X} {point.Y}";
+        }
+
+        #endregion
+
     }
 }
