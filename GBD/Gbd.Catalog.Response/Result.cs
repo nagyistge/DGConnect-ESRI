@@ -19,6 +19,8 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Collections.Generic;
+
 namespace GBD
 {
     using System.Diagnostics.CodeAnalysis;
@@ -26,37 +28,10 @@ namespace GBD
     /// <summary>
     /// The result.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Reviewed.")]
     public class Result
     {
-        /// <summary>
-        /// Gets or sets the in edges.
-        /// </summary>
-        public InEdges inEdges { get; set; }
-
-        /// <summary>
-        /// Gets or sets the out edges.
-        /// </summary>
-        public OutEdges outEdges { get; set; }
-
-        /// <summary>
-        /// Gets or sets the properties.
-        /// </summary>
+        public string identifier { get; set; }
+        public List<string> type { get; set; }
         public Properties properties { get; set; }
-
-        /// <summary>
-        /// Gets or sets the type.
-        /// </summary>
-        public string type { get; set; }
-
-        /// <summary>
-        /// Gets or sets the owner.
-        /// </summary>
-        public object owner { get; set; }
-
-        /// <summary>
-        /// Gets or sets the identifier.
-        /// </summary>
-        public string identifier { get; set; } 
     }
 }

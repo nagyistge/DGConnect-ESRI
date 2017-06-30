@@ -13,6 +13,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using VectorServices;
+
 namespace Gbdx.Gbd
 {
     using System;
@@ -69,6 +71,8 @@ namespace Gbdx.Gbd
         private delegate void DataTableDone(DataTable dt, Dictionary<string, Properties> responses);
 
         private delegate void ExecuteAfterResponse(List<GbdOrder> orders);
+
+        private delegate void UpdateIdahoInformation(string catalogid, string pan, string ms);
 
         /// <summary>
         ///     Callback to update the order status.  Will be fired from a background thread
@@ -129,9 +133,15 @@ namespace Gbdx.Gbd
         /// <summary>
         ///     The data table holding all of the records
         /// </summary>
-        private readonly DataTable localDatatable;
+        private DataTable localDatatable;
+
+        private BindingSource localBindingSource;
 
         private readonly string token;
+
+        private static List<string> testList = new List<string>();
+
+        private static string gbdxToken;
 
         private readonly Dictionary<string, string> usedIdahoIds;
 
@@ -223,7 +233,7 @@ namespace Gbdx.Gbd
                 MessageBox.Show(GbdxResources.InvalidUserPass);
                 return;
             }
-
+            
             string pass;
             var result = Aes.Instance.Decrypt128(Settings.Default.password, out pass);
             if (result)
@@ -239,11 +249,15 @@ namespace Gbdx.Gbd
             this.comms = new GbdxComms(Jarvis.LogFile, false);
 
             this.InitializeComponent();
+            this.data_grid_view.AutoGenerateColumns = true;
             this.VisibleChanged += this.GbdDockableWindowVisibleChanged;
             this.Hook = hook;
             GbdRelay.Instance.AoiHasBeenDrawn += this.InstanceAoiHasBeenDrawn;
 
             this.localDatatable = this.CreateDataTable();
+            this.localBindingSource = new BindingSource();
+            this.localBindingSource.DataSource = this.localDatatable;
+            this.data_grid_view.DataSource = this.localBindingSource;
 
             //this.dataGridView1.CellFormatting += this.EventHandlerCellFormatting;
 
@@ -705,6 +719,12 @@ namespace Gbdx.Gbd
             return output;
         }
 
+        private void CatIdBoxTextChanged(object sender, EventArgs e)
+        {
+            var catIdFilter = CatalogIdFilter(string.Empty, this.catalogIdSearchTextBox.Text);
+            
+        }
+
         /// <summary>
         ///     The combo box selected index changed.
         /// </summary>
@@ -718,13 +738,29 @@ namespace Gbdx.Gbd
         {
             try
             {
-                this.CheckDateTime(sender);
+                if (this.localPolygon == null)
+                {
+                    return;
+                }
 
-                this.SetHeaderBoxToOff();
+                string polyWkt = Jarvis.ConvertPolygonToWKT(this.localPolygon);
+                GbdSearchObject searchObj = this.ConstructSearchObject(polyWkt);
+                string serializedString = JsonConvert.SerializeObject(searchObj);
 
-                this.dataView.RowFilter = this.FilterSetup();
+                var restClient = new RestClient("https://geobigdata.io");
+                var request = new RestRequest("catalog/v2/search", Method.POST);
+                request.AddHeader("Authorization", "Bearer " + this.token);
+                request.AddHeader("Content-Type", "application/json");
+                request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
+                restClient.ExecuteAsync<List<GbdResponse>>(request, resp => this.ProcessGbdSearchResult(resp, polyWkt, this.token));
 
-                this.UpdateSelectedAndTotalLabels();
+                //this.CheckDateTime(sender);
+
+                //this.SetHeaderBoxToOff();
+
+                //this.dataView.RowFilter = this.FilterSetup();
+
+                //this.UpdateSelectedAndTotalLabels();
             }
             catch (Exception error)
             {
@@ -773,26 +809,14 @@ namespace Gbdx.Gbd
             {
                 row["Acquired"] = Convert.ToDateTime(item.properties.timestamp);
             }
+            row["Cloud Cover"] = item.properties.cloudCover;
 
-            if (!string.IsNullOrEmpty(item.properties.cloudCover))
-            {
-                row["Cloud Cover"] = Convert.ToDouble(item.properties.cloudCover);
-            }
+            row["Off Nadir Angle"] = item.properties.offNadirAngle;
 
-            if (!string.IsNullOrEmpty(item.properties.offNadirAngle))
-            {
-                row["Off Nadir Angle"] = Convert.ToDouble(item.properties.offNadirAngle);
-            }
+            row["Sun Elevation"] = item.properties.sunElevation;
+            
+            row["Pan Resolution"] = item.properties.panResolution;
 
-            if (!string.IsNullOrEmpty(item.properties.sunElevation))
-            {
-                row["Sun Elevation"] = Convert.ToDouble(item.properties.sunElevation);
-            }
-
-            if (!string.IsNullOrEmpty(item.properties.panResolution))
-            {
-                row["Pan Resolution"] = Convert.ToDouble(item.properties.panResolution);
-            }
             return row;
         }
 
@@ -814,6 +838,12 @@ namespace Gbdx.Gbd
             primary[0] = dt.Columns["Order ID"];
             dt.PrimaryKey = primary;
             return dt;
+        }
+
+        private void CreateDataGridColumns(ref DataGridView datagrid)
+        {
+            
+            datagrid.Columns.Add(new DataGridViewColumn());
         }
 
         /// <summary>
@@ -1006,7 +1036,8 @@ namespace Gbdx.Gbd
         {
             var poly = new PolygonClass();
             poly.Project(ArcMap.Document.ActiveView.Extent.SpatialReference);
-            foreach (var pnt in polyToBeDrawn.Points)
+            var points = GbdJarvis.GetPointsFromWkt(polyToBeDrawn.footprintWkt);
+            foreach (var pnt in points)
             {
                 var tempPoint = new PointClass();
                 tempPoint.PutCoords(pnt.X, pnt.Y);
@@ -1307,6 +1338,11 @@ namespace Gbdx.Gbd
 
         private static string GetAccessToken(string apiKey, string username, string password)
         {
+            if (!string.IsNullOrEmpty(gbdxToken))
+            {
+                return gbdxToken;
+            }
+
             var tok = string.Empty;
 
             var restClient = new RestClient("https://geobigdata.io");
@@ -1324,44 +1360,10 @@ namespace Gbdx.Gbd
             {
                 tok = response.Data.access_token;
             }
-
+            gbdxToken = tok;
             return tok;
         }
-
-        /// <summary>
-        ///     Go out and get the GBD data.
-        /// </summary>
-        /// <param name="polygons">
-        ///     The AOI split into 1x1 degree AOI's
-        /// </param>
-        private void GetGbdData(List<GbdPolygon> polygons)
-        {
-            // Set control variable to true prior to kicking off work.
-            this.okToWork = true;
-
-            var restClient = new RestClient("https://geobigdata.io");
-
-            foreach (var polygon in polygons)
-            {
-                var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
-                request.AddHeader("Authorization", "Bearer " + this.token);
-                request.AddHeader("Content-Type", "application/json");
-
-                var searchObject = new GbdSearchObject { searchAreaWkt = polygon.ToString() };
-                searchObject.types.Add("Acquisition");
-                searchObject.types.Add("IDAHOImage");
-
-                var serializedString = JsonConvert.SerializeObject(searchObject);
-
-                request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
-
-                var polygon1 = polygon;
-                restClient.ExecuteAsync<List<GbdResponse>>(
-                    request,
-                    resp => this.ProcessGbdSearchResult(resp, polygon1.ToString(), this.token));
-            }
-        }
-
+        
         private GbdSearchObject ConstructSearchObject(string wktSearchArea=null)
         {
             if (wktSearchArea == null)
@@ -1374,19 +1376,18 @@ namespace Gbdx.Gbd
                 startDate = this.startDateTimePicker.Value.ToString("yyyy-MM-dd"),
                 endDate = this.endDateTimePicker.Value.ToString("yyyy-MM-dd")
             };
-            searchObject.types.Add("Acquisition");
-            //searchObject.types.Add("IDAHOImage");
+
             var sensor = this.GetSensorFilterString();
             if(sensor != string.Empty)
             {
                 searchObject.filters.Add(sensor);
             }
 
-            var panResolution = this.GetPanResolutionString();
-            if(panResolution != string.Empty)
-            {
-                searchObject.filters.Add(panResolution);
-            }
+//            var panResolution = this.GetPanResolutionString();
+//            if(panResolution != string.Empty)
+//            {
+//                searchObject.filters.Add(panResolution);
+//            }
 
             var nadirAngle = this.GetOffNadirAngleString();
             if (nadirAngle != string.Empty)
@@ -1406,13 +1407,28 @@ namespace Gbdx.Gbd
                 searchObject.filters.Add(cloudCoverage);
             }
 
+            var catalogId = this.GetCatalogIdString();
+            if (catalogId != string.Empty)
+            {
+                searchObject.filters.Add(catalogId);
+            }
+
             var temp = JsonConvert.SerializeObject(searchObject);
             return searchObject;
         }
 
+        private string GetCatalogIdString()
+        {
+            if (this.catalogIdSearchTextBox.Text != string.Empty)
+            {
+                return $"catalogID like {this.catalogIdSearchTextBox.Text}*";
+            }
+            return string.Empty;
+        }
+
         private string GetCloudCoverageString()
         {
-            string output = "cloudcoverage <= ";
+            string output = "cloudCover <= ";
             if (this.cloudCoverageComboBox.SelectedIndex < 0)
             {
                 return string.Empty;
@@ -1440,7 +1456,7 @@ namespace Gbdx.Gbd
             string output = string.Empty;
             if (this.panResolutionComboBox.SelectedIndex < 0)
             {
-                return string.Empty;
+                return "panResolution <= 1.3";
             }
 
             output = $"panResolution <= {this.panResolutionComboBox.Items[this.panResolutionComboBox.SelectedIndex]}";
@@ -1492,87 +1508,37 @@ namespace Gbdx.Gbd
             return output;
         }
         
-        private void GetGbdData2(string wkt)
+        private void GetGbdData(string wkt)
         {
             // Set control variable to true prior to kicking off work.
             this.okToWork = true;
-
+            GbdSearchObject searchObj = this.ConstructSearchObject(wkt);
+//            searchObj.types.Add("IDAHOImage");
+            string serializedString = JsonConvert.SerializeObject(searchObj);
             var restClient = new RestClient("https://geobigdata.io");
-
             var request = new RestRequest("catalog/v2/search", Method.POST);
             request.AddHeader("Authorization", "Bearer " + this.token);
             request.AddHeader("Content-Type", "application/json");
-            GbdSearchObject searchObj = new GbdSearchObject {searchAreaWkt = wkt};
-
-            var test2 = ConstructSearchObject(wkt);
-            var test = this.startDateTimePicker.Value;
-            searchObj.startDate = this.startDateTimePicker.Value.ToString("yyyy-MM-dd");
-            searchObj.endDate = this.endDateTimePicker.Value.ToString("yyyy-MM-dd");
-            //searchObj.types.Add("Acquisition");
-            //searchObj.types.Add("IDAHOImage");                     
-            string serializedString = JsonConvert.SerializeObject(searchObj);
             request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
-            restClient.ExecuteAsync<List<GbdResponse>>(request, resp=> this.ProcessGbdSearchResult2(resp, wkt, this.token));
-
-            //foreach (var polygon in polygons)
-            //{
-            //    var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
-            //    request.AddHeader("Authorization", "Bearer " + this.token);
-            //    request.AddHeader("Content-Type", "application/json");
-
-            //    var searchObject = new GbdSearchObject { searchAreaWkt = polygon.ToString() };
-            //    searchObject.types.Add("Acquisition");
-            //    searchObject.types.Add("IDAHOImage");
-
-            //    var serializedString = JsonConvert.SerializeObject(searchObject);
-
-            //    request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
-
-            //    var polygon1 = polygon;
-            //    restClient.ExecuteAsync<List<GbdResponse>>(
-            //        request,
-            //resp => this.ProcessGbdSearchResult(resp, polygon1.ToString(), this.token));
-            //}
+            restClient.ExecuteAsync<List<GbdResponse>>(request, resp=> this.ProcessGbdSearchResult(resp, wkt, this.token));
         }
 
-        /// <summary>
-        ///     Get the user selected imagery cat ids for ordering
-        /// </summary>
-        /// <param name="grid">
-        ///     The data grid that contains the imagery information.
-        /// </param>
-        /// <returns>
-        ///     The <see cref="List{T}" />.
-        /// </returns>
-        private static List<string> GetImageryToBeOrdered(DataGridView grid)
+        private void GetGbdData2(string geojson)
         {
-            var catIdList = new List<string>();
-            foreach (DataGridViewRow item in grid.Rows)
-            {
-                var addRow = false;
-                for (var i = 0; i <= item.Cells.Count - 1; i++)
-                {
-                    // Don't record the value of if the polygon is being displayed or a null value.
-                    if (item.Cells[i].Value == null || item.Cells[i].OwningColumn.Name == "showPolygon")
-                    {
-                        continue;
-                    }
+            this.okToWork = true;
+            var restClient = new RestClient("https://vector.geobigdata.io");
+            var request = new RestRequest("insight-vector/api/index/query/vector-gbdx-alpha-catalog-v2*/items", Method.POST);
+            request.AddHeader("Authorization", "Bearer " + this.token);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddQueryParameter("q", "item_date:[now-1M TO now]");
+            request.AddParameter("application/json", geojson, ParameterType.RequestBody);
+            restClient.ExecuteAsync<List<VectorServicesResponse>>(request, resp => this.ProcessVectorServicesResult(resp) );
 
-                    if (addRow != true && item.Cells[i].OwningColumn.Name == "Selected")
-                    {
-                        addRow = (bool)item.Cells[i].Value;
-                        continue;
-                    }
-
-                    if (addRow && item.Cells[i].OwningColumn.Name == "Catalog ID")
-                    {
-                        catIdList.Add((string)item.Cells[i].Value);
-                    }
-                }
-            }
-
-            return catIdList;
         }
+
+        
+
+       
 
         /// <summary>
         ///     The get order ids for refresh.
@@ -1676,20 +1642,20 @@ namespace Gbdx.Gbd
             this.localPolygon = poly;
             this.localElement = elm;
             this.localDatatable.Clear();
+            this.localBindingSource.ResetBindings(false);
 
-            string test = Jarvis.ConvertPolygonToWKT(poly);
-            
-            //var output = GbdJarvis.CreateAois(this.localPolygon.Envelope);
+//            string polyWkt = Jarvis.ConvertPolygonToWKT(this.localPolygon);
+            string geoJson = Jarvis.ConvertPolygonsGeoJson(this.localPolygon);
+            var output = GbdJarvis.CreateAois(this.localPolygon.Envelope);
 
-            //if (output == null)
-            //{
-            //    MessageBox.Show(GbdxResources.redrawBoundingBox);
-            //    return;
-            //}
-
+            if (output == null)
+            {
+                MessageBox.Show(GbdxResources.redrawBoundingBox);
+                return;
+            }
+            this.GetGbdData2(geoJson);
             // Login has been completed so lets proceed with the next set of network calls.
-            this.GetGbdData2(test);
-            //this.GetGbdData(output);
+//            this.GetGbdData(polyWkt);
         }
 
         /// <summary>
@@ -1744,33 +1710,33 @@ namespace Gbdx.Gbd
         /// </summary>
         private void OrderImagery()
         {
-            try
-            {
-                // get the ID's of the images to be ordered
-                var catIdList = GetImageryToBeOrdered(this.data_grid_view);
-
-                var output = JsonConvert.SerializeObject(catIdList);
-
-                // setup the request for the orders
-                var request = new RestRequest("/raster-catalog/api/gbd/orders/v1", Method.POST);
-                request.AddHeader("Authorization", "Bearer " + this.comms.GetAccessToken());
-                request.AddParameter("application/json", output, ParameterType.RequestBody);
-
-                var commsClient = this.comms.GetClient();
-
-                if (commsClient == null)
-                {
-                    commsClient = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
-                }
-
-                commsClient.ExecuteAsync<List<GbdOrder>>(
-                    request,
-                    resp => this.Invoke(new ExecuteAfterResponse(this.HandleOrderResponse), resp.Data));
-            }
-            catch (Exception error)
-            {
-                Jarvis.Logger.Error(error);
-            }
+//            try
+//            {
+//                // get the ID's of the images to be ordered
+//                var catIdList = GetImageryToBeOrdered(this.data_grid_view);
+//
+//                var output = JsonConvert.SerializeObject(catIdList);
+//
+//                // setup the request for the orders
+//                var request = new RestRequest("/raster-catalog/api/gbd/orders/v1", Method.POST);
+//                request.AddHeader("Authorization", "Bearer " + this.comms.GetAccessToken());
+//                request.AddParameter("application/json", output, ParameterType.RequestBody);
+//
+//                var commsClient = this.comms.GetClient();
+//
+//                if (commsClient == null)
+//                {
+//                    commsClient = new RestClient(GbdxHelper.GetEndpointBase(Settings.Default));
+//                }
+//
+//                commsClient.ExecuteAsync<List<GbdOrder>>(
+//                    request,
+//                    resp => this.Invoke(new ExecuteAfterResponse(this.HandleOrderResponse), resp.Data));
+//            }
+//            catch (Exception error)
+//            {
+//                Jarvis.Logger.Error(error);
+//            }
         }
 
         /// <summary>
@@ -1815,7 +1781,29 @@ namespace Gbdx.Gbd
             return output;
         }
 
-        private void ProcessGbdSearchResult2(IRestResponse<List<GbdResponse>> resp, string wkt, string authToken)
+        private void ProcessVectorServicesResult(IRestResponse<List<VectorServicesResponse>> response)
+        {
+            try
+            {
+                Jarvis.Logger.Info(response.ResponseUri.ToString());
+            }
+            catch (Exception e)
+            {
+                Jarvis.Logger.Error(e);
+            }
+
+            if (response.Data != null)
+            {
+                var tempTable = this.CreateDataTable();
+                var catIds = new HashSet<string>();
+                foreach (var vector in response.Data)
+                {
+                    
+                }
+            }
+        }
+
+        private void ProcessGbdSearchResult(IRestResponse<List<GbdResponse>> resp, string wkt, string authToken)
         {
             try
             {
@@ -1832,6 +1820,8 @@ namespace Gbdx.Gbd
                 var dt = this.CreateDataTable();
                 var responses = new Dictionary<string, Properties>();
 
+                var catIds = new HashSet<string>();
+                var catIdsWithIdahoIds = new HashSet<string>();
                 // go through all the results and add valid rows to the temporary table.
                 foreach (var gbdResponse in resp.Data)
                 {
@@ -1842,144 +1832,87 @@ namespace Gbdx.Gbd
 
                     foreach (var item in gbdResponse.results)
                     {
+                        catIds.Add(item.properties.catalogID);
+
                         ProcessRow(item, dt, responses);
+
+                        if (item.type.Exists(x => x.Equals("IDAHOImage")))
+                        {
+                            catIdsWithIdahoIds.Add(item.properties.catalogID);
+                        }
                     }
                 }
-
+                
                 // Now all the work has been completed so lets do a callback to the main thread to merge it with the existing results.
                 this.Invoke(new DataTableDone(this.UpdateDataTable), dt, responses);
+
+                foreach (var catid in catIdsWithIdahoIds)
+                {
+                    GetAdditionalIdahoInfo(catid);
+                }
             }
         }
 
-        private void ProcessGbdSearchResult(IRestResponse<List<GbdResponse>> resp, string polygon, string authToken)
+        private void ProcessIdahoResultNoAsync(Result item, string catalogId, DataRow row)
+        {
+            var idahoDetails = GetAdditionalIdahoInfoNoAsync(item.properties.catalogID);
+
+            if (idahoDetails[0] != string.Empty)
+            {
+                row["PAN ID"] = idahoDetails[0];
+            }
+            if (idahoDetails[1] != string.Empty)
+            {
+                row["MS ID"] = idahoDetails[1];
+            }
+
+        }
+        
+        private void ProcessIdahoResult(Result item, string catalogId, DataRow row)
+        {
+//            var imageId = item.properties.idahoImageId;
+//            var currentValue = string.Empty;
+              GetAdditionalIdahoInfo(item.properties.catalogID);
+
+
+//            switch (item.properties.colorInterpretation)
+//            {
+//                case "PAN":
+//                    IdahoIdRepo.AddSinglePanId(catalogId, imageId);
+//                    currentValue = row["PAN ID"].ToString();
+//
+//                    if (string.IsNullOrEmpty(currentValue)
+//                        || item.properties.nativeTileFileFormat.Equals("PNG", StringComparison.OrdinalIgnoreCase))
+//                    {
+//                        row["PAN ID"] = imageId;
+//                    }
+//                    break;
+//
+//                case "WORLDVIEW_8_BAND":
+//                case "BGRN":
+//                    IdahoIdRepo.AddSingleMsId(catalogId, imageId);
+//
+//                    currentValue = row["MS ID"].ToString();
+//
+//                    if (string.IsNullOrEmpty(currentValue)
+//                        || item.properties.nativeTileFileFormat.Equals("PNG", StringComparison.OrdinalIgnoreCase))
+//                    {
+//                        row["MS ID"] = imageId;
+//                    }
+//
+//                    break;
+//
+//                // don't do anything if it doesn't match one of those.
+//                default:
+//                    break;
+//            }
+        }
+
+        private void ProcessRow(Result item, DataTable dt, Dictionary<string, Properties> responses)
         {
             try
             {
-                Jarvis.Logger.Info(resp.ResponseUri.ToString());
-            }
-            catch (Exception e)
-            {
-                Jarvis.Logger.Error(e);
-            }
-
-            if (resp.Data != null)
-            {
-                // Create data table in the thread to be mereged later
-                var dt = this.CreateDataTable();
-                var responses = new Dictionary<string, Properties>();
-
-                // go through all the results and add valid rows to the temporary table.
-                foreach (var gbdResponse in resp.Data)
-                {
-                    if (gbdResponse.results == null)
-                    {
-                        continue;
-                    }
-
-                    foreach (var item in gbdResponse.results)
-                    {
-                        ProcessRow(item, dt, responses);
-                    }
-                }
-
-                // Now all the work has been completed so lets do a callback to the main thread to merge it with the existing results.
-                this.Invoke(new DataTableDone(this.UpdateDataTable), dt, responses);
-            }
-        }
-
-        private static void ProcessIdahoResult(Result item, string catalogId, DataRow row)
-        {
-            var imageId = item.properties.imageId;
-            var currentValue = string.Empty;
-
-            switch (item.properties.colorInterpretation)
-            {
-                case "PAN":
-                    IdahoIdRepo.AddSinglePanId(catalogId, imageId);
-                    currentValue = row["PAN ID"].ToString();
-
-                    if (string.IsNullOrEmpty(currentValue)
-                        || item.properties.nativeTileFileFormat.Equals("PNG", StringComparison.OrdinalIgnoreCase))
-                    {
-                        row["PAN ID"] = imageId;
-                    }
-                    break;
-
-                case "WORLDVIEW_8_BAND":
-                case "BGRN":
-                    IdahoIdRepo.AddSingleMsId(catalogId, imageId);
-
-                    currentValue = row["MS ID"].ToString();
-
-                    if (string.IsNullOrEmpty(currentValue)
-                        || item.properties.nativeTileFileFormat.Equals("PNG", StringComparison.OrdinalIgnoreCase))
-                    {
-                        row["MS ID"] = imageId;
-                    }
-
-                    break;
-
-                // don't do anything if it doesn't match one of those.
-                default:
-                    break;
-            }
-        }
-
-        private static void ProcessIdahoResultOld(DataRow row, Result item)
-        {
-            // no need to go further if the row isn't found
-            if (row == null)
-            {
-                return;
-            }
-
-            var imageId = item.properties.imageId;
-
-            // if string doesn't have an imageId, doesn't have a color interp and isn't PNG format move on
-            if (string.IsNullOrEmpty(imageId) || string.IsNullOrEmpty(item.properties.colorInterpretation))
-            {
-                return;
-            }
-
-            // only add the ID's if there currently isn't one or the new ideas are of type PNG
-            if (item.properties.colorInterpretation.Equals("PAN"))
-            {
-                var currentValue = row["PAN ID"].ToString();
-
-                if (string.IsNullOrEmpty(currentValue)
-                    || item.properties.nativeTileFileFormat.Equals("PNG", StringComparison.OrdinalIgnoreCase))
-                {
-                    row["PAN ID"] = imageId;
-                }
-            }
-            else if (item.properties.colorInterpretation.Equals("WORLDVIEW_8_BAND"))
-            {
-                var currentValue = row["MS ID"].ToString();
-
-                if (string.IsNullOrEmpty(currentValue)
-                    || item.properties.nativeTileFileFormat.Equals("PNG", StringComparison.OrdinalIgnoreCase))
-                {
-                    row["MS ID"] = imageId;
-                }
-            }
-        }
-
-        private static void ProcessRow(Result item, DataTable dt, Dictionary<string, Properties> responses)
-        {
-            try
-            {
-                string catalogId = null;
-                if (string.IsNullOrEmpty(item.properties.catalogID))
-                {
-                    if (!string.IsNullOrEmpty(item.properties.vendorDatasetIdentifier3))
-                    {
-                        catalogId = item.properties.vendorDatasetIdentifier3;
-                    }
-                }
-                else
-                {
-                    catalogId = item.properties.catalogID;
-                }
+                string catalogId = item.properties.catalogID;
 
                 // if after checking both 
                 if (string.IsNullOrEmpty(catalogId))
@@ -1987,33 +1920,109 @@ namespace Gbdx.Gbd
                     return;
                 }
 
-                if (item.properties.footprintWkt != null)
-                {
-                    item.properties.Points = GbdJarvis.GetPointsFromWkt(item.properties.footprintWkt);
-                }
-
                 DataRow row;
-                // If the dictionary doesn't have the response lets add it.
-                if (!responses.ContainsKey(catalogId))
-                {
-                    responses.Add(catalogId, item.properties);
+                
+                responses.Add(catalogId, item.properties);
+                row = dt.NewRow();
+                row = CreateNewRow(row, item, catalogId);
+                dt.Rows.Add(row);
+//                if(item.type.Exists(x => x.Equals("IDAHOImage")))
+//                {
+//                    row = dt.Rows.Find(catalogId);
+//                    ProcessIdahoResultNoAsync(item, catalogId, row);
+//                }
 
-                    // setup new row for datatable complete with VALUES!
-                    row = dt.NewRow();
-                    row = CreateNewRow(row, item, catalogId);
-                    dt.Rows.Add(row);
-                }
-                else
-                {
-                    row = dt.Rows.Find(catalogId);
-                    ProcessIdahoResult(item, catalogId, row);
-                }
             }
             catch (Exception error)
             {
                 Jarvis.Logger.Error(error);
             }
         }
+
+        private string[] GetAdditionalIdahoInfoNoAsync(string catalogId)
+        {
+            string pan = string.Empty;
+            string ms = string.Empty;
+
+            var client = new RestClient("https://geobigdata.io");
+            var request = new RestRequest("catalog/v2/search", Method.POST);
+            request.AddHeader("Authorization", "Bearer " + gbdxToken);
+            GbdSearchObject searchObj = new GbdSearchObject();
+            searchObj.types.Add("IDAHOImage");
+            searchObj.filters.Add($"catalogID = {catalogId}");
+            string serializedString = JsonConvert.SerializeObject(searchObj);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
+            Jarvis.Logger.Info("https://geobigdata.io/catalog/v2/search");
+            var resp = client.Execute<GbdResponse>(request);
+
+            if (resp.Data != null)
+            {
+                foreach (var item in resp.Data.results)
+                {
+                    if (item.properties.colorInterpretation.ToLower() == "pan" &&
+                        !string.IsNullOrEmpty(item.properties.idahoImageId))
+                    {
+                        pan = item.properties.idahoImageId;
+                    }
+                    else if ((item.properties.colorInterpretation.ToLower() == "worldview_8_band" ||
+                              item.properties.colorInterpretation.ToLower() == "bgrn") &&
+                             !string.IsNullOrEmpty(item.properties.idahoImageId))
+                    {
+                        ms = item.properties.idahoImageId;
+                    }
+
+                    if (pan != string.Empty && ms != string.Empty)
+                    {
+                        break;
+                    }
+                }
+            }
+            return new[] {pan, ms};
+        }
+
+        private void GetAdditionalIdahoInfo(string catalogId)
+        {
+            string pan = string.Empty;
+            string ms = string.Empty;
+
+            var client = new RestClient("https://geobigdata.io");
+            var request = new RestRequest("catalog/v2/search", Method.POST);
+            request.AddHeader("Authorization", "Bearer " + gbdxToken);
+            GbdSearchObject searchObj = new GbdSearchObject();
+            searchObj.types.Add("IDAHOImage");
+            searchObj.filters.Add($"catalogID = {catalogId}");
+            string serializedString = JsonConvert.SerializeObject(searchObj);
+            request.AddHeader("Content-Type", "application/json");
+            request.AddParameter("application/json", serializedString, ParameterType.RequestBody);
+            Jarvis.Logger.Info("https://geobigdata.io/catalog/v2/search");
+            client.ExecuteAsync<GbdResponse>(request, resp =>
+            {
+                if (resp.Data != null)
+                {
+                    foreach (var item in resp.Data.results)
+                    {
+                        if (item.properties.colorInterpretation.ToLower() == "pan" &&
+                            !string.IsNullOrEmpty(item.properties.idahoImageId))
+                        {
+                            pan = item.properties.idahoImageId;
+                        }
+                        else if ((item.properties.colorInterpretation.ToLower() == "worldview_8_band" ||
+                                  item.properties.colorInterpretation.ToLower() == "bgrn") &&
+                                 !string.IsNullOrEmpty(item.properties.idahoImageId))
+                        {
+                            ms = item.properties.idahoImageId;
+                        }
+
+                        if (pan != string.Empty && ms != string.Empty)
+                        {
+                            this.Invoke(new UpdateIdahoInformation(this.UpdateIdahoInfo), catalogId, pan, ms);
+                        }
+                    }
+                }
+            });
+        }
+
 
         /// <summary>
         ///     The refresh button click.
@@ -2371,6 +2380,42 @@ namespace Gbdx.Gbd
             this.cachedImages.Add(catId, picBox.Image);
         }
 
+
+        private void UpdateIdahoIdRepository(string catId, string[] idahoIds)
+        {
+            
+        }
+
+        private void UpdateIdahoInfo(string catId, string pan, string ms)
+        {
+            foreach (DataRow row in this.localDatatable.Rows)
+            {
+                if (row.ItemArray[3] == catId)
+                {
+                    row.ItemArray[10] = pan;
+                    row.ItemArray[11] = ms;
+
+                }
+            }
+            this.localBindingSource.ResetBindings(false);
+
+//            var record = this.localDatatable.Select($"'Catalog ID' = '{catId}'").FirstOrDefault();
+//            record["MS ID"] = ms;
+//            record["PAN ID"] = pan;
+//            record[0].ItemArray[10] = pan;
+//            record[0].ItemArray[11] = ms;
+
+            //            var results = from myRow in this.localDatatable.AsEnumerable()
+            //                where myRow.Field<string>("Catalog ID") == catId
+            //                select myRow;
+            //
+            //            foreach (var result in results)
+            //            {
+            //                result.ItemArray[10] = pan;
+            //                result.ItemArray[11] = ms;
+            //            }
+        }
+
         /// <summary>
         ///     The update data table.
         /// </summary>
@@ -2386,26 +2431,32 @@ namespace Gbdx.Gbd
             {
                 // Only update the table if we are still allowed to do work.
                 if (!this.okToWork)
-                {
+                {  
                     return;
                 }
                 // need to check the newly added data for duplicates and remove them
                 var index = this.data_grid_view.FirstDisplayedScrollingRowIndex;
                 var horizIndex = this.data_grid_view.FirstDisplayedScrollingColumnIndex;
 
-                this.localDatatable.Merge(dataTobeAdded, true);
+                //this.localDatatable.Merge(dataTobeAdded, true);
 
                 // Add the new responses to the others.
-                this.allResults = this.allResults.Concat(responses)
-                    .GroupBy(d => d.Key)
-                    .ToDictionary(d => d.Key, d => d.First().Value);
+                //this.allResults = this.allResults.Concat(responses)
+                //    .GroupBy(d => d.Key)
+                //    .ToDictionary(d => d.Key, d => d.First().Value);
+
+                this.data_grid_view.AutoGenerateColumns = true;
+                this.localDatatable = dataTobeAdded;
+                this.localBindingSource.ResetBindings(true);
+                this.data_grid_view.Refresh();
+//                this.data_grid_view.DataSource = this.localDatatable;
 
                 if (this.displayAllPolgons)
                 {
                     this.SetAllCheckBoxes(this.displayAllPolgons, this.data_grid_view);
                 }
 
-                this.DrawViewablePolygons();
+                //this.DrawViewablePolygons();
 
                 
 

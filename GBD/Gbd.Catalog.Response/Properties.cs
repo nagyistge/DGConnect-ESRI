@@ -19,146 +19,97 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+// ReSharper disable InconsistentNaming
+
 namespace GBD
 {
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-
     /// <summary>
-    /// The properties.
+    ///     The properties.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Reviewed.")]
-    public partial class Properties
+    public class Properties
     {
-        /// <summary>
-        /// Gets or sets the pan resolution.
-        /// </summary>
-        public string panResolution { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp.
-        /// </summary>
-        public string timestamp { get; set; }
-
-        /// <summary>
-        /// Gets or sets the EPSG code.
-        /// </summary>
-        public string epsgCode { get; set; }
-
-        /// <summary>
-        /// Gets or sets the timestamp WKT (Well Known Text).
-        /// </summary>
-        public string timestampWkt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the cloud cover.
-        /// </summary>
-        public string cloudCover { get; set; }
-
-        /// <summary>
-        /// Gets or sets the browse url.
-        /// </summary>
-        public string browseURL { get; set; }
-
-        /// <summary>
-        /// Gets or sets the path.
-        /// </summary>
-        public string path { get; set; }
-
-        /// <summary>
-        /// Gets or sets the multi resolution.
-        /// </summary>
-        public string multiResolution { get; set; }
-
-        /// <summary>
-        /// Gets or sets the row.
-        /// </summary>
-        public string row { get; set; }
-
-        /// <summary>
-        /// Gets or sets the footprint WKT (Well Known Text).
-        /// </summary>
-        public string footprintWkt { get; set; }
-
-        /// <summary>
-        /// Gets or sets the vendor name.
-        /// </summary>
-        public string vendorName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the catalog id.
-        /// </summary>
-        public string catalogID { get; set; }
-
-        /// <summary>
-        /// Gets or sets the image bands.
-        /// </summary>
-        public string imageBands { get; set; }
-
-        /// <summary>
-        /// Gets or sets the sensor platform name.
-        /// </summary>
-        public string sensorPlatformName { get; set; }
-
-        /// <summary>
-        /// Gets or sets the sun azimuth.
-        /// </summary>
-        public string sunAzimuth { get; set; }
-
-        /// <summary>
-        /// Gets or sets the off nadir angle.
-        /// </summary>
-        public string offNadirAngle { get; set; }
-
-        /// <summary>
-        /// Gets or sets the sun elevation.
-        /// </summary>
-        public string sunElevation { get; set; }
-
-        /// <summary>
-        /// Gets or sets the available.
-        /// </summary>
-        public string available { get; set; }
-
-        /// <summary>
-        /// Gets or sets the ordered.
-        /// </summary>
-        public string ordered { get; set; }
-
-        /// <summary>
-        /// Gets or sets the points.
-        /// </summary>
-        public List<GbdPoint> Points { get; set; }
-
-        public string numXTiles { get; set; }
-        public string tilePartition { get; set; }
-        public string profileName { get; set; }
         public string acquisitionDate { get; set; }
-        public string pniirs { get; set; }
-        public string tileYOffset { get; set; }
-        public string nativeTileFileFormat { get; set; }
-        public string imageBoundsWGS84 { get; set; }
+        public string attFile { get; set; }
+        public string bands { get; set; }
+        public string bandsList { get; set; }
+        public string browseJpgFile { get; set; }
+        public string browseURL { get; set; }
+        public string bucketName { get; set; }
+        public string bucketPrefix { get; set; }
+        public string catalogID { get; set; }
+        public double cloudCover { get; set; }
         public string colorInterpretation { get; set; }
-        public string vendorDatasetIdentifier1 { get; set; }
-        public string vendorDatasetIdentifier2 { get; set; }
-        public string vendorDatasetIdentifier3 { get; set; }
-        public string vendorDatasetIdentifier4 { get; set; }
-        public string tileXSize { get; set; }
-        public string imageWidth { get; set; }
-        public string imageId { get; set; }
-        public string sensorName { get; set; }
-        public string groundSampleDistanceMeters { get; set; }
         public string dataType { get; set; }
-        public string tileYSize { get; set; }
-        public string tileXOffset { get; set; }
+        public string ephFile { get; set; }
+        public string epsgCode { get; set; }
+        public string footprintWkt { get; set; }
+        public string geoFile { get; set; }
+        public double groundSampleDistanceMeters { get; set; }
+        public string idahoImageId { get; set; }
+        public string imageBands { get; set; }
+        public string imageFile { get; set; }
+        public double imageHeight { get; set; }
+        public double imageWidth { get; set; }
+        public string imdFile { get; set; }
+        public double multiResolution { get; set; }
+        public object multiResolution_end { get; set; }
+        public object multiResolution_max { get; set; }
+        public object multiResolution_min { get; set; }
+        public object multiResolution_start { get; set; }
+        public string nativeTileFileFormat { get; set; }
+        public double numBands { get; set; }
+        public double numXTiles { get; set; }
+        public double numYTiles { get; set; }
+        public double offNadirAngle { get; set; }
+        public double offNadirAngle_end { get; set; }
+        public double offNadirAngle_max { get; set; }
+        public double offNadirAngle_min { get; set; }
+        public double offNadirAngle_start { get; set; }
+        public double panResolution { get; set; }
+        public double panResolution_end { get; set; }
+        public double panResolution_max { get; set; }
+        public double panResolution_min { get; set; }
+        public double panResolution_start { get; set; }
+        public double part { get; set; }
+        public double path { get; set; }
+        public string platformName { get; set; }
+        public double pniirs { get; set; }
+        public string productLevel { get; set; }
+        public string profileName { get; set; }
+        public string readmeTxtFile { get; set; }
+        public double resolution { get; set; }
+        public double row { get; set; }
+        public string rpbFile { get; set; }
+        public double satAzimuth { get; set; }
+        public double satElevation { get; set; }
+        public string scanDirection { get; set; }
+        public string sensorName { get; set; }
+        public string sensorPlatformName { get; set; }
+        public string soli { get; set; }
+        public object stereoPair { get; set; }
+        public double sunAzimuth { get; set; }
+        public double sunAzimuth_max { get; set; }
+        public double sunAzimuth_min { get; set; }
+        public double sunElevation { get; set; }
+        public double sunElevation_max { get; set; }
+        public double sunElevation_min { get; set; }
+        public double targetAzimuth { get; set; }
+        public double targetAzimuth_end { get; set; }
+        public double targetAzimuth_max { get; set; }
+        public double targetAzimuth_min { get; set; }
+        public double targetAzimuth_start { get; set; }
         public string tileBucketName { get; set; }
-        public string version { get; set; }
-        public string imageHeight { get; set; }
-        public string numBands { get; set; }
-        public string satAzimuth { get; set; }
+        public string tilePartition { get; set; }
+        public double tileXOffset { get; set; }
+        public double tileXSize { get; set; }
+        public double tileYOffset { get; set; }
+        public double tileYSize { get; set; }
+        public string tilFile { get; set; }
+        public string timestamp { get; set; }
+        public string vendor { get; set; }
         public string vendorDatasetIdentifier { get; set; }
-        public string numYTiles { get; set; }
-        public string satElevation { get; set; }
-        public string imageBucketName { get; set; }
+        public string vendorName { get; set; }
+        public string version { get; set; }
+        public string xmlFile { get; set; }
     }
 }

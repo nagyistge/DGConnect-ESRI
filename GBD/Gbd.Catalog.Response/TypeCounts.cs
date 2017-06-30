@@ -19,6 +19,10 @@
 // </summary>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Diagnostics.Contracts;
+using RestSharp.Deserializers;
+// ReSharper disable InconsistentNaming
+
 namespace GBD
 {
     using System.Diagnostics.CodeAnalysis;
@@ -26,19 +30,18 @@ namespace GBD
     /// <summary>
     /// The type counts.
     /// </summary>
-    [SuppressMessage("StyleCop.CSharp.NamingRules", "SA1300:ElementMustBeginWithUpperCaseLetter", Justification = "Reviewed.")]
     public class TypeCounts
     {
-        /// <summary>
-        /// Gets or sets the digital globe acquisition.
-        /// </summary>
-        public int DigitalGlobeAcquisition { get; set; }
-
-        /// <summary>
-        /// Gets or sets the landsat acquisition.
-        /// </summary>
-        public int LandsatAcquisition { get; set; }
-        
         public int IDAHOImage { get; set; }
+        public int WV03_SWIR { get; set; }
+        public int WV02 { get; set; }
+        public int WV01 { get; set; }
+        public int WV03_VNIR { get; set; }
+        public int GBDXCatalogRecord { get; set; }
+        public int GE01 { get; set; }
+        [DeserializeAs(Name="1BProduct")]
+        public int OneBProduct { get; set; }
+        public int DigitalGlobeProduct { get; set; }
+        public int QB02 { get; set; }
     }
 }

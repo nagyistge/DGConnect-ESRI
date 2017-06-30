@@ -41,7 +41,7 @@ namespace GBD
             this.filters = new List<string>();
             this.tagResults = false;
             this.types = new List<string>();
-            this.limit = 1000;
+            this.limit = 300;
         }
 
         /// <summary>
