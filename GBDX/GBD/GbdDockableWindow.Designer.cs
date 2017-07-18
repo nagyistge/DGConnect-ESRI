@@ -37,9 +37,9 @@
             this.label1 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.toFromDateTimePickerLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.toDateTimePicker = new System.Windows.Forms.DateTimePicker();
+            this.endDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.label6 = new System.Windows.Forms.Label();
-            this.fromDateTimePicker = new System.Windows.Forms.DateTimePicker();
+            this.startDateTimePicker = new System.Windows.Forms.DateTimePicker();
             this.label5 = new System.Windows.Forms.Label();
             this.cloudCoverageComboBox = new System.Windows.Forms.ComboBox();
             this.nadirAngleComboBox = new System.Windows.Forms.ComboBox();
@@ -212,9 +212,9 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.toFromDateTimePickerLayoutPanel.ColumnCount = 1;
             this.toFromDateTimePickerLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.toFromDateTimePickerLayoutPanel.Controls.Add(this.toDateTimePicker, 0, 3);
+            this.toFromDateTimePickerLayoutPanel.Controls.Add(this.endDateTimePicker, 0, 3);
             this.toFromDateTimePickerLayoutPanel.Controls.Add(this.label6, 0, 2);
-            this.toFromDateTimePickerLayoutPanel.Controls.Add(this.fromDateTimePicker, 0, 1);
+            this.toFromDateTimePickerLayoutPanel.Controls.Add(this.startDateTimePicker, 0, 1);
             this.toFromDateTimePickerLayoutPanel.Controls.Add(this.label5, 0, 0);
             this.toFromDateTimePickerLayoutPanel.Location = new System.Drawing.Point(137, 39);
             this.toFromDateTimePickerLayoutPanel.Name = "toFromDateTimePickerLayoutPanel";
@@ -226,18 +226,18 @@
             this.toFromDateTimePickerLayoutPanel.Size = new System.Drawing.Size(135, 126);
             this.toFromDateTimePickerLayoutPanel.TabIndex = 7;
             // 
-            // toDateTimePicker
+            // endDateTimePicker
             // 
-            this.toDateTimePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.endDateTimePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.toDateTimePicker.CustomFormat = "MM\'/\'dd\'/\'yyyy";
-            this.toDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.toDateTimePicker.Location = new System.Drawing.Point(3, 103);
-            this.toDateTimePicker.Name = "toDateTimePicker";
-            this.toDateTimePicker.Size = new System.Drawing.Size(129, 20);
-            this.toDateTimePicker.TabIndex = 1;
-            this.toDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
+            this.endDateTimePicker.CustomFormat = "MM\'/\'dd\'/\'yyyy";
+            this.endDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.endDateTimePicker.Location = new System.Drawing.Point(3, 103);
+            this.endDateTimePicker.Name = "endDateTimePicker";
+            this.endDateTimePicker.Size = new System.Drawing.Size(129, 20);
+            this.endDateTimePicker.TabIndex = 1;
+            this.endDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
             // label6
             // 
@@ -249,19 +249,19 @@
             this.label6.TabIndex = 0;
             this.label6.Text = "To";
             // 
-            // fromDateTimePicker
+            // startDateTimePicker
             // 
-            this.fromDateTimePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.startDateTimePicker.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.fromDateTimePicker.CustomFormat = "MM\'/\'dd\'/\'yyyy";
-            this.fromDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
-            this.fromDateTimePicker.ImeMode = System.Windows.Forms.ImeMode.Disable;
-            this.fromDateTimePicker.Location = new System.Drawing.Point(3, 33);
-            this.fromDateTimePicker.Name = "fromDateTimePicker";
-            this.fromDateTimePicker.Size = new System.Drawing.Size(129, 20);
-            this.fromDateTimePicker.TabIndex = 1;
-            this.fromDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
+            this.startDateTimePicker.CustomFormat = "MM\'/\'dd\'/\'yyyy";
+            this.startDateTimePicker.Format = System.Windows.Forms.DateTimePickerFormat.Custom;
+            this.startDateTimePicker.ImeMode = System.Windows.Forms.ImeMode.Disable;
+            this.startDateTimePicker.Location = new System.Drawing.Point(3, 33);
+            this.startDateTimePicker.Name = "startDateTimePicker";
+            this.startDateTimePicker.Size = new System.Drawing.Size(129, 20);
+            this.startDateTimePicker.TabIndex = 1;
+            this.startDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
             // 
             // label5
             // 
@@ -611,8 +611,8 @@
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TableLayoutPanel toFromDateTimePickerLayoutPanel;
         private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.DateTimePicker fromDateTimePicker;
-        private System.Windows.Forms.DateTimePicker toDateTimePicker;
+        private System.Windows.Forms.DateTimePicker startDateTimePicker;
+        private System.Windows.Forms.DateTimePicker endDateTimePicker;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.ComboBox cloudCoverageComboBox;

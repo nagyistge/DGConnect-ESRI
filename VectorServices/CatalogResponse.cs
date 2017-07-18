@@ -127,4 +127,12 @@ namespace VectorServices
         public Geometry geometry { get; set; }
         public Properties properties { get; set; }
     }
+
+    public class PagingCatalogResponse
+    {
+        public List<CatalogResponse> data { get; set; }
+        public string next_paging_id { get; set; }
+        public string item_count { get; set; }
+        public string total_count { get; set; }  
+    }
 }

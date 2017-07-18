@@ -1,4 +1,8 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using GBD;
+using Newtonsoft.Json;
+
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="GbdJarvisTests.cs" company="DigitalGlobe">
 //   Copyright 2015 DigitalGlobe
 //   
@@ -51,9 +55,17 @@ namespace GBD.Tests
         {
             //var output = GbdJarvis.ConvertWktToEsri(TestResource.wkt);
 
-            var output = GbdJarvis.GetPointsFromWkt(TestResource.wkt);
+//            var output = GbdJarvis.GetPointsFromWkt(TestResource.wkt);
 
-            Assert.IsTrue(output.Count == 21);
+//            Assert.IsTrue(output.Count == 21);
+        }
+
+        [TestMethod()]
+        public void GetWKTPointsTest()
+        {
+            var resp = JsonConvert.DeserializeObject<VectorServices.CatalogResponse>(TestResource.CatalogResponseItem);
+            var result = GbdJarvis.GetWKTPoints(resp.geometry.coordinates);
+            Assert.IsTrue(result.Count == 5 );
         }
     }
 }

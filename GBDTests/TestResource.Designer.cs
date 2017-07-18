@@ -61,11 +61,20 @@ namespace GBDTests {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to POLYGON ((-94.185144 44.041032, -94.106088 44.03556, -94.04532 44.031384, -94.016232 44.029368, -93.932712 44.023608, -93.933288 43.909416, -93.934728 43.717464, -93.935736 43.552152, -93.9366 43.443864, -93.93876 43.130808, -93.939912 42.967368, -94.174776 42.978168, -94.175208 43.026696, -94.176072 43.145928, -94.177368 43.300584, -94.179096 43.4934, -94.181544 43.734888, -94.18212 43.788888, -94.183704 43.933752, -94.184136 43.957512, -94.185144 44.041032)).
+        ///   Looks up a localized string similar to {&quot;type&quot;:&quot;Feature&quot;,&quot;geometry&quot;:{&quot;type&quot;:&quot;MultiPolygon&quot;,&quot;coordinates&quot;:[[[[-90.4631238,38.7247225],[-90.21653602,38.75189523],[-90.21576338,38.63032904],[-90.46341164,38.6024272],[-90.4631238,38.7247225]]]]},&quot;properties&quot;:{&quot;ingest_source&quot;:&quot;GBDX_INGEST_ALPHA&quot;,&quot;access&quot;:{&quot;groups&quot;:[&quot;_ALL_&quot;],&quot;users&quot;:[&quot;_ALL_&quot;]},&quot;item_date&quot;:&quot;2017-06-07T19:52:40.527Z&quot;,&quot;original_crs&quot;:&quot;EPSG:4326&quot;,&quot;item_type&quot;:[&quot;GBDXCatalogRecord&quot;,&quot;IDAHOImage&quot;,&quot;DigitalGlobeProduct&quot;,&quot;WV01&quot;],&quot;format&quot;:null,&quot;ingest_date&quot;:&quot;2017-06-17T22:23:16.989Z&quot;,&quot;source&quot;:null, [rest of string was truncated]&quot;;.
         /// </summary>
-        internal static string wkt {
+        internal static string CatalogResponseItem {
             get {
-                return ResourceManager.GetString("wkt", resourceCulture);
+                return ResourceManager.GetString("CatalogResponseItem", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {&quot;geometry&quot;:{&quot;type&quot;:&quot;MultiPolygon&quot;,&quot;coordinates&quot;:[[[[-90.4631238,38.7247225],[-90.21653602,38.75189523],[-90.21576338,38.63032904],[-90.46341164,38.6024272],[-90.4631238,38.7247225]]]]}}.
+        /// </summary>
+        internal static string geometry {
+            get {
+                return ResourceManager.GetString("geometry", resourceCulture);
             }
         }
     }

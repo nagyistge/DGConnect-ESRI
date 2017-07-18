@@ -103,6 +103,18 @@ namespace GBD
             return points;
         }
 
+        public static List<GbdPoint> GetWKTPoints(List<List<List<List<double>>>> points)
+        {
+            List<GbdPoint> output = new List<GbdPoint>();
+            var pointList = points[0][0];
+
+            foreach (List<Double> coord in pointList)
+            {
+                output.Add(new GbdPoint(coord[0],coord[1]));
+            }
+            return output;
+        }
+
         /// <summary>
         /// Process the row across the large AOI
         /// </summary>

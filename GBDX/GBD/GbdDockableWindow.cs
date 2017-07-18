@@ -13,6 +13,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+using System.Net;
+using VectorServices;
+
 namespace Gbdx.Gbd
 {
     using System;
@@ -69,6 +72,8 @@ namespace Gbdx.Gbd
         private delegate void DataTableDone(DataTable dt, Dictionary<string, Properties> responses);
 
         private delegate void ExecuteAfterResponse(List<GbdOrder> orders);
+
+        private delegate void PageTransferCompleteDelegate(List<List<CatalogResponse>> pages);
 
         /// <summary>
         ///     Callback to update the order status.  Will be fired from a background thread
@@ -131,7 +136,9 @@ namespace Gbdx.Gbd
         /// </summary>
         private readonly DataTable localDatatable;
 
-        private readonly string token;
+        private readonly string token = string.Empty;
+
+        private static AccessToken gbdxAccessToken = null;
 
         private readonly Dictionary<string, string> usedIdahoIds;
 
@@ -207,6 +214,8 @@ namespace Gbdx.Gbd
         /// </summary>
         private object Hook { get; set; }
 
+        
+
         #endregion
 
         /// <summary>
@@ -269,9 +278,9 @@ namespace Gbdx.Gbd
                 dataGridViewColumnMs.CellTemplate = new DataGridViewDisableCheckBoxCell();
             }
             // Set the current DateTime to last year
-            this.fromDateTimePicker.Value = DateTime.Now.AddMonths(-1);
+            this.startDateTimePicker.Value = DateTime.Now.AddMonths(-1);
             this.startTime = DateTime.Now.AddMonths(-1);
-            this.toDateTimePicker.Value = DateTime.Now;
+            this.endDateTimePicker.Value = DateTime.Now;
             this.endTime = DateTime.Now;
 
             this.dataGridView1.CellClick += this.DataGridView1SelectionChanged;
@@ -509,13 +518,13 @@ namespace Gbdx.Gbd
             var temp = (DateTimePicker)sender;
 
             // Check to see which date time picker is being used
-            if (temp.Name == this.fromDateTimePicker.Name)
+            if (temp.Name == this.startDateTimePicker.Name)
             {
-                this.SetDate(ref this.fromDateTimePicker, ref this.startTime);
+                this.SetDate(ref this.startDateTimePicker, ref this.startTime);
             }
             else
             {
-                this.SetDate(ref this.toDateTimePicker, ref this.endTime);
+                this.SetDate(ref this.endDateTimePicker, ref this.endTime);
             }
         }
 
@@ -1247,7 +1256,7 @@ namespace Gbdx.Gbd
             newFilter += this.NadirAngleFilterSetup(newFilter);
             newFilter += this.SunElevationFilterSetup(newFilter);
             newFilter += this.PanResolutionFilterSetup(newFilter);
-            newFilter += AcquiredDateFilterSetup(newFilter, this.fromDateTimePicker, this.toDateTimePicker);
+            newFilter += AcquiredDateFilterSetup(newFilter, this.startDateTimePicker, this.endDateTimePicker);
             newFilter += this.IdahoIdOnlyFilterSetup(newFilter);
             newFilter = CatalogIdFilter(newFilter, this.catalogIdSearchTextBox.Text);
 
@@ -1307,6 +1316,12 @@ namespace Gbdx.Gbd
 
         private static string GetAccessToken(string apiKey, string username, string password)
         {
+
+            if (gbdxAccessToken != null)
+            {
+                return gbdxAccessToken.access_token;
+            }
+
             var tok = string.Empty;
 
             var restClient = new RestClient("https://geobigdata.io");
@@ -1324,7 +1339,7 @@ namespace Gbdx.Gbd
             {
                 tok = response.Data.access_token;
             }
-
+            gbdxAccessToken = response.Data;
             return tok;
         }
 
@@ -1359,6 +1374,180 @@ namespace Gbdx.Gbd
                 restClient.ExecuteAsync<List<GbdResponse>>(
                     request,
                     resp => this.ProcessGbdSearchResult(resp, polygon1.ToString(), this.token));
+            }
+        }
+
+        private void GetGbdData2(string geojson)
+        {
+            this.okToWork = true;
+            var restClient = new RestClient("https://vector.geobigdata.io");
+            var startDate = this.startDateTimePicker.Value.ToString("yyyy-MM-dd");
+            var endDate = this.endDateTimePicker.Value.ToString("yyyy-MM-dd");
+            var date = $"item_date:[{startDate} TO {endDate}]";
+            var request = new RestRequest("/insight-vector/api/index/query/vector-gbdx-alpha-catalog-v2*/paging?q=item_date:[now-1M TO now]", Method.POST);
+            
+            request.RequestFormat = DataFormat.Json;
+            request.Parameters.Clear();
+            request.AddParameter("applicaton/json", geojson.Replace("\\",""), ParameterType.RequestBody);
+            request.AddHeader("Authorization", $"Bearer {this.token}");
+            request.AddHeader("Content-Type", "application/json");
+            
+            
+//            request.AddQueryParameter("q", $"item_date:[now-1M TO now]");
+//            request.AddQueryParameter("q", $"item_date:[{startDate} TO {endDate}]");
+//            request.AddQueryParameter("ttl", "10");
+//            request.AddQueryParameter("count", "100");
+//            restClient.ExecuteAsync<PagingCatalogResponse>(request, resp => this.CatalogDataPaging(resp));
+            var response = restClient.Execute(request);
+            Jarvis.Logger.Info(response.ResponseUri.AbsoluteUri);
+        }
+
+        //handles the paging of data.  Once all of the data has been collected it will sift through the pages to create the view dataset
+        private void CatalogDataPaging(IRestResponse<PagingCatalogResponse> response, int attempts = 0,  int currentCount = 0, List<List<CatalogResponse>> currentPages = null )
+        {
+            if (response == null)
+            {
+                return;
+            }
+            Jarvis.Logger.Info(response.ResponseUri.ToString());
+            var restClient = new RestClient("https://vector.geobigdata.io");
+
+            // error checking in case we have a problem during process
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                // five attempts then stop
+                if(attempts < 5)
+                {
+                    attempts += 1;
+                    restClient.ExecuteAsync<PagingCatalogResponse>(response.Request,
+                        resp => this.CatalogDataPaging(resp, attempts, currentCount, currentPages));
+                }
+                return;
+            }
+            else
+            {
+                if (currentPages == null)
+                {
+                    currentPages = new List<List<CatalogResponse>>();
+                }
+
+                var pageCount = Convert.ToInt32(response.Data.item_count);
+                if (pageCount > 0)
+                {
+                    currentPages.Add(response.Data.data);
+                    currentCount += pageCount;
+                    attempts = 0;
+                    var request = new RestRequest("/insight-vector/api/vectors/paging", Method.POST);
+                    request.AddHeader("Authorization", $"Bearer {gbdxAccessToken.access_token}");
+                    request.AddHeader("Content-Type", "application/json");
+                    request.AddParameter("ttl", "5m");
+                    request.AddParameter("pagingId", response.Data.next_paging_id);
+
+                    restClient.ExecuteAsync<PagingCatalogResponse>(request,
+                        resp => this.CatalogDataPaging(resp, attempts, currentCount, currentPages));
+                }
+                else // all pages have been received
+                {
+                    this.Invoke(new PageTransferCompleteDelegate(this.ProcessPages), currentPages);
+                }
+            }
+        }
+
+        private void ProcessPages(List<List<CatalogResponse>> pages)
+        {
+            
+        }
+
+
+        private void ProcessVectorServicesResult(IRestResponse<List<CatalogResponse>> resp)
+        {
+            try
+            {
+                Jarvis.Logger.Info(resp.ResponseUri.ToString());
+                if (resp.Data != null)
+                {
+                    var dt = this.CreateDataTable();
+                    var responses = new Dictionary<string, Properties>();
+
+                    // Start going through the responses
+                    foreach (var item in resp.Data)
+                    {
+                        ProcessCatalogItem(item, dt);
+                    }
+                }
+            }
+            catch (Exception error)
+            {
+                Jarvis.Logger.Error(error);
+            }
+        }
+
+        private void ProcessCatalogItem(CatalogResponse item, DataTable dataTable)
+        {
+            string catalogId = item.properties.attributes.catalogID;
+
+            // check to see if the catalog id is blank.  If it is then discard
+            if (string.IsNullOrEmpty(catalogId))
+            {
+                return;
+            }
+
+            var footprint = GbdJarvis.GetWKTPoints(item.geometry.coordinates);
+            DataRow row;
+
+            if ((row = dataTable.Rows.Find(catalogId)) != null)
+            {
+
+                if (item.properties.item_type.Contains("IDAHOImage"))
+                {
+                    IdahoImageRowHandler(item, row);
+                }
+            }
+            else
+            {
+                row = dataTable.NewRow();
+                if (!string.IsNullOrEmpty(item.properties.attributes.sensorPlatformName))
+                {
+                    row["Sensor"] = item.properties.attributes.sensorPlatformName;
+                }
+
+                if (!string.IsNullOrEmpty(item.properties.item_date))
+                {
+                    row["Acquired"] = Convert.ToDateTime(item.properties.item_date);
+                }
+                row["Cloud Cover"] = item.properties.attributes.cloudCover_int;
+                row["Off Nadir Angle"] = item.properties.attributes.offNadirAngle_dbl;
+                row["Sun Elevation"] = item.properties.attributes.sunAzimuth_dbl;
+                row["Pan Resolution"] = item.properties.attributes.panResolution_dbl;
+
+                // Check to see if a idaho image type tag is associated with the record
+                if (item.properties.item_type.Contains("IDAHOImage"))
+                {
+                    IdahoImageRowHandler(item, row);
+                }
+            }
+        }
+
+        private static void IdahoImageRowHandler(CatalogResponse item, DataRow row)
+        {
+            switch (item.properties.attributes.colorInterpretation.ToUpper())
+            {
+                case "PAN":
+                    if (!string.IsNullOrEmpty(item.properties.attributes.idahoImageId))
+                    {
+                        IdahoIdRepo.AddSinglePanId(item.properties.attributes.catalogID,item.properties.attributes.idahoImageId);
+                        row["PAN ID"] = item.properties.attributes.idahoImageId;
+                    }
+                    break;
+
+                case "WORLDVIEW_8_BAND":
+                case "BGRN":
+                    IdahoIdRepo.AddSingleMsId(item.properties.attributes.catalogID, item.properties.attributes.idahoImageId);
+                    if (!string.IsNullOrEmpty(item.properties.attributes.idahoImageId))
+                    {
+                        row["MS ID"] = item.properties.attributes.idahoImageId;
+                    }
+                    break;
             }
         }
 
@@ -1513,7 +1702,8 @@ namespace Gbdx.Gbd
             }
 
             // Login has been completed so lets proceed with the next set of network calls.
-            this.GetGbdData(output);
+//            this.GetGbdData(output);
+              this.GetGbdData2(Jarvis.ConvertPolygonsGeoJson(poly));
         }
 
         /// <summary>

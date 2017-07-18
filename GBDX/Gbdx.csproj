@@ -327,6 +327,10 @@
       <Project>{F3BB8B18-B4E2-42D1-8E46-F09C13F41465}</Project>
       <Name>NetworkConnections</Name>
     </ProjectReference>
+    <ProjectReference Include="..\VectorServices\VectorServices.csproj">
+      <Project>{f837f6ca-15fd-4c27-800f-d4429b07c1a4}</Project>
+      <Name>VectorServices</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <AddInContent Include="Images\VectorIndex.png" />
