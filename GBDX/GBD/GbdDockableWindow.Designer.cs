@@ -237,7 +237,7 @@
             this.endDateTimePicker.Name = "endDateTimePicker";
             this.endDateTimePicker.Size = new System.Drawing.Size(129, 20);
             this.endDateTimePicker.TabIndex = 1;
-            this.endDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
+            this.endDateTimePicker.ValueChanged += new System.EventHandler(this.DateChange);
             // 
             // label6
             // 
@@ -261,7 +261,7 @@
             this.startDateTimePicker.Name = "startDateTimePicker";
             this.startDateTimePicker.Size = new System.Drawing.Size(129, 20);
             this.startDateTimePicker.TabIndex = 1;
-            this.startDateTimePicker.ValueChanged += new System.EventHandler(this.ComboBoxSelectedIndexChanged);
+            this.startDateTimePicker.ValueChanged += new System.EventHandler(this.DateChange);
             // 
             // label5
             // 

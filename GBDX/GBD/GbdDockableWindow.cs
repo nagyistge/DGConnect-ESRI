@@ -14,6 +14,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 using System.Net;
+using System.Runtime.Serialization.Formatters.Binary;
 using VectorServices;
 
 namespace Gbdx.Gbd
@@ -75,6 +76,8 @@ namespace Gbdx.Gbd
 
         private delegate void PageTransferCompleteDelegate(List<List<CatalogResponse>> pages);
 
+        private delegate void DingDataTableDone(DataTable newlyCreatedDataTable);
+
         /// <summary>
         ///     Callback to update the order status.  Will be fired from a background thread
         /// </summary>
@@ -113,7 +116,7 @@ namespace Gbdx.Gbd
         /// <summary>
         ///     the data view that the data grid view is using as a data source.
         /// </summary>
-        private readonly DataView dataView;
+        private DataView dataView;
 
         /// <summary>
         ///     Determines if all polygons should be displayed
@@ -214,7 +217,9 @@ namespace Gbdx.Gbd
         /// </summary>
         private object Hook { get; set; }
 
-        
+        private static Guid StateGuid { get; set; }
+
+        private System.Windows.Forms.Timer dateClickTimer;
 
         #endregion
 
@@ -712,6 +717,63 @@ namespace Gbdx.Gbd
             }
 
             return output;
+        }
+
+        /// <summary>
+        /// When the user changes the date UI elements trigger a re-acquring of the data within the respective dates.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void DateChange(object sender, EventArgs e)
+        {
+            if (this.localPolygon == null)
+            {
+                return;
+            }
+
+
+            StateGuid = Guid.NewGuid();
+            var localCopy = DeepCopy<Guid>(StateGuid);
+
+            if (this.dateClickTimer != null && this.dateClickTimer.Enabled)
+            {
+                this.dateClickTimer.Stop();
+            }
+
+            // reset timer
+            this.dateClickTimer = new System.Windows.Forms.Timer {Interval = 3000};
+            this.dateClickTimer.Tick += new EventHandler(this.FireRequest);
+            this.dateClickTimer.Start();
+            
+
+
+            
+        }
+
+        private void FireRequest(object sender, System.EventArgs e)
+        {
+            this.dateClickTimer.Stop();
+            this.dateClickTimer = null;
+
+            this.GetGbdData2(Jarvis.ConvertPolygonsGeoJson(this.localPolygon));
+        }
+
+        /// <summary>
+        /// Deep Copy utility method.  Can make a deep copy of any object as long as it are serializable
+        /// </summary>
+        /// <typeparam name="T">Type of object to be copied</typeparam>
+        /// <param name="obj">Object being copied</param>
+        /// <returns>A deep copied object of the target class and values contained in the target object.</returns>
+        public static T DeepCopy<T>(T obj)
+        {
+            using (MemoryStream stream = new MemoryStream())
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                formatter.Serialize(stream, obj);
+                stream.Position = 0;
+
+                return (T)formatter.Deserialize(stream);
+            }
         }
 
         /// <summary>
@@ -1379,27 +1441,22 @@ namespace Gbdx.Gbd
 
         private void GetGbdData2(string geojson)
         {
+            this.localDatatable.Clear();
             this.okToWork = true;
             var restClient = new RestClient("https://vector.geobigdata.io");
             var startDate = this.startDateTimePicker.Value.ToString("yyyy-MM-dd");
             var endDate = this.endDateTimePicker.Value.ToString("yyyy-MM-dd");
             var date = $"item_date:[{startDate} TO {endDate}]";
-            var request = new RestRequest("/insight-vector/api/index/query/vector-gbdx-alpha-catalog-v2*/paging?q=item_date:[now-1M TO now]", Method.POST);
-            
-            request.RequestFormat = DataFormat.Json;
+            var request =
+                new RestRequest(
+                    $"/insight-vector/api/index/query/vector-gbdx-alpha-catalog-v2-2017/paging?q={date}",
+                    Method.POST) {RequestFormat = DataFormat.Json};
+
             request.Parameters.Clear();
-            request.AddParameter("applicaton/json", geojson.Replace("\\",""), ParameterType.RequestBody);
+            request.AddParameter("application/json", geojson, ParameterType.RequestBody);
             request.AddHeader("Authorization", $"Bearer {this.token}");
             request.AddHeader("Content-Type", "application/json");
-            
-            
-//            request.AddQueryParameter("q", $"item_date:[now-1M TO now]");
-//            request.AddQueryParameter("q", $"item_date:[{startDate} TO {endDate}]");
-//            request.AddQueryParameter("ttl", "10");
-//            request.AddQueryParameter("count", "100");
-//            restClient.ExecuteAsync<PagingCatalogResponse>(request, resp => this.CatalogDataPaging(resp));
-            var response = restClient.Execute(request);
-            Jarvis.Logger.Info(response.ResponseUri.AbsoluteUri);
+            restClient.ExecuteAsync<PagingCatalogResponse>(request, resp => this.CatalogDataPaging(resp));
         }
 
         //handles the paging of data.  Once all of the data has been collected it will sift through the pages to create the view dataset
@@ -1455,9 +1512,73 @@ namespace Gbdx.Gbd
 
         private void ProcessPages(List<List<CatalogResponse>> pages)
         {
-            
+
+            var dataTable = this.CreateDataTable();
+
+            foreach (var page in pages)
+            {
+                foreach (var item in page)
+                {
+                    string catalogId = item.properties.attributes.catalogID;
+                    if (string.IsNullOrEmpty(catalogId))
+                    {
+                        continue;
+                    }
+
+                    var footprint = GbdJarvis.GetWKTPoints(item.geometry.coordinates);
+                    DataRow row;
+                    if ((row = dataTable.Rows.Find(catalogId)) != null)
+                    {
+                        if (item.properties.item_type.Contains("IDAHOImage"))
+                        {
+                            IdahoImageRowHandler(item, row);
+                        }
+                    }
+                    else
+                    {
+                        row = dataTable.NewRow();
+                        row["Catalog ID"] = catalogId;
+                        if (!string.IsNullOrEmpty(item.properties.attributes.sensorPlatformName))
+                        {
+                            row["Sensor"] = item.properties.attributes.sensorPlatformName;
+                        }
+
+                        if (!string.IsNullOrEmpty(item.properties.item_date))
+                        {
+                            row["Acquired"] = Convert.ToDateTime(item.properties.item_date);
+                        }
+                        if (item.properties.attributes.cloudCover_int == null ||
+                            item.properties.attributes.offNadirAngle_dbl == null ||
+                            item.properties.attributes.sunAzimuth_dbl == null ||
+                            item.properties.attributes.panResolution_dbl == null)
+                        {
+                            continue;
+                        }
+
+                        row["Cloud Cover"] = item.properties.attributes.cloudCover_int;
+                        row["Off Nadir Angle"] = item.properties.attributes.offNadirAngle_dbl;
+                        row["Sun Elevation"] = item.properties.attributes.sunAzimuth_dbl;
+                        row["Pan Resolution"] = item.properties.attributes.panResolution_dbl;
+
+                        // Check to see if a idaho image type tag is associated with the record
+                        if (item.properties.item_type.Contains("IDAHOImage"))
+                        {
+                            IdahoImageRowHandler(item, row);
+                        }
+
+                        dataTable.Rows.Add(row);
+                    }
+                }
+            }
+
+            this.Invoke(new DingDataTableDone(this.DisplayNewDataTable), dataTable);
         }
 
+        private void DisplayNewDataTable(DataTable data)
+        {
+            this.localDatatable.Clear();
+            this.localDatatable.Merge(data, true);
+        }
 
         private void ProcessVectorServicesResult(IRestResponse<List<CatalogResponse>> resp)
         {
@@ -1703,7 +1824,7 @@ namespace Gbdx.Gbd
 
             // Login has been completed so lets proceed with the next set of network calls.
 //            this.GetGbdData(output);
-              this.GetGbdData2(Jarvis.ConvertPolygonsGeoJson(poly));
+              this.GetGbdData2(Jarvis.ConvertPolygonsGeoJson(this.localPolygon));
         }
 
         /// <summary>
