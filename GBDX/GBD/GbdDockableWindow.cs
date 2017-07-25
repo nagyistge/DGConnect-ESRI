@@ -732,8 +732,7 @@ namespace Gbdx.Gbd
             }
 
 
-            StateGuid = Guid.NewGuid();
-            var localCopy = DeepCopy<Guid>(StateGuid);
+            
 
             if (this.dateClickTimer != null && this.dateClickTimer.Enabled)
             {
@@ -1418,7 +1417,7 @@ namespace Gbdx.Gbd
 
             var restClient = new RestClient("https://geobigdata.io");
 
-            foreach (var polygon in polygons)
+            foreach (var polygon in polygons)  
             {
                 var request = new RestRequest(Settings.Default.GbdSearchPath, Method.POST);
                 request.AddHeader("Authorization", "Bearer " + this.token);
@@ -1443,6 +1442,7 @@ namespace Gbdx.Gbd
         {
             this.localDatatable.Clear();
             this.okToWork = true;
+            StateGuid = Guid.NewGuid();
             var restClient = new RestClient("https://vector.geobigdata.io");
             var startDate = this.startDateTimePicker.Value.ToString("yyyy-MM-dd");
             var endDate = this.endDateTimePicker.Value.ToString("yyyy-MM-dd");
@@ -1456,13 +1456,13 @@ namespace Gbdx.Gbd
             request.AddParameter("application/json", geojson, ParameterType.RequestBody);
             request.AddHeader("Authorization", $"Bearer {this.token}");
             request.AddHeader("Content-Type", "application/json");
-            restClient.ExecuteAsync<PagingCatalogResponse>(request, resp => this.CatalogDataPaging(resp));
+            restClient.ExecuteAsync<PagingCatalogResponse>(request, resp => this.CatalogDataPaging(resp, StateGuid));
         }
 
         //handles the paging of data.  Once all of the data has been collected it will sift through the pages to create the view dataset
-        private void CatalogDataPaging(IRestResponse<PagingCatalogResponse> response, int attempts = 0,  int currentCount = 0, List<List<CatalogResponse>> currentPages = null )
+        private void CatalogDataPaging(IRestResponse<PagingCatalogResponse> response, Guid state, int attempts = 0,  int currentCount = 0, List<List<CatalogResponse>> currentPages = null )
         {
-            if (response == null)
+            if (response == null || state != StateGuid)
             {
                 return;
             }
@@ -1477,7 +1477,7 @@ namespace Gbdx.Gbd
                 {
                     attempts += 1;
                     restClient.ExecuteAsync<PagingCatalogResponse>(response.Request,
-                        resp => this.CatalogDataPaging(resp, attempts, currentCount, currentPages));
+                        resp => this.CatalogDataPaging(resp, state, attempts, currentCount, currentPages));
                 }
                 return;
             }
@@ -1501,7 +1501,7 @@ namespace Gbdx.Gbd
                     request.AddParameter("pagingId", response.Data.next_paging_id);
 
                     restClient.ExecuteAsync<PagingCatalogResponse>(request,
-                        resp => this.CatalogDataPaging(resp, attempts, currentCount, currentPages));
+                        resp => this.CatalogDataPaging(resp, state, attempts, currentCount, currentPages));
                 }
                 else // all pages have been received
                 {
