@@ -76,7 +76,7 @@ namespace Gbdx.Gbd
 
         private delegate void PageTransferCompleteDelegate(List<List<CatalogResponse>> pages);
 
-        private delegate void DingDataTableDone(DataTable newlyCreatedDataTable);
+        private delegate void DingDataTableDone(DataTable newlyCreatedDataTable, Dictionary<string, List<GbdPoint>> footprints);
 
         /// <summary>
         ///     Callback to update the order status.  Will be fired from a background thread
@@ -221,6 +221,10 @@ namespace Gbdx.Gbd
 
         private System.Windows.Forms.Timer dateClickTimer;
 
+        /// <summary>
+        /// Dictionary of footprints for displaying the outline of image strip.
+        /// </summary>
+        private Dictionary<string, List<GbdPoint>> FootPrintsDictionary;
         #endregion
 
         /// <summary>
@@ -731,9 +735,6 @@ namespace Gbdx.Gbd
                 return;
             }
 
-
-            
-
             if (this.dateClickTimer != null && this.dateClickTimer.Enabled)
             {
                 this.dateClickTimer.Stop();
@@ -743,10 +744,6 @@ namespace Gbdx.Gbd
             this.dateClickTimer = new System.Windows.Forms.Timer {Interval = 3000};
             this.dateClickTimer.Tick += new EventHandler(this.FireRequest);
             this.dateClickTimer.Start();
-            
-
-
-            
         }
 
         private void FireRequest(object sender, System.EventArgs e)
@@ -913,12 +910,12 @@ namespace Gbdx.Gbd
                     {
                         var catId = formattedValue.ToString();
 
-                        if (!this.allResults.ContainsKey(catId))
+                        if (!this.FootPrintsDictionary.ContainsKey(catId))
                         {
                             return;
                         }
 
-                        var item = this.allResults[catId];
+                        var item = this.FootPrintsDictionary[catId];
 
                         var graphicsContainer = ArcMap.Document.ActiveView.FocusMap as IGraphicsContainer;
 
@@ -1050,7 +1047,7 @@ namespace Gbdx.Gbd
                     var drawable = (bool)row.Cells["Selected"].Value;
                     if (drawable)
                     {
-                        var itemToDraw = this.allResults[catId];
+                        var itemToDraw = this.FootPrintsDictionary[catId];
                         this.DrawPoly(itemToDraw, graphicsContainer);
                     }
                 }
@@ -1072,11 +1069,11 @@ namespace Gbdx.Gbd
         /// <param name="graphicContainer">
         ///     The graphic container.
         /// </param>
-        private void DrawPoly(Properties polyToBeDrawn, IGraphicsContainer graphicContainer)
+        private void DrawPoly(List<GbdPoint> polyToBeDrawn, IGraphicsContainer graphicContainer)
         {
             var poly = new PolygonClass();
             poly.Project(ArcMap.Document.ActiveView.Extent.SpatialReference);
-            foreach (var pnt in polyToBeDrawn.Points)
+            foreach (var pnt in polyToBeDrawn)
             {
                 var tempPoint = new PointClass();
                 tempPoint.PutCoords(pnt.X, pnt.Y);
@@ -1119,12 +1116,12 @@ namespace Gbdx.Gbd
                     {
                         var catId = formattedValue.ToString();
 
-                        if (!this.allResults.ContainsKey(catId))
+                        if (!this.FootPrintsDictionary.ContainsKey(catId))
                         {
                             continue;
                         }
 
-                        var item = this.allResults[catId];
+                        var item = this.FootPrintsDictionary[catId];
 
                         // Draw the polygon
                         this.DrawPoly(item, graphicsContainer);
@@ -1510,8 +1507,16 @@ namespace Gbdx.Gbd
             }
         }
 
+        private void DisplayProgressBar()
+        {
+            ProgressBar progBar = new ProgressBar();
+            progBar.Anchor = (AnchorStyles.Right | AnchorStyles.Left | AnchorStyles.Bottom | AnchorStyles.Top);
+            this.mainTableLayout.Controls.Add(progBar,1,0);
+        }
+
         private void ProcessPages(List<List<CatalogResponse>> pages)
         {
+            var footprintDictionary = new Dictionary<string, List<GbdPoint>>();
 
             var dataTable = this.CreateDataTable();
 
@@ -1525,7 +1530,12 @@ namespace Gbdx.Gbd
                         continue;
                     }
 
-                    var footprint = GbdJarvis.GetWKTPoints(item.geometry.coordinates);
+                    List<GbdPoint> footprint = GbdJarvis.GetWKTPoints(item.geometry.coordinates);
+                    if (!footprintDictionary.ContainsKey(catalogId) && footprint != null)
+                    {
+                        footprintDictionary.Add(catalogId, footprint);
+                    }
+
                     DataRow row;
                     if ((row = dataTable.Rows.Find(catalogId)) != null)
                     {
@@ -1571,13 +1581,16 @@ namespace Gbdx.Gbd
                 }
             }
 
-            this.Invoke(new DingDataTableDone(this.DisplayNewDataTable), dataTable);
+            this.Invoke(new DingDataTableDone(this.DisplayNewDataTable), dataTable, footprintDictionary);
         }
 
-        private void DisplayNewDataTable(DataTable data)
+        private void DisplayNewDataTable(DataTable data, Dictionary<string, List<GbdPoint>> footprints)
         {
+            this.FootPrintsDictionary = null;
+            this.FootPrintsDictionary = footprints;
             this.localDatatable.Clear();
             this.localDatatable.Merge(data, true);
+            this.UpdateSelectedAndTotalLabels();
         }
 
         private void ProcessVectorServicesResult(IRestResponse<List<CatalogResponse>> resp)
